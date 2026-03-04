@@ -180,9 +180,10 @@ def _merge_custom_items() -> None:
         listing: list = json.load(f)
 
     # Существующие data-пути для быстрой проверки дубликатов
-    existing_paths = {entry.get("data", "") for entry in listing}
+    existing_paths = {entry.get("data", ""): i for i, entry in enumerate(listing)}
 
     added = 0
+    updated = 0
     for ci in custom_items:
         listing_entry = ci.get("listing", {})
         detail = ci.get("detail", {})
@@ -191,10 +192,19 @@ def _merge_custom_items() -> None:
         if not data_path:
             continue
 
-        # Добавляем в listing если ещё нет
+        # Добавляем в listing если ещё нет, или обновляем icon
         if data_path not in existing_paths:
             listing.append(listing_entry)
-            existing_paths.add(data_path)
+            existing_paths[data_path] = len(listing) - 1
+            added += 1
+        else:
+            # Обновляем icon если он появился
+            idx = existing_paths[data_path]
+            new_icon = listing_entry.get("icon", "")
+            old_icon = listing[idx].get("icon", "")
+            if new_icon and new_icon != old_icon:
+                listing[idx]["icon"] = new_icon
+                updated += 1
 
         # Создаём JSON-файл предмета
         if detail:
@@ -211,6 +221,8 @@ def _merge_custom_items() -> None:
 
     if added:
         logger.info("📝 Добавлено %d кастомных предметов в базу", added)
+    if updated:
+        logger.info("🔄 Обновлено %d иконок в listing.json", updated)
 
 
 async def update_game_database(force: bool = False) -> bool:

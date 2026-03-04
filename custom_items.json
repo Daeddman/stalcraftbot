@@ -4,7 +4,7 @@
     {
       "listing": {
         "data": "/items/other/cpe1d8xz.json",
-        "icon": "",
+        "icon": "/icons/other/useful/cpe1d8xz.png",
         "name": {
           "type": "translation",
           "key": "item.season_pass.bp_token_50bl.name",
@@ -88,12 +88,13 @@
             ]
           }
         ]
-      }
+      },
+      "_wiki_category": "other/useful"
     },
     {
       "listing": {
         "data": "/items/other/8AjTFOVB.json",
-        "icon": "",
+        "icon": "/icons/other/useful/8AjTFOVB.png",
         "name": {
           "type": "translation",
           "key": "item.season_pass.bp_token.name",
@@ -177,12 +178,13 @@
             ]
           }
         ]
-      }
+      },
+      "_wiki_category": "other/useful"
     },
     {
       "listing": {
         "data": "/items/other/kJD59qaP.json",
-        "icon": "",
+        "icon": "/icons/other/useful/kJD59qaP.png",
         "name": {
           "type": "translation",
           "key": "item.season_pass.bp_token_20bl.name",
@@ -266,12 +268,13 @@
             ]
           }
         ]
-      }
+      },
+      "_wiki_category": "other/useful"
     },
     {
       "listing": {
         "data": "/items/armor/AwYf0Jgw.json",
-        "icon": "",
+        "icon": "/icons/armor/AwYf0Jgw.png",
         "name": {
           "key": "item.arm.hunter_donate.name",
           "type": "translation",
@@ -301,12 +304,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "armor"
     },
     {
       "listing": {
         "data": "/items/armor/1rk6g.json",
-        "icon": "",
+        "icon": "/icons/armor/clothes/1rk6g.png",
         "name": {
           "key": "item.arm.kyrtka_bandit.name",
           "args": {},
@@ -342,12 +346,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "armor/clothes"
     },
     {
       "listing": {
         "data": "/items/armor/5lrg1.json",
-        "icon": "",
+        "icon": "/icons/armor/combined/5lrg1.png",
         "name": {
           "key": "item.arm.pahan.name",
           "args": {},
@@ -381,12 +386,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "armor/combined"
     },
     {
       "listing": {
         "data": "/items/artefact/azq5t9so.json",
-        "icon": "",
+        "icon": "/icons/artefact/other_arts/azq5t9so.png",
         "name": {
           "key": "item.artefact.other_arts.regalia",
           "type": "translation",
@@ -416,12 +422,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "artefact/other_arts"
     },
     {
       "listing": {
         "data": "/items/attachment/OWTWndYE.json",
-        "icon": "",
+        "icon": "/icons/attachment/handgrips/OWTWndYE.png",
         "name": {
           "key": "item.att.handgrip_ang4_f.name",
           "type": "translation",
@@ -451,12 +458,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "attachment/handgrips"
     },
     {
       "listing": {
         "data": "/items/attachment/96jyz.json",
-        "icon": "",
+        "icon": "/icons/attachment/accessory/96jyz.png",
         "name": {
           "key": "item.24100.name",
           "args": {},
@@ -490,12 +498,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "attachment/accessory"
     },
     {
       "listing": {
         "data": "/items/attachment/7zXQwlAx.json",
-        "icon": "",
+        "icon": "/icons/attachment/handgrips/7zXQwlAx.png",
         "name": {
           "key": "item.att.handgrip_magpul_f.name",
           "type": "translation",
@@ -525,12 +534,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "attachment/handgrips"
     },
     {
       "listing": {
         "data": "/items/attachment/ly4ok.json",
-        "icon": "",
+        "icon": "/icons/attachment/forend/ly4ok.png",
         "name": {
           "key": "item.att.forend_saiga.name",
           "args": {},
@@ -568,12 +578,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "attachment/forend"
     },
     {
       "listing": {
         "data": "/items/attachment/3gp95.json",
-        "icon": "",
+        "icon": "/icons/attachment/mag/3gp95.png",
         "name": {
           "key": "item.att.mag_mc55810.name",
           "args": {},
@@ -609,12 +620,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "attachment/mag"
     },
     {
       "listing": {
         "data": "/items/backpacks/qOGG3q1d.json",
-        "icon": "",
+        "icon": "/icons/backpacks/qOGG3q1d.png",
         "name": {
           "key": "item.16127.name",
           "type": "translation",
@@ -644,12 +656,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "backpacks"
     },
     {
       "listing": {
         "data": "/items/backpacks/pQEt3XNY.json",
-        "icon": "",
+        "icon": "/icons/backpacks/pQEt3XNY.png",
         "name": {
           "key": "go.tournament_camp_respawn.name",
           "type": "translation",
@@ -679,12 +692,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "backpacks"
     },
     {
       "listing": {
         "data": "/items/consumables/1vWBpuz7.json",
-        "icon": "",
+        "icon": "/icons/consumables/bullet/1vWBpuz7.png",
         "name": {
           "key": "item.bag.762snp.name",
           "type": "translation",
@@ -714,12 +728,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/bullet"
     },
     {
       "listing": {
         "data": "/items/consumables/DLWlR7S8.json",
-        "icon": "",
+        "icon": "/icons/consumables/bullet/DLWlR7S8.png",
         "name": {
           "key": "item.crate.box_ammo_spb939.name",
           "type": "translation",
@@ -749,12 +764,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/bullet"
     },
     {
       "listing": {
         "data": "/items/consumables/dsxs222x.json",
-        "icon": "",
+        "icon": "/icons/consumables/grenade/dsxs222x.png",
         "name": {
           "key": "item.exp.snowstorm.name",
           "type": "translation",
@@ -784,12 +800,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/grenade"
     },
     {
       "listing": {
         "data": "/items/consumables/1NbPsCF8.json",
-        "icon": "",
+        "icon": "/icons/consumables/grenade/1NbPsCF8.png",
         "name": {
           "key": "item.exp.frag_crafted.name",
           "type": "translation",
@@ -819,12 +836,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/grenade"
     },
     {
       "listing": {
         "data": "/items/consumables/dsxs222y.json",
-        "icon": "",
+        "icon": "/icons/consumables/grenade/dsxs222y.png",
         "name": {
           "key": "item.exp.plantain.name",
           "type": "translation",
@@ -854,12 +872,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/grenade"
     },
     {
       "listing": {
         "data": "/items/consumables/P1QcsKVq.json",
-        "icon": "",
+        "icon": "/icons/consumables/medicine/P1QcsKVq.png",
         "name": {
           "key": "item.pouch.apt_i.name",
           "type": "translation",
@@ -889,12 +908,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/medicine"
     },
     {
       "listing": {
         "data": "/items/consumables/dsxs222z.json",
-        "icon": "",
+        "icon": "/icons/consumables/grenade/dsxs222z.png",
         "name": {
           "key": "item.exp.thunder.name",
           "type": "translation",
@@ -924,12 +944,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/grenade"
     },
     {
       "listing": {
         "data": "/items/consumables/knnop.json",
-        "icon": "",
+        "icon": "/icons/consumables/bullet/knnop.png",
         "name": {
           "key": "item.amm.12st_sessions.name",
           "args": {},
@@ -965,12 +986,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/bullet"
     },
     {
       "listing": {
         "data": "/items/consumables/m0pqj.json",
-        "icon": "",
+        "icon": "/icons/consumables/medicine/m0pqj.png",
         "name": {
           "key": "item.med.psiblock_1.name",
           "args": {},
@@ -1008,12 +1030,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/medicine"
     },
     {
       "listing": {
         "data": "/items/consumables/rw1vg.json",
-        "icon": "",
+        "icon": "/icons/consumables/medicine/rw1vg.png",
         "name": {
           "key": "item.med.thermobarier_1.name",
           "args": {},
@@ -1051,12 +1074,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/medicine"
     },
     {
       "listing": {
         "data": "/items/consumables/ScTm1w2S.json",
-        "icon": "",
+        "icon": "/icons/consumables/medicine/ScTm1w2S.png",
         "name": {
           "key": "item.med.apt_sp.name",
           "type": "translation",
@@ -1088,12 +1112,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/medicine"
     },
     {
       "listing": {
         "data": "/items/consumables/62zeLMPl.json",
-        "icon": "",
+        "icon": "/icons/consumables/bullet/62zeLMPl.png",
         "name": {
           "key": "item.bag.939st.name",
           "type": "translation",
@@ -1123,12 +1148,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/bullet"
     },
     {
       "listing": {
         "data": "/items/consumables/D327y7Pf.json",
-        "icon": "",
+        "icon": "/icons/consumables/bullet/D327y7Pf.png",
         "name": {
           "key": "item.16521.name",
           "type": "translation",
@@ -1158,12 +1184,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/bullet"
     },
     {
       "listing": {
         "data": "/items/consumables/Keh9GoTs.json",
-        "icon": "",
+        "icon": "/icons/consumables/bullet/Keh9GoTs.png",
         "name": {
           "key": "item.bag.556exp.name",
           "type": "translation",
@@ -1193,12 +1220,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/bullet"
     },
     {
       "listing": {
         "data": "/items/consumables/edOEz5rR.json",
-        "icon": "",
+        "icon": "/icons/consumables/bullet/edOEz5rR.png",
         "name": {
           "key": "item.bag.9st.name",
           "type": "translation",
@@ -1228,12 +1256,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/bullet"
     },
     {
       "listing": {
         "data": "/items/consumables/9i9DywxI.json",
-        "icon": "",
+        "icon": "/icons/consumables/grenade/9i9DywxI.png",
         "name": {
           "key": "item.exp.homemade.name",
           "type": "translation",
@@ -1263,12 +1292,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/grenade"
     },
     {
       "listing": {
         "data": "/items/consumables/0rd7d.json",
-        "icon": "",
+        "icon": "/icons/consumables/medicine/0rd7d.png",
         "name": {
           "key": "item.med.protector_1.name",
           "args": {},
@@ -1306,12 +1336,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/medicine"
     },
     {
       "listing": {
         "data": "/items/consumables/x69JgSSB.json",
-        "icon": "",
+        "icon": "/icons/consumables/bullet/x69JgSSB.png",
         "name": {
           "key": "item.crate.box_ammo_spb556.name",
           "type": "translation",
@@ -1341,12 +1372,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/bullet"
     },
     {
       "listing": {
         "data": "/items/consumables/qIoAqWKK.json",
-        "icon": "",
+        "icon": "/icons/consumables/medicine/qIoAqWKK.png",
         "name": {
           "key": "item.med.warming_serum.name",
           "type": "translation",
@@ -1376,12 +1408,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/medicine"
     },
     {
       "listing": {
         "data": "/items/consumables/IjmjRd0h.json",
-        "icon": "",
+        "icon": "/icons/consumables/grenade/IjmjRd0h.png",
         "name": {
           "key": "item.crate.hotjack.name",
           "type": "translation",
@@ -1411,12 +1444,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/grenade"
     },
     {
       "listing": {
         "data": "/items/consumables/knfFNZKn.json",
-        "icon": "",
+        "icon": "/icons/consumables/bullet/knfFNZKn.png",
         "name": {
           "key": "item.bag.762exp.name",
           "type": "translation",
@@ -1446,12 +1480,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/bullet"
     },
     {
       "listing": {
         "data": "/items/consumables/jDDnrxqH.json",
-        "icon": "",
+        "icon": "/icons/consumables/bullet/jDDnrxqH.png",
         "name": {
           "key": "item.16515.name",
           "type": "translation",
@@ -1481,12 +1516,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/bullet"
     },
     {
       "listing": {
         "data": "/items/consumables/IJwQCTjr.json",
-        "icon": "",
+        "icon": "/icons/consumables/bullet/IJwQCTjr.png",
         "name": {
           "key": "item.bag.12kar.name",
           "type": "translation",
@@ -1516,12 +1552,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/bullet"
     },
     {
       "listing": {
         "data": "/items/consumables/kr25j.json",
-        "icon": "",
+        "icon": "/icons/consumables/bullet/kr25j.png",
         "name": {
           "key": "item.amm.12st_sessions.name",
           "args": {},
@@ -1557,12 +1594,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/bullet"
     },
     {
       "listing": {
         "data": "/items/consumables/Vf5KvvEl.json",
-        "icon": "",
+        "icon": "/icons/consumables/bullet/Vf5KvvEl.png",
         "name": {
           "key": "item.bag.545st.name",
           "type": "translation",
@@ -1592,12 +1630,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/bullet"
     },
     {
       "listing": {
         "data": "/items/consumables/7ynr.json",
-        "icon": "",
+        "icon": "/icons/consumables/grenade/7ynr.png",
         "name": {
           "key": "item.exp.m381_2.name",
           "args": {},
@@ -1633,12 +1672,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/grenade"
     },
     {
       "listing": {
         "data": "/items/consumables/8AizvZAF.json",
-        "icon": "",
+        "icon": "/icons/consumables/food/8AizvZAF.png",
         "name": {
           "key": "item.16550.name",
           "type": "translation",
@@ -1668,12 +1708,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/food"
     },
     {
       "listing": {
         "data": "/items/consumables/5VlW5cqZ.json",
-        "icon": "",
+        "icon": "/icons/consumables/bullet/5VlW5cqZ.png",
         "name": {
           "key": "item.crate.box_ammo_spb762.name",
           "type": "translation",
@@ -1703,12 +1744,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/bullet"
     },
     {
       "listing": {
         "data": "/items/consumables/JZRpZ8iK.json",
-        "icon": "",
+        "icon": "/icons/consumables/bullet/JZRpZ8iK.png",
         "name": {
           "key": "item.bag.556st.name",
           "type": "translation",
@@ -1738,12 +1780,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/bullet"
     },
     {
       "listing": {
         "data": "/items/consumables/MSvs6rFq.json",
-        "icon": "",
+        "icon": "/icons/consumables/bullet/MSvs6rFq.png",
         "name": {
           "key": "item.create.box_ammo_spb545.name",
           "type": "translation",
@@ -1773,12 +1816,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/bullet"
     },
     {
       "listing": {
         "data": "/items/consumables/oq2Gahcd.json",
-        "icon": "",
+        "icon": "/icons/consumables/bullet/oq2Gahcd.png",
         "name": {
           "key": "item.bag.762st.name",
           "type": "translation",
@@ -1808,12 +1852,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/bullet"
     },
     {
       "listing": {
         "data": "/items/consumables/v4b9hQD2.json",
-        "icon": "",
+        "icon": "/icons/consumables/bullet/v4b9hQD2.png",
         "name": {
           "key": "item.bag.12drob.name",
           "type": "translation",
@@ -1843,12 +1888,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/bullet"
     },
     {
       "listing": {
         "data": "/items/consumables/slvB0xFP.json",
-        "icon": "",
+        "icon": "/icons/consumables/bullet/slvB0xFP.png",
         "name": {
           "key": "item.bag.545exp.name",
           "type": "translation",
@@ -1878,12 +1924,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/bullet"
     },
     {
       "listing": {
         "data": "/items/consumables/PHcByLfh.json",
-        "icon": "",
+        "icon": "/icons/consumables/medicine/PHcByLfh.png",
         "name": {
           "key": "go.gorelka.name",
           "type": "translation",
@@ -1913,12 +1960,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/medicine"
     },
     {
       "listing": {
         "data": "/items/consumables/f78zAepq.json",
-        "icon": "",
+        "icon": "/icons/consumables/medicine/f78zAepq.png",
         "name": {
           "key": "item.16126.name",
           "type": "translation",
@@ -1948,12 +1996,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/medicine"
     },
     {
       "listing": {
         "data": "/items/consumables/XLF5kXBU.json",
-        "icon": "",
+        "icon": "/icons/consumables/medicine/XLF5kXBU.png",
         "name": {
           "key": "item.med.clarinol.name",
           "type": "translation",
@@ -1985,12 +2034,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/medicine"
     },
     {
       "listing": {
         "data": "/items/consumables/kno60.json",
-        "icon": "",
+        "icon": "/icons/consumables/medicine/kno60.png",
         "name": {
           "key": "item.med.psiblock_2.name",
           "args": {},
@@ -2028,12 +2078,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/medicine"
     },
     {
       "listing": {
         "data": "/items/consumables/j5mn7.json",
-        "icon": "",
+        "icon": "/icons/consumables/medicine/j5mn7.png",
         "name": {
           "key": "item.med.thermobarier_2.name",
           "args": {},
@@ -2071,12 +2122,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/medicine"
     },
     {
       "listing": {
         "data": "/items/consumables/lPgPDviX.json",
-        "icon": "",
+        "icon": "/icons/consumables/medicine/lPgPDviX.png",
         "name": {
           "key": "item.med.desperol.name",
           "type": "translation",
@@ -2108,12 +2160,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/medicine"
     },
     {
       "listing": {
         "data": "/items/consumables/m0p4j.json",
-        "icon": "",
+        "icon": "/icons/consumables/medicine/m0p4j.png",
         "name": {
           "key": "item.med.protector_2.name",
           "args": {},
@@ -2151,12 +2204,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/medicine"
     },
     {
       "listing": {
         "data": "/items/consumables/qj9q6.json",
-        "icon": "",
+        "icon": "/icons/consumables/medicine/qj9q6.png",
         "name": {
           "key": "item.med.psiblock_3.name",
           "args": {},
@@ -2194,12 +2248,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/medicine"
     },
     {
       "listing": {
         "data": "/items/consumables/0rdld.json",
-        "icon": "",
+        "icon": "/icons/consumables/medicine/0rdld.png",
         "name": {
           "key": "item.med.thermobarier_3.name",
           "args": {},
@@ -2237,12 +2292,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/medicine"
     },
     {
       "listing": {
         "data": "/items/consumables/dmky5.json",
-        "icon": "",
+        "icon": "/icons/consumables/medicine/dmky5.png",
         "name": {
           "key": "item.med.clearmind.name",
           "args": {},
@@ -2280,12 +2336,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/medicine"
     },
     {
       "listing": {
         "data": "/items/consumables/okd4o.json",
-        "icon": "",
+        "icon": "/icons/consumables/medicine/okd4o.png",
         "name": {
           "key": "item.med.protector_3.name",
           "args": {},
@@ -2323,12 +2380,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "consumables/medicine"
     },
     {
       "listing": {
         "data": "/items/device/rz6ZNaDw.json",
-        "icon": "",
+        "icon": "/icons/device/rz6ZNaDw.png",
         "name": {
           "key": "item.device.dshd_sak3.name",
           "type": "translation",
@@ -2358,12 +2416,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "device"
     },
     {
       "listing": {
         "data": "/items/other/0QYUJCsr.json",
-        "icon": "",
+        "icon": "/icons/other/trash/0QYUJCsr.png",
         "name": {
           "key": "item.misc.chimera_claw_t1.name",
           "type": "translation",
@@ -2393,12 +2452,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/kQaXaCSP.json",
-        "icon": "",
+        "icon": "/icons/other/trash/kQaXaCSP.png",
         "name": {
           "key": "item.filler.mob_3.name",
           "type": "translation",
@@ -2428,12 +2488,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/rA8fsgH1.json",
-        "icon": "",
+        "icon": "/icons/other/trash/rA8fsgH1.png",
         "name": {
           "key": "item.16713.name",
           "type": "translation",
@@ -2463,12 +2524,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/lrMyt4zP.json",
-        "icon": "",
+        "icon": "/icons/other/trash/lrMyt4zP.png",
         "name": {
           "key": "item.misc.boar_hoof_t2.name",
           "type": "translation",
@@ -2498,12 +2560,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/gcd2b9lz.json",
-        "icon": "",
+        "icon": "/icons/other/barter/gcd2b9lz.png",
         "name": {
           "key": "item.scheme.svu_mod_3.name",
           "type": "translation",
@@ -2533,12 +2596,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/AeEpXAZ4.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/AeEpXAZ4.png",
         "name": {
           "key": "go.ny_box4.name",
           "type": "translation",
@@ -2568,12 +2632,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/lIoOKGRJ.json",
-        "icon": "",
+        "icon": "/icons/other/structures/lIoOKGRJ.png",
         "name": {
           "key": "go.barricade_ural_living.name",
           "type": "translation",
@@ -2603,12 +2668,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/structures"
     },
     {
       "listing": {
         "data": "/items/other/55VrA59M.json",
-        "icon": "",
+        "icon": "/icons/other/trash/55VrA59M.png",
         "name": {
           "key": "item.16715.name",
           "type": "translation",
@@ -2638,12 +2704,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/3Bu8anpH.json",
-        "icon": "",
+        "icon": "/icons/other/trash/3Bu8anpH.png",
         "name": {
           "key": "item.filler.mob_2.name",
           "type": "translation",
@@ -2673,12 +2740,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/bcx1h5jv.json",
-        "icon": "",
+        "icon": "/icons/other/barter/bcx1h5jv.png",
         "name": {
           "key": "item.scheme.svu_mod_2.name",
           "type": "translation",
@@ -2708,12 +2776,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/cgl4v7jt.json",
-        "icon": "",
+        "icon": "/icons/other/barter/cgl4v7jt.png",
         "name": {
           "key": "item.scheme.p99_mod_2.name",
           "type": "translation",
@@ -2743,12 +2812,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/zmr5g7uz.json",
-        "icon": "",
+        "icon": "/icons/other/barter/zmr5g7uz.png",
         "name": {
           "key": "item.scheme.mp5_mod_1.name",
           "type": "translation",
@@ -2778,12 +2848,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/mQa1w5wX.json",
-        "icon": "",
+        "icon": "/icons/other/trash/mQa1w5wX.png",
         "name": {
           "key": "item.filler.valuable_9.name",
           "type": "translation",
@@ -2813,12 +2884,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/pbb7n4xt.json",
-        "icon": "",
+        "icon": "/icons/other/barter/pbb7n4xt.png",
         "name": {
           "key": "item.scheme.yorsh_4.name",
           "type": "translation",
@@ -2848,12 +2920,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/nbo9o0ci.json",
-        "icon": "",
+        "icon": "/icons/other/barter/nbo9o0ci.png",
         "name": {
           "key": "item.scheme.l85_mod_1.name",
           "type": "translation",
@@ -2883,12 +2956,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/sin6o7nc.json",
-        "icon": "",
+        "icon": "/icons/other/barter/sin6o7nc.png",
         "name": {
           "key": "item.scheme.spanner_2.name",
           "type": "translation",
@@ -2918,12 +2992,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/3grk1.json",
-        "icon": "",
+        "icon": "/icons/other/skins/3grk1.png",
         "name": {
           "key": "item.19821.name",
           "args": {},
@@ -2961,12 +3036,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/skins"
     },
     {
       "listing": {
         "data": "/items/other/UGRVBObD.json",
-        "icon": "",
+        "icon": "/icons/other/trash/UGRVBObD.png",
         "name": {
           "key": "item.filler.npc_limansk_4.name",
           "type": "translation",
@@ -2996,12 +3072,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/R9euiU8Q.json",
-        "icon": "",
+        "icon": "/icons/other/trash/R9euiU8Q.png",
         "name": {
           "key": "item.misc.chimera_claw_t3.name",
           "type": "translation",
@@ -3031,12 +3108,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/vpxznHgV.json",
-        "icon": "",
+        "icon": "/icons/other/trash/vpxznHgV.png",
         "name": {
           "key": "item.16712.name",
           "type": "translation",
@@ -3066,12 +3144,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/XpFwE2l3.json",
-        "icon": "",
+        "icon": "/icons/other/trash/XpFwE2l3.png",
         "name": {
           "key": "item.unexplored.name",
           "type": "translation",
@@ -3101,12 +3180,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/6wr2n.json",
-        "icon": "",
+        "icon": "/icons/other/skins/6wr2n.png",
         "name": {
           "key": "item.19823.name",
           "args": {},
@@ -3144,12 +3224,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/skins"
     },
     {
       "listing": {
         "data": "/items/other/1WaDR1TK.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/1WaDR1TK.png",
         "name": {
           "key": "item.lootbox.ny24_case2.name",
           "type": "translation",
@@ -3179,12 +3260,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/ahj5z3kj.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/ahj5z3kj.png",
         "name": {
           "key": "item.lootbox.ny25_case3.name",
           "type": "translation",
@@ -3214,12 +3296,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/sch5n6uf.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/sch5n6uf.png",
         "name": {
           "key": "item.lootbox.wpn_camo.name",
           "type": "translation",
@@ -3249,12 +3332,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/kvt5u3jn.json",
-        "icon": "",
+        "icon": "/icons/other/barter/kvt5u3jn.png",
         "name": {
           "key": "item.scheme.pm_mod_1.name",
           "type": "translation",
@@ -3284,12 +3368,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/lnb0s1uf.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/lnb0s1uf.png",
         "name": {
           "key": "item.lootbox.ny25_case2.name",
           "type": "translation",
@@ -3319,12 +3404,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/Iirocxiu.json",
-        "icon": "",
+        "icon": "/icons/other/trash/Iirocxiu.png",
         "name": {
           "key": "item.misc.krovosos_tentacles_t1.name",
           "type": "translation",
@@ -3354,12 +3440,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/ldh3w0jl.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/ldh3w0jl.png",
         "name": {
           "key": "item.lootbox.blizzard_2021.name",
           "type": "translation",
@@ -3389,12 +3476,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/NUI2d2MX.json",
-        "icon": "",
+        "icon": "/icons/other/trash/NUI2d2MX.png",
         "name": {
           "key": "item.misc.tushkan_head_t3.name",
           "type": "translation",
@@ -3424,12 +3512,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/cuk6o2wg.json",
-        "icon": "",
+        "icon": "/icons/other/barter/cuk6o2wg.png",
         "name": {
           "key": "item.scheme.yorsh_1.name",
           "type": "translation",
@@ -3459,12 +3548,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/dsz3l9jb.json",
-        "icon": "",
+        "icon": "/icons/other/barter/dsz3l9jb.png",
         "name": {
           "key": "item.scheme.spanner_4.name",
           "type": "translation",
@@ -3494,12 +3584,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/kfj9o3sw.json",
-        "icon": "",
+        "icon": "/icons/other/barter/kfj9o3sw.png",
         "name": {
           "key": "item.scheme.p99_mod_1.name",
           "type": "translation",
@@ -3529,12 +3620,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/Ex5ioOif.json",
-        "icon": "",
+        "icon": "/icons/other/useful/Ex5ioOif.png",
         "name": {
           "key": "item.resc.arm_newbie_unit.name",
           "type": "translation",
@@ -3564,12 +3656,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/useful"
     },
     {
       "listing": {
         "data": "/items/other/sAkV9rtC.json",
-        "icon": "",
+        "icon": "/icons/other/useful/sAkV9rtC.png",
         "name": {
           "key": "item.resc.arm_veteran_unit.name",
           "type": "translation",
@@ -3599,12 +3692,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/useful"
     },
     {
       "listing": {
         "data": "/items/other/dmqzg.json",
-        "icon": "",
+        "icon": "/icons/other/skins/dmqzg.png",
         "name": {
           "key": "item.19819.name",
           "args": {},
@@ -3642,12 +3736,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/skins"
     },
     {
       "listing": {
         "data": "/items/other/qgl3b9ur.json",
-        "icon": "",
+        "icon": "/icons/other/barter/qgl3b9ur.png",
         "name": {
           "key": "item.scheme.mp5_mod_3.name",
           "type": "translation",
@@ -3677,12 +3772,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/myh4j6ya.json",
-        "icon": "",
+        "icon": "/icons/other/barter/myh4j6ya.png",
         "name": {
           "key": "item.scheme.spanner_3.name",
           "type": "translation",
@@ -3712,12 +3808,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/myo4a4qk.json",
-        "icon": "",
+        "icon": "/icons/other/barter/myo4a4qk.png",
         "name": {
           "key": "item.scheme.hp_mod_2.name",
           "type": "translation",
@@ -3747,12 +3844,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/nxc9y6yv.json",
-        "icon": "",
+        "icon": "/icons/other/barter/nxc9y6yv.png",
         "name": {
           "key": "item.scheme.svt40_mod_1.name",
           "type": "translation",
@@ -3782,12 +3880,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/wjooz.json",
-        "icon": "",
+        "icon": "/icons/other/skins/wjooz.png",
         "name": {
           "key": "item.camo.unique_wpn.hrenostrel_fg42.name",
           "args": {},
@@ -3825,12 +3924,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/skins"
     },
     {
       "listing": {
         "data": "/items/other/dmn2a1yr.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/dmn2a1yr.png",
         "name": {
           "key": "item.lootbox.blizzard_2022.name",
           "type": "translation",
@@ -3860,12 +3960,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/kpw8j0jo.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/kpw8j0jo.png",
         "name": {
           "key": "item.gachapon.ravent_2023.name",
           "type": "translation",
@@ -3895,12 +3996,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/pmm1l5kb.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/pmm1l5kb.png",
         "name": {
           "key": "item.other.container.crown_arena",
           "type": "translation",
@@ -3930,12 +4032,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/uzv1r2to.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/uzv1r2to.png",
         "name": {
           "key": "item.lootbox.summer24.name",
           "type": "translation",
@@ -3965,12 +4068,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/FqyuqIqv.json",
-        "icon": "",
+        "icon": "/icons/other/trash/FqyuqIqv.png",
         "name": {
           "key": "item.misc.gas_cylinder.name",
           "type": "translation",
@@ -4000,12 +4104,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/WBO04JY1.json",
-        "icon": "",
+        "icon": "/icons/other/trash/WBO04JY1.png",
         "name": {
           "key": "item.misc.flesh_eye_t2.name",
           "type": "translation",
@@ -4035,12 +4140,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/skuTyVhI.json",
-        "icon": "",
+        "icon": "/icons/other/trash/skuTyVhI.png",
         "name": {
           "key": "item.16710.name",
           "type": "translation",
@@ -4070,12 +4176,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/SJSpCipH.json",
-        "icon": "",
+        "icon": "/icons/other/trash/SJSpCipH.png",
         "name": {
           "key": "item.misc.tushkan_head_t1.name",
           "type": "translation",
@@ -4105,12 +4212,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/woz4p9bx.json",
-        "icon": "",
+        "icon": "/icons/other/barter/woz4p9bx.png",
         "name": {
           "key": "item.scheme.mp5_mod_2.name",
           "type": "translation",
@@ -4140,12 +4248,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/WdVYNOia.json",
-        "icon": "",
+        "icon": "/icons/other/trash/WdVYNOia.png",
         "name": {
           "key": "item.16714.name",
           "type": "translation",
@@ -4175,12 +4284,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/JKlN6qPj.json",
-        "icon": "",
+        "icon": "/icons/other/trash/JKlN6qPj.png",
         "name": {
           "key": "item.misc.dog_tail_t1.name",
           "type": "translation",
@@ -4210,12 +4320,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/jqqdlMD5.json",
-        "icon": "",
+        "icon": "/icons/other/trash/jqqdlMD5.png",
         "name": {
           "key": "item.misc.snork_hand_t2.name",
           "type": "translation",
@@ -4245,12 +4356,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/ht2V41v2.json",
-        "icon": "",
+        "icon": "/icons/other/useful/ht2V41v2.png",
         "name": {
           "key": "item.resc.wpn_stalker_unit.name",
           "type": "translation",
@@ -4280,12 +4392,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/useful"
     },
     {
       "listing": {
         "data": "/items/other/LkwM4Yh7.json",
-        "icon": "",
+        "icon": "/icons/other/useful/LkwM4Yh7.png",
         "name": {
           "key": "item.resc.wpn_newbie.name",
           "type": "translation",
@@ -4315,12 +4428,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/useful"
     },
     {
       "listing": {
         "data": "/items/other/2KNZNlCx.json",
-        "icon": "",
+        "icon": "/icons/other/trash/2KNZNlCx.png",
         "name": {
           "key": "item.filler.npc_3.name",
           "type": "translation",
@@ -4350,12 +4464,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/8hdHP76H.json",
-        "icon": "",
+        "icon": "/icons/other/skins/8hdHP76H.png",
         "name": {
           "key": "item.25640.name",
           "type": "translation",
@@ -4385,12 +4500,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/skins"
     },
     {
       "listing": {
         "data": "/items/other/5wIf1vNj.json",
-        "icon": "",
+        "icon": "/icons/other/trash/5wIf1vNj.png",
         "name": {
           "key": "item.filler.npc_limansk_6.name",
           "type": "translation",
@@ -4420,12 +4536,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/553qq.json",
-        "icon": "",
+        "icon": "/icons/other/barter/553qq.png",
         "name": {
           "key": "item.brt.sever.fallout_add.name",
           "args": {},
@@ -4461,12 +4578,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/AHRfUZpw.json",
-        "icon": "",
+        "icon": "/icons/other/trash/AHRfUZpw.png",
         "name": {
           "key": "item.misc.flesh_eye_t1.name",
           "type": "translation",
@@ -4496,12 +4614,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/vKJbSN93.json",
-        "icon": "",
+        "icon": "/icons/other/trash/vKJbSN93.png",
         "name": {
           "key": "item.16711.name",
           "type": "translation",
@@ -4531,12 +4650,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/2w5jGvy7.json",
-        "icon": "",
+        "icon": "/icons/other/useful/2w5jGvy7.png",
         "name": {
           "key": "item.resc.wpn_master_unit.name",
           "type": "translation",
@@ -4566,12 +4686,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/useful"
     },
     {
       "listing": {
         "data": "/items/other/yISIQeGI.json",
-        "icon": "",
+        "icon": "/icons/other/trash/yISIQeGI.png",
         "name": {
           "key": "item.misc.krovosos_tentacles_t2.name",
           "type": "translation",
@@ -4601,12 +4722,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/GgrcJ4N2.json",
-        "icon": "",
+        "icon": "/icons/other/useful/GgrcJ4N2.png",
         "name": {
           "key": "item.resc.wpn_stalker.name",
           "type": "translation",
@@ -4636,12 +4758,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/useful"
     },
     {
       "listing": {
         "data": "/items/other/nVcwpSEJ.json",
-        "icon": "",
+        "icon": "/icons/other/useful/nVcwpSEJ.png",
         "name": {
           "key": "item.resc.arm_master_unit.name",
           "type": "translation",
@@ -4671,12 +4794,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/useful"
     },
     {
       "listing": {
         "data": "/items/other/yqc7q1mx.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/yqc7q1mx.png",
         "name": {
           "key": "item.16657.name",
           "type": "translation",
@@ -4706,12 +4830,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/exs0l1qb.json",
-        "icon": "",
+        "icon": "/icons/other/barter/exs0l1qb.png",
         "name": {
           "key": "item.scheme.aks74_mod_2.name",
           "type": "translation",
@@ -4741,12 +4866,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/6o5CxHKF.json",
-        "icon": "",
+        "icon": "/icons/other/trash/6o5CxHKF.png",
         "name": {
           "key": "item.quest.kolenval_steel.name",
           "type": "translation",
@@ -4776,12 +4902,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/vjrm7.json",
-        "icon": "",
+        "icon": "/icons/other/skins/vjrm7.png",
         "name": {
           "key": "item.19818.name",
           "args": {},
@@ -4819,12 +4946,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/skins"
     },
     {
       "listing": {
         "data": "/items/other/arp7y6ea.json",
-        "icon": "",
+        "icon": "/icons/other/barter/arp7y6ea.png",
         "name": {
           "key": "item.scheme.hp_mod_1.name",
           "type": "translation",
@@ -4854,12 +4982,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/0kiENu5H.json",
-        "icon": "",
+        "icon": "/icons/other/trash/0kiENu5H.png",
         "name": {
           "key": "item.misc.pseudodog_tail_t2.name",
           "type": "translation",
@@ -4889,12 +5018,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/535Usksw.json",
-        "icon": "",
+        "icon": "/icons/other/trash/535Usksw.png",
         "name": {
           "key": "item.misc.cat_tail_t1.name",
           "type": "translation",
@@ -4924,12 +5054,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/LDsonOgx.json",
-        "icon": "",
+        "icon": "/icons/other/trash/LDsonOgx.png",
         "name": {
           "key": "item.misc.pseudodog_tail_t1.name",
           "type": "translation",
@@ -4959,12 +5090,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/Y0mIp2i7.json",
-        "icon": "",
+        "icon": "/icons/other/trash/Y0mIp2i7.png",
         "name": {
           "key": "item.misc.boar_hoof_t1.name",
           "type": "translation",
@@ -4994,12 +5126,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/cfMjPUM6.json",
-        "icon": "",
+        "icon": "/icons/other/trash/cfMjPUM6.png",
         "name": {
           "key": "item.misc.chimera_head_t3.name",
           "type": "translation",
@@ -5029,12 +5162,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/eB68r5Ll.json",
-        "icon": "",
+        "icon": "/icons/other/trash/eB68r5Ll.png",
         "name": {
           "key": "item.16173.name",
           "type": "translation",
@@ -5064,12 +5198,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/xiBNx5Hj.json",
-        "icon": "",
+        "icon": "/icons/other/trash/xiBNx5Hj.png",
         "name": {
           "key": "item.misc.flesh_eye_t3.name",
           "type": "translation",
@@ -5099,12 +5234,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/rdt1m5ve.json",
-        "icon": "",
+        "icon": "/icons/other/useful/rdt1m5ve.png",
         "name": {
           "key": "item.art.protoart.name",
           "type": "translation",
@@ -5134,12 +5270,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/useful"
     },
     {
       "listing": {
         "data": "/items/other/2IwPAkYv.json",
-        "icon": "",
+        "icon": "/icons/other/barter/2IwPAkYv.png",
         "name": {
           "key": "item.scheme.mp5_mod_1.name",
           "type": "translation",
@@ -5169,12 +5306,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/izl3h3mr.json",
-        "icon": "",
+        "icon": "/icons/other/barter/izl3h3mr.png",
         "name": {
           "key": "item.scheme.kedr_mod_2.name",
           "type": "translation",
@@ -5204,12 +5342,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/7gRe14XU.json",
-        "icon": "",
+        "icon": "/icons/other/trash/7gRe14XU.png",
         "name": {
           "key": "item.empty_bottle.name",
           "type": "translation",
@@ -5239,12 +5378,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/nwr5c5wn.json",
-        "icon": "",
+        "icon": "/icons/other/barter/nwr5c5wn.png",
         "name": {
           "key": "item.scheme.aks74_mod_1.name",
           "type": "translation",
@@ -5274,12 +5414,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/lyr3k.json",
-        "icon": "",
+        "icon": "/icons/other/trash/lyr3k.png",
         "name": {
           "key": "item.misc.warpcrate.name",
           "args": {},
@@ -5315,12 +5456,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/rFggScZT.json",
-        "icon": "",
+        "icon": "/icons/other/trash/rFggScZT.png",
         "name": {
           "key": "item.misc.krovosos_tentacles_t3.name",
           "type": "translation",
@@ -5350,12 +5492,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/6olnp.json",
-        "icon": "",
+        "icon": "/icons/other/barter/6olnp.png",
         "name": {
           "key": "item.brt.sever.fallout.name",
           "args": {},
@@ -5391,12 +5534,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/uJj59xnV.json",
-        "icon": "",
+        "icon": "/icons/other/useful/uJj59xnV.png",
         "name": {
           "key": "item.resc.wpn_master.name",
           "type": "translation",
@@ -5426,12 +5570,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/useful"
     },
     {
       "listing": {
         "data": "/items/other/zls9v1cw.json",
-        "icon": "",
+        "icon": "/icons/other/barter/zls9v1cw.png",
         "name": {
           "key": "item.scheme.kedr_mod_1.name",
           "type": "translation",
@@ -5461,12 +5606,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/UYdYvayN.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/UYdYvayN.png",
         "name": {
           "key": "item.lootbox.autumn24.name",
           "type": "translation",
@@ -5496,12 +5642,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/wvPaN5kd.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/wvPaN5kd.png",
         "name": {
           "key": "item.lootbox.ny24_case3.name",
           "type": "translation",
@@ -5531,12 +5678,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/atu0p9vd.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/atu0p9vd.png",
         "name": {
           "key": "item.gachapon.spring24.name",
           "type": "translation",
@@ -5566,12 +5714,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/emc0b8fy.json",
-        "icon": "",
+        "icon": "/icons/other/barter/emc0b8fy.png",
         "name": {
           "key": "item.scheme.yorsh_2.name",
           "type": "translation",
@@ -5601,12 +5750,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/gix6p2bt.json",
-        "icon": "",
+        "icon": "/icons/other/barter/gix6p2bt.png",
         "name": {
           "key": "item.scheme.l85_mod_2.name",
           "type": "translation",
@@ -5636,12 +5786,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/chg8q2la.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/chg8q2la.png",
         "name": {
           "key": "item.other.container.skin_maraphon",
           "type": "translation",
@@ -5671,12 +5822,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/qXZPikj5.json",
-        "icon": "",
+        "icon": "/icons/other/useful/qXZPikj5.png",
         "name": {
           "key": "item.resc.wpn_veteran_unit.name",
           "type": "translation",
@@ -5706,12 +5858,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/useful"
     },
     {
       "listing": {
         "data": "/items/other/JYiptjXv.json",
-        "icon": "",
+        "icon": "/icons/other/misc/JYiptjXv.png",
         "name": {
           "key": "item.misc.prepared_sleeve.name",
           "type": "translation",
@@ -5741,12 +5894,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/misc"
     },
     {
       "listing": {
         "data": "/items/other/wba5k5xh.json",
-        "icon": "",
+        "icon": "/icons/other/barter/wba5k5xh.png",
         "name": {
           "key": "item.scheme.yorsh_3.name",
           "type": "translation",
@@ -5776,12 +5930,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/zoj8e8fq.json",
-        "icon": "",
+        "icon": "/icons/other/barter/zoj8e8fq.png",
         "name": {
           "key": "item.scheme.svt40_mod_2.name",
           "type": "translation",
@@ -5811,12 +5966,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/zvx3b8fi.json",
-        "icon": "",
+        "icon": "/icons/other/barter/zvx3b8fi.png",
         "name": {
           "key": "item.scheme.l85_mod_3.name",
           "type": "translation",
@@ -5846,12 +6002,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/vJ38yPx3.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/vJ38yPx3.png",
         "name": {
           "key": "item.gachapon.halloween_2023.name",
           "type": "translation",
@@ -5881,12 +6038,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/wzw1f7tk.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/wzw1f7tk.png",
         "name": {
           "key": "item.gachapon.newyear_2024.name",
           "type": "translation",
@@ -5916,12 +6074,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/mml2e9sk.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/mml2e9sk.png",
         "name": {
           "key": "item.lootbox.ny25_case1.name",
           "type": "translation",
@@ -5951,12 +6110,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/Q1eo3Ssp.json",
-        "icon": "",
+        "icon": "/icons/other/trash/Q1eo3Ssp.png",
         "name": {
           "key": "item.misc.aceton.name",
           "type": "translation",
@@ -5986,12 +6146,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/OSyyVAhy.json",
-        "icon": "",
+        "icon": "/icons/other/trash/OSyyVAhy.png",
         "name": {
           "key": "item.filler.outpost_8.name",
           "type": "translation",
@@ -6021,12 +6182,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/q6eqd1Au.json",
-        "icon": "",
+        "icon": "/icons/other/trash/q6eqd1Au.png",
         "name": {
           "key": "item.filler.watch.name",
           "type": "translation",
@@ -6056,12 +6218,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/KR2JfO3l.json",
-        "icon": "",
+        "icon": "/icons/other/trash/KR2JfO3l.png",
         "name": {
           "key": "item.filler.mining_1.name",
           "type": "translation",
@@ -6091,12 +6254,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/wvg0t4vw.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/wvg0t4vw.png",
         "name": {
           "key": "item.lootbox.ny25_case7.name",
           "type": "translation",
@@ -6126,12 +6290,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/kJUAEzWF.json",
-        "icon": "",
+        "icon": "/icons/other/trash/kJUAEzWF.png",
         "name": {
           "key": "item.filler.boss_limansk_1.name",
           "type": "translation",
@@ -6161,12 +6326,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/o9a9nsqW.json",
-        "icon": "",
+        "icon": "/icons/other/trash/o9a9nsqW.png",
         "name": {
           "key": "item.quest.kolenval_castiron.name",
           "type": "translation",
@@ -6196,12 +6362,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/J3rTGSLm.json",
-        "icon": "",
+        "icon": "/icons/other/barter/J3rTGSLm.png",
         "name": {
           "key": "item.scheme.mp5_mod_2.name",
           "type": "translation",
@@ -6231,12 +6398,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/boz1d0ab.json",
-        "icon": "",
+        "icon": "/icons/other/barter/boz1d0ab.png",
         "name": {
           "key": "item.scheme.aks74_mod_3.name",
           "type": "translation",
@@ -6266,12 +6434,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/dYcqeFJN.json",
-        "icon": "",
+        "icon": "/icons/other/misc/dYcqeFJN.png",
         "name": {
           "key": "item.misc.sleeve_blank.name",
           "type": "translation",
@@ -6301,12 +6470,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/misc"
     },
     {
       "listing": {
         "data": "/items/other/y8ASjaul.json",
-        "icon": "",
+        "icon": "/icons/other/misc/y8ASjaul.png",
         "name": {
           "key": "item.misc.threads.name",
           "type": "translation",
@@ -6336,12 +6506,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/misc"
     },
     {
       "listing": {
         "data": "/items/other/VSQZ5wJB.json",
-        "icon": "",
+        "icon": "/icons/other/misc/VSQZ5wJB.png",
         "name": {
           "key": "item.misc.sewing_needles.name",
           "type": "translation",
@@ -6371,12 +6542,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/misc"
     },
     {
       "listing": {
         "data": "/items/other/miu0j0jk.json",
-        "icon": "",
+        "icon": "/icons/other/barter/miu0j0jk.png",
         "name": {
           "key": "item.scheme.pm_mod_2.name",
           "type": "translation",
@@ -6406,12 +6578,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/XLN5GN7C.json",
-        "icon": "",
+        "icon": "/icons/other/trash/XLN5GN7C.png",
         "name": {
           "key": "item.lootbox.winter25.name",
           "type": "translation",
@@ -6441,12 +6614,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/rgd5u0cb.json",
-        "icon": "",
+        "icon": "/icons/other/barter/rgd5u0cb.png",
         "name": {
           "key": "item.scheme.svu_mod_1.name",
           "type": "translation",
@@ -6476,12 +6650,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/pgp7s0lt.json",
-        "icon": "",
+        "icon": "/icons/other/barter/pgp7s0lt.png",
         "name": {
           "key": "item.scheme.svu_mod_4.name",
           "type": "translation",
@@ -6511,12 +6686,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/tty9x9yf.json",
-        "icon": "",
+        "icon": "/icons/other/barter/tty9x9yf.png",
         "name": {
           "key": "item.scheme.svt40_mod_3.name",
           "type": "translation",
@@ -6546,12 +6722,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/xkv4i6fz.json",
-        "icon": "",
+        "icon": "/icons/other/barter/xkv4i6fz.png",
         "name": {
           "key": "item.scheme.hp_mod_3.name",
           "type": "translation",
@@ -6581,12 +6758,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/wbh0x9fn.json",
-        "icon": "",
+        "icon": "/icons/other/barter/wbh0x9fn.png",
         "name": {
           "key": "item.scheme.spanner_1.name",
           "type": "translation",
@@ -6616,12 +6794,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/other/coh7j2hn.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/coh7j2hn.png",
         "name": {
           "key": "item.16655.name",
           "type": "translation",
@@ -6651,12 +6830,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/fbDTZ1jc.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/fbDTZ1jc.png",
         "name": {
           "key": "item.lootbox.ny24_case5.name",
           "type": "translation",
@@ -6686,12 +6866,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/5iZDidNk.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/5iZDidNk.png",
         "name": {
           "key": "item.gachapon.autumn24.name",
           "type": "translation",
@@ -6721,12 +6902,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/riap4HSf.json",
-        "icon": "",
+        "icon": "/icons/other/trash/riap4HSf.png",
         "name": {
           "key": "item.filler.outpost_7.name",
           "type": "translation",
@@ -6756,12 +6938,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/IUXAFRjM.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/IUXAFRjM.png",
         "name": {
           "key": "item.clan.resource4.name",
           "type": "translation",
@@ -6791,12 +6974,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/aqo1i8kv.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/aqo1i8kv.png",
         "name": {
           "key": "item.lootbox.ny25_case6.name",
           "type": "translation",
@@ -6826,12 +7010,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/gF8noYxz.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/gF8noYxz.png",
         "name": {
           "key": "item.lootbox.ravent_2023.name",
           "type": "translation",
@@ -6861,12 +7046,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/die8j3pn.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/die8j3pn.png",
         "name": {
           "key": "item.lootbox.blizzard_2023.name",
           "type": "translation",
@@ -6896,12 +7082,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/bAq1C7P3.json",
-        "icon": "",
+        "icon": "/icons/other/misc/bAq1C7P3.png",
         "name": {
           "key": "item.misc.tire.name",
           "type": "translation",
@@ -6931,12 +7118,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/misc"
     },
     {
       "listing": {
         "data": "/items/other/dwv4y8hl.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/dwv4y8hl.png",
         "name": {
           "key": "item.lootbox.halloween_2022.name",
           "type": "translation",
@@ -6966,12 +7154,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/gwe1j1uc.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/gwe1j1uc.png",
         "name": {
           "key": "item.gachapon.blizzard_2023.name",
           "type": "translation",
@@ -7001,12 +7190,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/ist4x2xl.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/ist4x2xl.png",
         "name": {
           "key": "item.lootbox.halloween_2021.name",
           "type": "translation",
@@ -7036,12 +7226,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/kFdakoZY.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/kFdakoZY.png",
         "name": {
           "key": "item.gachapon.winter25.name",
           "type": "translation",
@@ -7071,12 +7262,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/oel3x4lg.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/oel3x4lg.png",
         "name": {
           "key": "item.lootbox.arm_camo.name",
           "type": "translation",
@@ -7106,12 +7298,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/mzw6c9xo.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/mzw6c9xo.png",
         "name": {
           "key": "item.lootbox.incident_battlepack.name",
           "type": "translation",
@@ -7141,12 +7334,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/nin4o6oe.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/nin4o6oe.png",
         "name": {
           "key": "item.lootbox.ny25_case4.name",
           "type": "translation",
@@ -7176,12 +7370,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/pfc9x3vt.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/pfc9x3vt.png",
         "name": {
           "key": "item.lootbox.faction_weapon.name",
           "type": "translation",
@@ -7211,12 +7406,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/uac9k9lr.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/uac9k9lr.png",
         "name": {
           "key": "item.lootbox.halloween_2023.name",
           "type": "translation",
@@ -7246,12 +7442,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/ybd1j9ic.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/ybd1j9ic.png",
         "name": {
           "key": "item.gachapon.summer24.name",
           "type": "translation",
@@ -7281,12 +7478,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/ysq9q3ox.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/ysq9q3ox.png",
         "name": {
           "key": "item.lootbox.ny25_case5.name",
           "type": "translation",
@@ -7316,12 +7514,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/zhb3k1cx.json",
-        "icon": "",
+        "icon": "/icons/other/boxes/zhb3k1cx.png",
         "name": {
           "key": "item.lootbox.spring24.name",
           "type": "translation",
@@ -7351,12 +7550,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/boxes"
     },
     {
       "listing": {
         "data": "/items/other/rGXyBfEO.json",
-        "icon": "",
+        "icon": "/icons/other/trash/rGXyBfEO.png",
         "name": {
           "key": "item.filler.npc_limansk_3.name",
           "type": "translation",
@@ -7386,12 +7586,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/25zUecnS.json",
-        "icon": "",
+        "icon": "/icons/other/trash/25zUecnS.png",
         "name": {
           "key": "item.filler.valuable_11.name",
           "type": "translation",
@@ -7421,12 +7622,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/We71RSee.json",
-        "icon": "",
+        "icon": "/icons/other/misc/We71RSee.png",
         "name": {
           "key": "item.misc.copper_oxide.name",
           "type": "translation",
@@ -7456,12 +7658,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/misc"
     },
     {
       "listing": {
         "data": "/items/other/vjbK3UT8.json",
-        "icon": "",
+        "icon": "/icons/other/misc/vjbK3UT8.png",
         "name": {
           "key": "item.misc.bullet_form.name",
           "type": "translation",
@@ -7491,12 +7694,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/misc"
     },
     {
       "listing": {
         "data": "/items/other/OVKrwEqR.json",
-        "icon": "",
+        "icon": "/icons/other/trash/OVKrwEqR.png",
         "name": {
           "key": "item.filler.boss_limansk_3.name",
           "type": "translation",
@@ -7526,12 +7730,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/wpFIlUYI.json",
-        "icon": "",
+        "icon": "/icons/other/trash/wpFIlUYI.png",
         "name": {
           "key": "item.filler.npc_9.name",
           "type": "translation",
@@ -7561,12 +7766,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/baWs8ScW.json",
-        "icon": "",
+        "icon": "/icons/other/misc/baWs8ScW.png",
         "name": {
           "key": "item.misc.primary_sleeve.name",
           "type": "translation",
@@ -7596,12 +7802,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/misc"
     },
     {
       "listing": {
         "data": "/items/other/YiDkI5Q0.json",
-        "icon": "",
+        "icon": "/icons/other/skins/YiDkI5Q0.png",
         "name": {
           "key": "item.24106.name",
           "type": "translation",
@@ -7631,12 +7838,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/skins"
     },
     {
       "listing": {
         "data": "/items/other/ic9KvBYe.json",
-        "icon": "",
+        "icon": "/icons/other/structures/ic9KvBYe.png",
         "name": {
           "key": "go.misc.extractor.name",
           "type": "translation",
@@ -7666,12 +7874,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/structures"
     },
     {
       "listing": {
         "data": "/items/other/QHw9J3gS.json",
-        "icon": "",
+        "icon": "/icons/other/skins/QHw9J3gS.png",
         "name": {
           "key": "item.24322.name",
           "type": "translation",
@@ -7701,12 +7910,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/skins"
     },
     {
       "listing": {
         "data": "/items/other/g400n.json",
-        "icon": "",
+        "icon": "/icons/other/skins/g400n.png",
         "name": {
           "key": "item.19826.name",
           "args": {},
@@ -7744,12 +7954,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/skins"
     },
     {
       "listing": {
         "data": "/items/other/xF8LODaM.json",
-        "icon": "",
+        "icon": "/icons/other/structures/xF8LODaM.png",
         "name": {
           "key": "go.barricade_army_living.name",
           "type": "translation",
@@ -7779,12 +7990,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/structures"
     },
     {
       "listing": {
         "data": "/items/other/OCSzvM1m.json",
-        "icon": "",
+        "icon": "/icons/other/trash/OCSzvM1m.png",
         "name": {
           "key": "item.filler.npc_2.name",
           "type": "translation",
@@ -7814,12 +8026,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/dengbhaT.json",
-        "icon": "",
+        "icon": "/icons/other/trash/dengbhaT.png",
         "name": {
           "key": "item.filler.mob_5.name",
           "type": "translation",
@@ -7849,12 +8062,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/oLv6sz2O.json",
-        "icon": "",
+        "icon": "/icons/other/trash/oLv6sz2O.png",
         "name": {
           "key": "item.filler.airdrop_3.name",
           "type": "translation",
@@ -7884,12 +8098,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/G9GsU7NG.json",
-        "icon": "",
+        "icon": "/icons/other/trash/G9GsU7NG.png",
         "name": {
           "key": "item.filler.valuable_5.name",
           "type": "translation",
@@ -7919,12 +8134,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/iXagTkT4.json",
-        "icon": "",
+        "icon": "/icons/other/trash/iXagTkT4.png",
         "name": {
           "key": "item.clan.resource3.name",
           "type": "translation",
@@ -7954,12 +8170,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/jptUfEGC.json",
-        "icon": "",
+        "icon": "/icons/other/trash/jptUfEGC.png",
         "name": {
           "key": "item.filler.outpost_10.name",
           "type": "translation",
@@ -7989,12 +8206,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/nVQXbbs3.json",
-        "icon": "",
+        "icon": "/icons/other/trash/nVQXbbs3.png",
         "name": {
           "key": "item.filler.valuable_1.name",
           "type": "translation",
@@ -8024,12 +8242,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/wa7xl6Wc.json",
-        "icon": "",
+        "icon": "/icons/other/trash/wa7xl6Wc.png",
         "name": {
           "key": "item.filler.npc_5.name",
           "type": "translation",
@@ -8059,12 +8278,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/krOF1kvZ.json",
-        "icon": "",
+        "icon": "/icons/other/trash/krOF1kvZ.png",
         "name": {
           "key": "item.filler.npc_limansk_5.name",
           "type": "translation",
@@ -8094,12 +8314,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/oiPFtUjH.json",
-        "icon": "",
+        "icon": "/icons/other/trash/oiPFtUjH.png",
         "name": {
           "key": "item.filler.mining_7.name",
           "type": "translation",
@@ -8129,12 +8350,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/7m4thIBn.json",
-        "icon": "",
+        "icon": "/icons/other/trash/7m4thIBn.png",
         "name": {
           "key": "item.filler.valuable_2.name",
           "type": "translation",
@@ -8164,12 +8386,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/G75jfjl7.json",
-        "icon": "",
+        "icon": "/icons/other/trash/G75jfjl7.png",
         "name": {
           "key": "item.filler.airdrop_1.name",
           "type": "translation",
@@ -8199,12 +8422,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/NpnpxrvX.json",
-        "icon": "",
+        "icon": "/icons/other/trash/NpnpxrvX.png",
         "name": {
           "key": "item.filler.npc_1.name",
           "type": "translation",
@@ -8234,12 +8458,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/Px7gNbMv.json",
-        "icon": "",
+        "icon": "/icons/other/trash/Px7gNbMv.png",
         "name": {
           "key": "item.filler.valuable_3.name",
           "type": "translation",
@@ -8269,12 +8494,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/nb0OaSNs.json",
-        "icon": "",
+        "icon": "/icons/other/trash/nb0OaSNs.png",
         "name": {
           "key": "item.16716.name",
           "type": "translation",
@@ -8304,12 +8530,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/zrnhkVFu.json",
-        "icon": "",
+        "icon": "/icons/other/trash/zrnhkVFu.png",
         "name": {
           "key": "item.misc.pseudogigant_eye_t1.name",
           "type": "translation",
@@ -8339,12 +8566,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/RkSKPUNO.json",
-        "icon": "",
+        "icon": "/icons/other/trash/RkSKPUNO.png",
         "name": {
           "key": "item.med.inside_nootrop_2.name",
           "type": "translation",
@@ -8374,12 +8602,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/NWMXZE66.json",
-        "icon": "",
+        "icon": "/icons/other/trash/NWMXZE66.png",
         "name": {
           "key": "item.filler.airdrop_2.name",
           "type": "translation",
@@ -8409,12 +8638,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/GpdSXQyq.json",
-        "icon": "",
+        "icon": "/icons/other/trash/GpdSXQyq.png",
         "name": {
           "key": "item.filler.npc_6.name",
           "type": "translation",
@@ -8444,12 +8674,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/RObDhNZb.json",
-        "icon": "",
+        "icon": "/icons/other/trash/RObDhNZb.png",
         "name": {
           "key": "item.filler.airdrop_4.name",
           "type": "translation",
@@ -8479,12 +8710,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/z2clUJuo.json",
-        "icon": "",
+        "icon": "/icons/other/trash/z2clUJuo.png",
         "name": {
           "key": "item.filler.valuable_6.name",
           "type": "translation",
@@ -8514,12 +8746,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/pT6RnVng.json",
-        "icon": "",
+        "icon": "/icons/other/trash/pT6RnVng.png",
         "name": {
           "key": "go.lighter.name",
           "type": "translation",
@@ -8549,12 +8782,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/a67vEZF1.json",
-        "icon": "",
+        "icon": "/icons/other/misc/a67vEZF1.png",
         "name": {
           "key": "item.misc.primary_bullet.name",
           "type": "translation",
@@ -8584,12 +8818,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/misc"
     },
     {
       "listing": {
         "data": "/items/other/HgdnRiQ6.json",
-        "icon": "",
+        "icon": "/icons/other/trash/HgdnRiQ6.png",
         "name": {
           "key": "item.filler.node_3.name",
           "type": "translation",
@@ -8619,12 +8854,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/IGKhe6El.json",
-        "icon": "",
+        "icon": "/icons/other/useful/IGKhe6El.png",
         "name": {
           "key": "item.resc.arm_newbie.name",
           "type": "translation",
@@ -8654,12 +8890,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/useful"
     },
     {
       "listing": {
         "data": "/items/other/iUV5K3Nk.json",
-        "icon": "",
+        "icon": "/icons/other/useful/iUV5K3Nk.png",
         "name": {
           "key": "item.resc.arm_veteran.name",
           "type": "translation",
@@ -8689,12 +8926,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/useful"
     },
     {
       "listing": {
         "data": "/items/other/wfN0Phpp.json",
-        "icon": "",
+        "icon": "/icons/other/useful/wfN0Phpp.png",
         "name": {
           "key": "item.resc.arm_stalker.name",
           "type": "translation",
@@ -8724,12 +8962,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/useful"
     },
     {
       "listing": {
         "data": "/items/other/uCNfgbjN.json",
-        "icon": "",
+        "icon": "/icons/other/useful/uCNfgbjN.png",
         "name": {
           "key": "item.resc.wpn_newbie_unit.name",
           "type": "translation",
@@ -8759,12 +8998,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/useful"
     },
     {
       "listing": {
         "data": "/items/other/tDpjSLto.json",
-        "icon": "",
+        "icon": "/icons/other/useful/tDpjSLto.png",
         "name": {
           "key": "item.resc.arm_stalker_unit.name",
           "type": "translation",
@@ -8794,12 +9034,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/useful"
     },
     {
       "listing": {
         "data": "/items/other/7lr29.json",
-        "icon": "",
+        "icon": "/icons/other/skins/7lr29.png",
         "name": {
           "key": "item.19822.name",
           "args": {},
@@ -8837,12 +9078,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/skins"
     },
     {
       "listing": {
         "data": "/items/other/rYQLYg4k.json",
-        "icon": "",
+        "icon": "/icons/other/structures/rYQLYg4k.png",
         "name": {
           "key": "go.regenerator_living.name",
           "type": "translation",
@@ -8872,12 +9114,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/structures"
     },
     {
       "listing": {
         "data": "/items/other/kMp8YSgs.json",
-        "icon": "",
+        "icon": "/icons/other/trash/kMp8YSgs.png",
         "name": {
           "key": "item.misc.snork_hand_t1.name",
           "type": "translation",
@@ -8907,12 +9150,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/CatBfGCl.json",
-        "icon": "",
+        "icon": "/icons/other/useful/CatBfGCl.png",
         "name": {
           "key": "item.resc.wpn_veteran.name",
           "type": "translation",
@@ -8942,12 +9186,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/useful"
     },
     {
       "listing": {
         "data": "/items/other/FDVzVqEA.json",
-        "icon": "",
+        "icon": "/icons/other/trash/FDVzVqEA.png",
         "name": {
           "key": "item.misc.snork_hand_t3.name",
           "type": "translation",
@@ -8977,12 +9222,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/OEqGjmJy.json",
-        "icon": "",
+        "icon": "/icons/other/structures/OEqGjmJy.png",
         "name": {
           "key": "go.clan.extractor.name",
           "type": "translation",
@@ -9012,12 +9258,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/structures"
     },
     {
       "listing": {
         "data": "/items/other/kTbVmTZN.json",
-        "icon": "",
+        "icon": "/icons/other/trash/kTbVmTZN.png",
         "name": {
           "key": "item.misc.pseudogigant_eye_t3.name",
           "type": "translation",
@@ -9047,12 +9294,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/mud9qLFR.json",
-        "icon": "",
+        "icon": "/icons/other/trash/mud9qLFR.png",
         "name": {
           "key": "item.filler.socket.name",
           "type": "translation",
@@ -9082,12 +9330,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/XOaGqZls.json",
-        "icon": "",
+        "icon": "/icons/other/trash/XOaGqZls.png",
         "name": {
           "key": "item.misc.dog_tail_t2.name",
           "type": "translation",
@@ -9117,12 +9366,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/bLFDYC8g.json",
-        "icon": "",
+        "icon": "/icons/other/trash/bLFDYC8g.png",
         "name": {
           "key": "item.bolt.name",
           "type": "translation",
@@ -9152,12 +9402,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/trash"
     },
     {
       "listing": {
         "data": "/items/other/aucjQRJN.json",
-        "icon": "",
+        "icon": "/icons/other/hideout/aucjQRJN.png",
         "name": {
           "key": "item.misc.canister_petrol.name",
           "type": "translation",
@@ -9187,12 +9438,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/hideout"
     },
     {
       "listing": {
         "data": "/items/other/lpeHfPtS.json",
-        "icon": "",
+        "icon": "/icons/other/hideout/lpeHfPtS.png",
         "name": {
           "key": "item.misc.canister_diesel.name",
           "type": "translation",
@@ -9222,12 +9474,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/hideout"
     },
     {
       "listing": {
         "data": "/items/other/eRQptERq.json",
-        "icon": "",
+        "icon": "/icons/other/hideout/eRQptERq.png",
         "name": {
           "key": "item.misc.balon_propane.name",
           "type": "translation",
@@ -9257,12 +9510,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/hideout"
     },
     {
       "listing": {
         "data": "/items/other/YIa4nSzO.json",
-        "icon": "",
+        "icon": "/icons/other/hideout/YIa4nSzO.png",
         "name": {
           "key": "item.misc.balon_methane.name",
           "type": "translation",
@@ -9292,12 +9546,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/hideout"
     },
     {
       "listing": {
         "data": "/items/other/hKPzvbS3.json",
-        "icon": "",
+        "icon": "/icons/other/barter/hKPzvbS3.png",
         "name": {
           "key": "item.key.halloween_2023.name",
           "type": "translation",
@@ -9327,12 +9582,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "other/barter"
     },
     {
       "listing": {
         "data": "/items/weapon/KvTIJWHw.json",
-        "icon": "",
+        "icon": "/icons/weapon/assault_rifle/KvTIJWHw.png",
         "name": {
           "key": "item.wpn.xm8s_a.name",
           "type": "translation",
@@ -9362,12 +9618,13 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "weapon/assault_rifle"
     },
     {
       "listing": {
         "data": "/items/weapon/xs3059xD.json",
-        "icon": "",
+        "icon": "/icons/weapon/assault_rifle/xs3059xD.png",
         "name": {
           "key": "item.wpn.scarl_dayx.name",
           "args": {},
@@ -9399,7 +9656,8 @@
           "state": ""
         },
         "infoBlocks": []
-      }
+      },
+      "_wiki_category": "weapon/assault_rifle"
     }
   ]
 }

@@ -1,11 +1,12 @@
 """
 Синхронизация предметов с stalcraft.wiki API.
 Находит предметы, которых нет в локальной EXBO базе, и добавляет их.
-Также скачивает иконки с wiki CDN.
+Скачивает иконки с cdn.stalcraft.wiki.
 
 Использование:
-  python -m services.wiki_sync          — синхронизация
-  python -m services.wiki_sync --force  — перезаписать даже существующие
+  python -m services.wiki_sync              — синхронизация новых предметов
+  python -m services.wiki_sync --force      — перезаписать даже существующие
+  python -m services.wiki_sync --icons      — только скачать недостающие иконки
 """
 
 import asyncio
@@ -21,24 +22,8 @@ from config import GAME_DB_DIR, STALCRAFT_REGION, BASE_DIR
 logger = logging.getLogger(__name__)
 
 WIKI_API = "https://stalcraft.wiki/api/exbo"
-WIKI_CDN = "https://stalcraft-wiki-cdn.b-cdn.net"
-
-# Маппинг slug категорий wiki → наши категории в EXBO базе
-WIKI_CAT_MAP = {
-    "weapon": "weapon",
-    "armor": "armor",
-    "artefact": "artefact",
-    "attachment": "attachment",
-    "backpacks": "backpacks",
-    "bullet": "bullet",
-    "containers": "containers",
-    "drink": "drink",
-    "food": "food",
-    "grenade": "grenade",
-    "medicine": "medicine",
-    "other": "other",
-    "misc": "misc",
-}
+# Правильный CDN для иконок: https://cdn.stalcraft.wiki/exbo_item_parser/{category}/{exbo_id}.png
+WIKI_ICON_CDN = "https://cdn.stalcraft.wiki/exbo_item_parser"
 
 CUSTOM_ITEMS_FILE = BASE_DIR / "custom_items.json"
 
@@ -52,7 +37,6 @@ def _load_existing_ids() -> set[str]:
         listing = json.load(f)
     ids = set()
     for entry in listing:
-        # id из пути: /items/other/abc123.json → abc123
         data_path = entry.get("data", "")
         if data_path:
             ids.add(Path(data_path).stem)
@@ -88,31 +72,96 @@ async def fetch_wiki_items(client: httpx.AsyncClient, category_slug: str) -> lis
     return []
 
 
-async def download_icon(client: httpx.AsyncClient, exbo_id: str, category: str) -> str | None:
-    """Попробовать скачать иконку предмета с wiki CDN."""
-    # Wiki хранит иконки по пути /images/items/{exbo_id}.png
+async def download_icon(client: httpx.AsyncClient, exbo_id: str, wiki_category: str) -> str:
+    """
+    Скачать иконку предмета с cdn.stalcraft.wiki.
+    URL формат: https://cdn.stalcraft.wiki/exbo_item_parser/{category}/{subcategory}/{exbo_id}.png
+    wiki_category примеры: "other/useful", "weapon/assault_rifle", "artefact"
+    """
+    parts = wiki_category.split("/")
+    # Пробуем с полной категорией (other/useful) и только базовой (other)
     urls_to_try = [
-        f"{WIKI_CDN}/images/items/{exbo_id}.png",
-        f"{WIKI_CDN}/images/items/{exbo_id}.webp",
+        f"{WIKI_ICON_CDN}/{wiki_category}/{exbo_id}.png",
     ]
+    if len(parts) > 1:
+        urls_to_try.append(f"{WIKI_ICON_CDN}/{parts[0]}/{exbo_id}.png")
 
     for url in urls_to_try:
         try:
             resp = await client.get(url)
             if resp.status_code == 200 and len(resp.content) > 100:
                 # Сохраняем в папку иконок
-                # category format: "other/useful" → parent = "other"
-                cat_folder = category.split("/")[0] if "/" in category else category
-                icon_dir = GAME_DB_DIR / STALCRAFT_REGION / "icons" / cat_folder
-                icon_dir.mkdir(parents=True, exist_ok=True)
+                cat_folder = parts[0]
+                sub_folder = parts[1] if len(parts) > 1 else ""
 
-                ext = ".png" if url.endswith(".png") else ".png"
-                icon_path = icon_dir / f"{exbo_id}{ext}"
-                icon_path.write_bytes(resp.content)
-                return f"/icons/{cat_folder}/{exbo_id}{ext}"
+                if sub_folder:
+                    icon_dir = GAME_DB_DIR / STALCRAFT_REGION / "icons" / cat_folder / sub_folder
+                else:
+                    icon_dir = GAME_DB_DIR / STALCRAFT_REGION / "icons" / cat_folder
+
+                icon_dir.mkdir(parents=True, exist_ok=True)
+                icon_file = icon_dir / f"{exbo_id}.png"
+                icon_file.write_bytes(resp.content)
+
+                if sub_folder:
+                    return f"/icons/{cat_folder}/{sub_folder}/{exbo_id}.png"
+                return f"/icons/{cat_folder}/{exbo_id}.png"
         except Exception:
             continue
     return ""
+
+
+async def download_missing_icons() -> int:
+    """Скачать иконки для всех кастомных предметов у которых icon_path пустой."""
+    custom_data = _load_custom_items()
+    items = custom_data.get("items", [])
+    if not items:
+        return 0
+
+    downloaded = 0
+    async with httpx.AsyncClient(timeout=15, follow_redirects=True) as client:
+        for ci in items:
+            listing = ci.get("listing", {})
+            icon = listing.get("icon", "")
+            if icon:
+                # Уже есть иконка — проверяем что файл существует
+                icon_file = GAME_DB_DIR / STALCRAFT_REGION / icon.lstrip("/")
+                if icon_file.exists():
+                    continue
+
+            exbo_id = Path(listing.get("data", "")).stem
+            if not exbo_id:
+                continue
+
+            # Определяем wiki-категорию
+            wiki_cat = ci.get("_wiki_category", "")
+            if not wiki_cat:
+                # Из data_path: /items/other/8AjTFOVB.json → other
+                data_path = listing.get("data", "")
+                path_parts = data_path.replace("\\", "/").split("/")
+                if len(path_parts) >= 3:
+                    wiki_cat = "/".join(path_parts[2:-1])
+                if not wiki_cat:
+                    wiki_cat = "other"
+
+            new_icon = await download_icon(client, exbo_id, wiki_cat)
+            if new_icon:
+                listing["icon"] = new_icon
+                downloaded += 1
+
+            await asyncio.sleep(0.05)
+
+    if downloaded:
+        _save_custom_items(custom_data)
+        logger.info("📸 Скачано %d иконок", downloaded)
+
+        from services.db_updater import _merge_custom_items
+        _merge_custom_items()
+
+        from services.item_loader import item_db
+        item_db.load()
+
+    return downloaded
 
 
 async def sync_from_wiki(force: bool = False) -> int:
@@ -137,23 +186,20 @@ async def sync_from_wiki(force: bool = False) -> int:
         headers={"Accept-Language": "ru", "Accept": "application/json"},
         follow_redirects=True,
     ) as client:
-        # Получаем категории
         try:
             categories = await fetch_wiki_categories(client)
         except Exception as exc:
             logger.error("Ошибка получения категорий wiki: %s", exc)
             return 0
 
-        # Собираем уникальные slug'и
         cat_slugs = set()
         for cat in categories:
             slug = cat.get("slug", "")
-            if slug and slug != "new":  # "new" — не реальная категория
+            if slug and slug != "new":
                 cat_slugs.add(slug)
 
         logger.info("📂 Найдено %d категорий на wiki", len(cat_slugs))
 
-        # Для каждой категории получаем предметы
         for cat_slug in sorted(cat_slugs):
             try:
                 items = await fetch_wiki_items(client, cat_slug)
@@ -166,13 +212,11 @@ async def sync_from_wiki(force: bool = False) -> int:
                 if not exbo_id:
                     continue
 
-                # Пропускаем если уже есть
                 if exbo_id in existing_ids and not force:
                     continue
                 if exbo_id in custom_ids and not force:
                     continue
 
-                # Извлекаем данные
                 wiki_cat = wiki_item.get("category", cat_slug)
                 color = wiki_item.get("color", "DEFAULT")
                 name_obj = wiki_item.get("name", {})
@@ -182,18 +226,14 @@ async def sync_from_wiki(force: bool = False) -> int:
                 if not name_ru and not name_en:
                     continue
 
-                # Определяем путь в нашей структуре
-                # wiki_cat бывает "other/useful", "weapon/assault_rifle" и тд
                 cat_parts = wiki_cat.split("/")
                 base_cat = cat_parts[0] if cat_parts else "other"
-                item_folder = base_cat  # храним в корне категории
 
-                data_path = f"/items/{item_folder}/{exbo_id}.json"
-                icon_path = ""
+                data_path = f"/items/{base_cat}/{exbo_id}.json"
 
-                # Wiki CDN не хранит иконки по exbo_id, пропускаем скачивание
+                # Скачиваем иконку
+                icon_path = await download_icon(client, exbo_id, wiki_cat)
 
-                # Формируем listing entry
                 listing_entry = {
                     "data": data_path,
                     "icon": icon_path,
@@ -202,36 +242,32 @@ async def sync_from_wiki(force: bool = False) -> int:
                     "status": {"state": ""},
                 }
 
-                # Формируем detail JSON
                 detail = {
                     "id": exbo_id,
-                    "category": item_folder,
+                    "category": base_cat,
                     "name": name_obj,
                     "color": color,
                     "status": {"state": ""},
                     "infoBlocks": [],
                 }
 
-                # Добавляем в custom_items
                 custom_data["items"].append({
                     "listing": listing_entry,
                     "detail": detail,
+                    "_wiki_category": wiki_cat,
                 })
                 custom_ids.add(exbo_id)
                 added += 1
 
-            # Не спамим запросами
             await asyncio.sleep(0.3)
 
     if added:
         _save_custom_items(custom_data)
         logger.info("✅ Добавлено %d новых предметов с wiki", added)
 
-        # Сразу мёржим в базу
         from services.db_updater import _merge_custom_items
         _merge_custom_items()
 
-        # Перезагружаем item_db
         from services.item_loader import item_db
         item_db.load()
         logger.info("📦 База перезагружена: %d предметов", item_db.total_items)
@@ -244,11 +280,19 @@ async def sync_from_wiki(force: bool = False) -> int:
 async def main():
     """CLI-запуск синхронизации."""
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
-    force = "--force" in sys.argv
-    count = await sync_from_wiki(force=force)
-    print(f"Добавлено: {count}")
+
+    if "--icons" in sys.argv:
+        count = await download_missing_icons()
+        print(f"Скачано иконок: {count}")
+    else:
+        force = "--force" in sys.argv
+        count = await sync_from_wiki(force=force)
+        print(f"Добавлено предметов: {count}")
+
+        # После добавления — качаем недостающие иконки
+        icon_count = await download_missing_icons()
+        print(f"Скачано иконок: {icon_count}")
 
 
 if __name__ == "__main__":
     asyncio.run(main())
-
