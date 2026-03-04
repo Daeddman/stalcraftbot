@@ -1,0 +1,17 @@
+{
+  "id": "kTbVmTZN",
+  "category": "other",
+  "name": {
+    "key": "item.misc.pseudogigant_eye_t3.name",
+    "type": "translation",
+    "lines": {
+      "en": "Strong Behemoth’s Eye",
+      "ru": "Глаз сильного бурелома"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

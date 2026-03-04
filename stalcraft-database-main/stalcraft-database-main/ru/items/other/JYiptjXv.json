@@ -1,0 +1,17 @@
+{
+  "id": "JYiptjXv",
+  "category": "other",
+  "name": {
+    "key": "item.misc.prepared_sleeve.name",
+    "type": "translation",
+    "lines": {
+      "en": "Pressed Casing Blank",
+      "ru": "Прессованная заготовка гильзы"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

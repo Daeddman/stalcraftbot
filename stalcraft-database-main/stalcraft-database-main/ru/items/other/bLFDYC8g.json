@@ -1,0 +1,17 @@
+{
+  "id": "bLFDYC8g",
+  "category": "other",
+  "name": {
+    "key": "item.bolt.name",
+    "type": "translation",
+    "lines": {
+      "en": "Bolt",
+      "ru": "Болт"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "nb0OaSNs",
+  "category": "other",
+  "name": {
+    "key": "item.16716.name",
+    "type": "translation",
+    "lines": {
+      "en": "Stasis Protoartifact",
+      "ru": "Протоартефакт «Застоя»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

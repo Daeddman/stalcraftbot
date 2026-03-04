@@ -1,0 +1,17 @@
+{
+  "id": "1vWBpuz7",
+  "category": "consumables",
+  "name": {
+    "key": "item.bag.762snp.name",
+    "type": "translation",
+    "lines": {
+      "en": "Pouch of 7.62 mm Sniper Rifle Rounds",
+      "ru": "Сумка снайперских 7.62 мм"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

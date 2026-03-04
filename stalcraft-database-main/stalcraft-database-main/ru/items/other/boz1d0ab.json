@@ -1,0 +1,17 @@
+{
+  "id": "boz1d0ab",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.aks74_mod_3.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #3: Rapier",
+      "ru": "Часть схемы #3: «Рапира»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

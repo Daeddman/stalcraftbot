@@ -1,0 +1,17 @@
+{
+  "id": "gcd2b9lz",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.svu_mod_3.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #3: Wave",
+      "ru": "Часть схемы #3: «Волна»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "ic9KvBYe",
+  "category": "other",
+  "name": {
+    "key": "go.misc.extractor.name",
+    "type": "translation",
+    "lines": {
+      "en": "Anomaly Research Installation",
+      "ru": "Аномальная установка"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

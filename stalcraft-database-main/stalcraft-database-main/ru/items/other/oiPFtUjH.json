@@ -1,0 +1,17 @@
+{
+  "id": "oiPFtUjH",
+  "category": "other",
+  "name": {
+    "key": "item.filler.mining_7.name",
+    "type": "translation",
+    "lines": {
+      "en": "Solenoid",
+      "ru": "Соленоид"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

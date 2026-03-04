@@ -1,0 +1,17 @@
+{
+  "id": "NpnpxrvX",
+  "category": "other",
+  "name": {
+    "key": "item.filler.npc_1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Pocket Money",
+      "ru": "Карманные деньги"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

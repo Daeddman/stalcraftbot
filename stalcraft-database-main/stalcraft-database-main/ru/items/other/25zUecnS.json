@@ -1,0 +1,17 @@
+{
+  "id": "25zUecnS",
+  "category": "other",
+  "name": {
+    "key": "item.filler.valuable_11.name",
+    "type": "translation",
+    "lines": {
+      "en": "Rare Alloy Components",
+      "ru": "Компоненты редких сплавов"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

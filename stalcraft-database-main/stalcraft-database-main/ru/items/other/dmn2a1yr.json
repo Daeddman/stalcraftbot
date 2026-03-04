@@ -1,0 +1,17 @@
+{
+  "id": "dmn2a1yr",
+  "category": "other",
+  "name": {
+    "key": "item.lootbox.blizzard_2022.name",
+    "type": "translation",
+    "lines": {
+      "en": "Anomalous Freeze Crate",
+      "ru": "Ящик аномальной стужи"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

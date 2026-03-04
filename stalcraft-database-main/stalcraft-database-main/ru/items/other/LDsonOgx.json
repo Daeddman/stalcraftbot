@@ -1,0 +1,17 @@
+{
+  "id": "LDsonOgx",
+  "category": "other",
+  "name": {
+    "key": "item.misc.pseudodog_tail_t1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Weak Wild Hound’s Tail",
+      "ru": "Хвост слабой дикой гончей"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

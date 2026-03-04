@@ -1,0 +1,17 @@
+{
+  "id": "kFdakoZY",
+  "category": "other",
+  "name": {
+    "key": "item.gachapon.winter25.name",
+    "type": "translation",
+    "lines": {
+      "en": "Case with skins from Operation Cryostasis",
+      "ru": "Кейс с обликами «Операции Криостазис»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

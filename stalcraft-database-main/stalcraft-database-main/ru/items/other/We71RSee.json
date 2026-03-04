@@ -1,0 +1,17 @@
+{
+  "id": "We71RSee",
+  "category": "other",
+  "name": {
+    "key": "item.misc.copper_oxide.name",
+    "type": "translation",
+    "lines": {
+      "en": "Patina",
+      "ru": "Патина"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

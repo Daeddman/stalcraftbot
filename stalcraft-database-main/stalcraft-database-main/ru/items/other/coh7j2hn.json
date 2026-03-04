@@ -1,0 +1,17 @@
+{
+  "id": "coh7j2hn",
+  "category": "other",
+  "name": {
+    "key": "item.16655.name",
+    "type": "translation",
+    "lines": {
+      "en": "Combat Set",
+      "ru": "Боевой набор"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

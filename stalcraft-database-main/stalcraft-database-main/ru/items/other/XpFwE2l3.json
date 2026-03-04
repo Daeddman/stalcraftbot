@@ -1,0 +1,17 @@
+{
+  "id": "XpFwE2l3",
+  "category": "other",
+  "name": {
+    "key": "item.unexplored.name",
+    "type": "translation",
+    "lines": {
+      "en": "Unresearched Item",
+      "ru": "Неисследованный предмет"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

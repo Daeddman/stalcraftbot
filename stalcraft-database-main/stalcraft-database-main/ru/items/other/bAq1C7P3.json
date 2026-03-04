@@ -1,0 +1,17 @@
+{
+  "id": "bAq1C7P3",
+  "category": "other",
+  "name": {
+    "key": "item.misc.tire.name",
+    "type": "translation",
+    "lines": {
+      "en": "Tire",
+      "ru": "Покрышка"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

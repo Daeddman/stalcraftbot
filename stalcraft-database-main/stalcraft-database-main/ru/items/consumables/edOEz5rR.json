@@ -1,0 +1,17 @@
+{
+  "id": "edOEz5rR",
+  "category": "consumables",
+  "name": {
+    "key": "item.bag.9st.name",
+    "type": "translation",
+    "lines": {
+      "en": "Pouch of 9 mm Rounds",
+      "ru": "Сумка патронов 9 мм"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

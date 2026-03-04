@@ -1,0 +1,21 @@
+{
+  "id": "3grk1",
+  "category": "other",
+  "name": {
+    "key": "item.19821.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "Test Prototype RMO-93",
+      "es": "Prototipo de prueba RMO-93",
+      "fr": "Prototype dessai RMO-93",
+      "ko": "시험용 프로토타입 RMO-93",
+      "ru": "«Тестовый образец» РМО-93"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

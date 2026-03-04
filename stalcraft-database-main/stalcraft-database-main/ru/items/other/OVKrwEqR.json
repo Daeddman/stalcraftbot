@@ -1,0 +1,17 @@
+{
+  "id": "OVKrwEqR",
+  "category": "other",
+  "name": {
+    "key": "item.filler.boss_limansk_3.name",
+    "type": "translation",
+    "lines": {
+      "en": "Royal Fang",
+      "ru": "Царский клык"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

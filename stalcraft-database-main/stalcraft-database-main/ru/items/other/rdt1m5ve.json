@@ -1,0 +1,17 @@
+{
+  "id": "rdt1m5ve",
+  "category": "other",
+  "name": {
+    "key": "item.art.protoart.name",
+    "type": "translation",
+    "lines": {
+      "en": "Protoartifact",
+      "ru": "Протоартефакт"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

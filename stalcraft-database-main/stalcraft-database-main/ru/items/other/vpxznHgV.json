@@ -1,0 +1,17 @@
+{
+  "id": "vpxznHgV",
+  "category": "other",
+  "name": {
+    "key": "item.16712.name",
+    "type": "translation",
+    "lines": {
+      "en": "Blender Protoartifact",
+      "ru": "Протоартефакт «Волчка»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

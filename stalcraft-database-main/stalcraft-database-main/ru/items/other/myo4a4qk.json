@@ -1,0 +1,17 @@
+{
+  "id": "myo4a4qk",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.hp_mod_2.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #2: Dream",
+      "ru": "Часть схемы #2: «Мечта»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

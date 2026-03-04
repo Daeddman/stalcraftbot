@@ -1,0 +1,17 @@
+{
+  "id": "dYcqeFJN",
+  "category": "other",
+  "name": {
+    "key": "item.misc.sleeve_blank.name",
+    "type": "translation",
+    "lines": {
+      "en": "Casing Blank",
+      "ru": "Заготовка для гильзы"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

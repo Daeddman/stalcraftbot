@@ -1,0 +1,17 @@
+{
+  "id": "1NbPsCF8",
+  "category": "consumables",
+  "name": {
+    "key": "item.exp.frag_crafted.name",
+    "type": "translation",
+    "lines": {
+      "en": "Jury-Rigged Fragmentation Grenade",
+      "ru": "Кустарная осколочная граната"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "kpw8j0jo",
+  "category": "other",
+  "name": {
+    "key": "item.gachapon.ravent_2023.name",
+    "type": "translation",
+    "lines": {
+      "en": "Case with Crow Arena Styles",
+      "ru": "Кейс с обликами «Арены Ворона»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

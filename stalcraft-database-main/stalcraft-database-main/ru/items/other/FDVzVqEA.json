@@ -1,0 +1,17 @@
+{
+  "id": "FDVzVqEA",
+  "category": "other",
+  "name": {
+    "key": "item.misc.snork_hand_t3.name",
+    "type": "translation",
+    "lines": {
+      "en": "Strong Skitter’s Hand",
+      "ru": "Рука сильного шныря"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "chg8q2la",
+  "category": "other",
+  "name": {
+    "key": "item.other.container.skin_maraphon",
+    "type": "translation",
+    "lines": {
+      "en": "Case with Dead Mans Marathon Styles",
+      "ru": "Кейс с обликами «Марафона\nмертвецов»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "jqqdlMD5",
+  "category": "other",
+  "name": {
+    "key": "item.misc.snork_hand_t2.name",
+    "type": "translation",
+    "lines": {
+      "en": "Skitter’s Hand",
+      "ru": "Рука шныря"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

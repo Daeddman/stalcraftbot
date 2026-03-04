@@ -1,0 +1,17 @@
+{
+  "id": "slvB0xFP",
+  "category": "consumables",
+  "name": {
+    "key": "item.bag.545exp.name",
+    "type": "translation",
+    "lines": {
+      "en": "Pouch of 5.45 mm Expanding Rounds",
+      "ru": "Сумка экспансивных патронов 5.45 мм"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

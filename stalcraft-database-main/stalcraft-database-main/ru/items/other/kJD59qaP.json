@@ -1,0 +1,70 @@
+{
+  "id": "kJD59qaP",
+  "category": "other",
+  "name": {
+    "type": "translation",
+    "key": "item.season_pass.bp_token_20bl.name",
+    "args": {},
+    "lines": {
+      "ru": "Сезонный Пропуск + 20 уровней",
+      "en": "Season Pass + 20 levels"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": [
+    {
+      "type": "list",
+      "title": {
+        "type": "text",
+        "text": ""
+      },
+      "elements": [
+        {
+          "type": "key-value",
+          "key": {
+            "type": "translation",
+            "key": "core.tooltip.info.category",
+            "args": {},
+            "lines": {
+              "ru": "Класс",
+              "en": "Class"
+            }
+          },
+          "value": {
+            "type": "translation",
+            "key": "core.handbook.category.useful",
+            "args": {},
+            "lines": {
+              "ru": "Прочее",
+              "en": "Other"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "list",
+      "title": {
+        "type": "text",
+        "text": ""
+      },
+      "elements": [
+        {
+          "type": "text",
+          "text": {
+            "type": "translation",
+            "key": "item.season_pass.bp_token_20bl.desc",
+            "args": {},
+            "lines": {
+              "ru": "Сезонный пропуск с бонусом в 20 уровней. Открывает доступ к премиальным наградам боевого пропуска и сразу повышает уровень на 20.",
+              "en": "Season pass with a bonus of 20 levels. Unlocks access to premium battle pass rewards and instantly boosts your level by 20."
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

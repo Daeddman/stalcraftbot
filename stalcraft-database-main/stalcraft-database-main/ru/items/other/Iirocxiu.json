@@ -1,0 +1,17 @@
+{
+  "id": "Iirocxiu",
+  "category": "other",
+  "name": {
+    "key": "item.misc.krovosos_tentacles_t1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Weak Ghoul’s Tentacle",
+      "ru": "Щупальца слабого упыря"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

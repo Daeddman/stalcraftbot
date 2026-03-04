@@ -1,0 +1,17 @@
+{
+  "id": "atu0p9vd",
+  "category": "other",
+  "name": {
+    "key": "item.gachapon.spring24.name",
+    "type": "translation",
+    "lines": {
+      "en": "Case with Folktale Spring styles",
+      "ru": "Кейс с обликами «Славянской весны»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,18 @@
+{
+  "id": "ScTm1w2S",
+  "category": "consumables",
+  "name": {
+    "key": "item.med.apt_sp.name",
+    "type": "translation",
+    "lines": {
+      "en": "Emergency First-Aid Kit",
+      "es": "Botiquín de emergencia",
+      "ru": "Аптечка для экстремальных условий"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

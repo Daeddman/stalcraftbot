@@ -1,0 +1,17 @@
+{
+  "id": "yISIQeGI",
+  "category": "other",
+  "name": {
+    "key": "item.misc.krovosos_tentacles_t2.name",
+    "type": "translation",
+    "lines": {
+      "en": "Ghoul’s Tentacle",
+      "ru": "Щупальца упыря"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

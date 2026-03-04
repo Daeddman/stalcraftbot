@@ -1,0 +1,20 @@
+{
+  "id": "3gp95",
+  "category": "attachment",
+  "name": {
+    "key": "item.att.mag_mc55810.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "MTs-558 Extended Magazine",
+      "es": "Cargador extendido MTs-558",
+      "fr": "Chargeur étendu MTs-558",
+      "ru": "Увеличенный магазин для МЦ-558"
+    }
+  },
+  "color": "RANK_MASTER",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

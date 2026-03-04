@@ -1,0 +1,17 @@
+{
+  "id": "JZRpZ8iK",
+  "category": "consumables",
+  "name": {
+    "key": "item.bag.556st.name",
+    "type": "translation",
+    "lines": {
+      "en": "Pouch of 5.56 mm Rounds",
+      "ru": "Сумка патронов 5.56 мм"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

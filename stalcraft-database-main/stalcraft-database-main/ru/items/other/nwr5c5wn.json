@@ -1,0 +1,17 @@
+{
+  "id": "nwr5c5wn",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.aks74_mod_1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #1: Rapier",
+      "ru": "Часть схемы #1: «Рапира»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

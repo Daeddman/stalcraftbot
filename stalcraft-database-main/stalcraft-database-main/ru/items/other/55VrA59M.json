@@ -1,0 +1,17 @@
+{
+  "id": "55VrA59M",
+  "category": "other",
+  "name": {
+    "key": "item.16715.name",
+    "type": "translation",
+    "lines": {
+      "en": "Whirlpool Protoartifact",
+      "ru": "Протоартефакт «Омута»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

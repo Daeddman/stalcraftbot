@@ -1,0 +1,21 @@
+{
+  "id": "6wr2n",
+  "category": "other",
+  "name": {
+    "key": "item.19823.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "Test Prototype RPK-16",
+      "es": "Prototipo de prueba RPK-16",
+      "fr": "Prototype dessai RPK-16",
+      "ko": "시험용 프로토타입 RPK-16",
+      "ru": "«Тестовый образец» РПК-16"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

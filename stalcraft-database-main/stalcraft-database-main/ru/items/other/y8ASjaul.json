@@ -1,0 +1,17 @@
+{
+  "id": "y8ASjaul",
+  "category": "other",
+  "name": {
+    "key": "item.misc.threads.name",
+    "type": "translation",
+    "lines": {
+      "en": "Spool of Thread",
+      "ru": "Моток ниток"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,21 @@
+{
+  "id": "g400n",
+  "category": "other",
+  "name": {
+    "key": "item.19826.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "OTs-62 Thug",
+      "es": "OTs-62 Matón",
+      "fr": "OTs-62 Voyou",
+      "ko": "OTs-62 불한당",
+      "ru": "«Головорез» ОЦ-62"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

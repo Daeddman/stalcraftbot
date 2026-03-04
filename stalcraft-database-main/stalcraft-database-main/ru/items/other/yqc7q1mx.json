@@ -1,0 +1,17 @@
+{
+  "id": "yqc7q1mx",
+  "category": "other",
+  "name": {
+    "key": "item.16657.name",
+    "type": "translation",
+    "lines": {
+      "en": "Reaper’s Legacy 2020 Crate",
+      "ru": "Ящик Наследия Жнеца 2020"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

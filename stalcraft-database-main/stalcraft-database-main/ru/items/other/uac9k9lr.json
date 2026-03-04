@@ -1,0 +1,17 @@
+{
+  "id": "uac9k9lr",
+  "category": "other",
+  "name": {
+    "key": "item.lootbox.halloween_2023.name",
+    "type": "translation",
+    "lines": {
+      "en": "Sponsors Gift",
+      "ru": "Спонсорский подгон"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

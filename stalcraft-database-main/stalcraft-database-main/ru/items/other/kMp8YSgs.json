@@ -1,0 +1,17 @@
+{
+  "id": "kMp8YSgs",
+  "category": "other",
+  "name": {
+    "key": "item.misc.snork_hand_t1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Weak Skitter’s Hand",
+      "ru": "Рука слабого шныря"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

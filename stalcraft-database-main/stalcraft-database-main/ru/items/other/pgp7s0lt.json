@@ -1,0 +1,17 @@
+{
+  "id": "pgp7s0lt",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.svu_mod_4.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #4: Wave",
+      "ru": "Часть схемы #4: «Волна»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

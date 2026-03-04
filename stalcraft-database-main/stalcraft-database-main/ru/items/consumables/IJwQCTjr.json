@@ -1,0 +1,17 @@
+{
+  "id": "IJwQCTjr",
+  "category": "consumables",
+  "name": {
+    "key": "item.bag.12kar.name",
+    "type": "translation",
+    "lines": {
+      "en": "Pouch of 12x76 mm Buckshot",
+      "ru": "Сумка картечи 12х76 мм"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

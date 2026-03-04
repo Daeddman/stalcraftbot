@@ -1,0 +1,17 @@
+{
+  "id": "WdVYNOia",
+  "category": "other",
+  "name": {
+    "key": "item.16714.name",
+    "type": "translation",
+    "lines": {
+      "en": "Trampoline Protoartifact",
+      "ru": "Протоартефакт «Батута»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

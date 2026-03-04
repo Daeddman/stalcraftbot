@@ -1,0 +1,17 @@
+{
+  "id": "PHcByLfh",
+  "category": "consumables",
+  "name": {
+    "key": "go.gorelka.name",
+    "type": "translation",
+    "lines": {
+      "en": "Burner",
+      "ru": "Горелка"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

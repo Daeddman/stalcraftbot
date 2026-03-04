@@ -1,0 +1,17 @@
+{
+  "id": "nVQXbbs3",
+  "category": "other",
+  "name": {
+    "key": "item.filler.valuable_1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Pharmaceutical Drug",
+      "ru": "Фармпрепарат"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "NUI2d2MX",
+  "category": "other",
+  "name": {
+    "key": "item.misc.tushkan_head_t3.name",
+    "type": "translation",
+    "lines": {
+      "en": "Strong Rat’s Head",
+      "ru": "Голова сильной крысы"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "5wIf1vNj",
+  "category": "other",
+  "name": {
+    "key": "item.filler.npc_limansk_6.name",
+    "type": "translation",
+    "lines": {
+      "en": "PDA Spare Parts",
+      "ru": "Запчасти для ПДА"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

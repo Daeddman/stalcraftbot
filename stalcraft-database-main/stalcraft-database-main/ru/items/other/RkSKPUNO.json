@@ -1,0 +1,17 @@
+{
+  "id": "RkSKPUNO",
+  "category": "other",
+  "name": {
+    "key": "item.med.inside_nootrop_2.name",
+    "type": "translation",
+    "lines": {
+      "en": "Nootropic-Tyrosine",
+      "ru": "Ноотроп-тирозин"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

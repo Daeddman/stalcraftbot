@@ -1,0 +1,17 @@
+{
+  "id": "OSyyVAhy",
+  "category": "other",
+  "name": {
+    "key": "item.filler.outpost_8.name",
+    "type": "translation",
+    "lines": {
+      "en": "Officer’s Flask",
+      "ru": "Офицерская фляга"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

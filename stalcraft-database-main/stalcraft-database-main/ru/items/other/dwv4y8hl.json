@@ -1,0 +1,17 @@
+{
+  "id": "dwv4y8hl",
+  "category": "other",
+  "name": {
+    "key": "item.lootbox.halloween_2022.name",
+    "type": "translation",
+    "lines": {
+      "en": "Shattered Reflection Crate",
+      "ru": "Ящик Разбитого отражения"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

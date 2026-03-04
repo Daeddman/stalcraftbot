@@ -1,0 +1,17 @@
+{
+  "id": "AwYf0Jgw",
+  "category": "armor",
+  "name": {
+    "key": "item.arm.hunter_donate.name",
+    "type": "translation",
+    "lines": {
+      "en": "Hunter’s Suit",
+      "ru": "Охотничий костюм"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "uJj59xnV",
+  "category": "other",
+  "name": {
+    "key": "item.resc.wpn_master.name",
+    "type": "translation",
+    "lines": {
+      "en": "Pack of Weapon Components (Master)",
+      "ru": "Набор компонентов оружия (Мастер)"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

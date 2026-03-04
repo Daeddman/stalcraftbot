@@ -1,0 +1,17 @@
+{
+  "id": "OCSzvM1m",
+  "category": "other",
+  "name": {
+    "key": "item.filler.npc_2.name",
+    "type": "translation",
+    "lines": {
+      "en": "Cigarettes",
+      "ru": "Сигареты"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

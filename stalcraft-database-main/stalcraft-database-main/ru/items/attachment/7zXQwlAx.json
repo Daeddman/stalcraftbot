@@ -1,0 +1,17 @@
+{
+  "id": "7zXQwlAx",
+  "category": "attachment",
+  "name": {
+    "key": "item.att.handgrip_magpul_f.name",
+    "type": "translation",
+    "lines": {
+      "en": "KAC Vertical Foregrip Tactical Grip, Winter",
+      "ru": "Тактическая рукоятка KAC Vertical Foregrip, зимняя"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

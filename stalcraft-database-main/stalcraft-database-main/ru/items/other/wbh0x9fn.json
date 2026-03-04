@@ -1,0 +1,17 @@
+{
+  "id": "wbh0x9fn",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.spanner_1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #1: Spanner",
+      "ru": "Часть схемы #1: «Спаннер»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

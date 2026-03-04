@@ -1,0 +1,21 @@
+{
+  "id": "rw1vg",
+  "category": "consumables",
+  "name": {
+    "key": "item.med.thermobarier_1.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "1st Class ThermoBlock",
+      "es": "Inhibidor térmico de 1.ª clase",
+      "fr": "ThermoBloc de 1ère classe",
+      "ko": "1급 열 보호제",
+      "ru": "«Термобарьер» первого класса"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

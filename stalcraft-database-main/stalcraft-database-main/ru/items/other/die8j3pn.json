@@ -1,0 +1,17 @@
+{
+  "id": "die8j3pn",
+  "category": "other",
+  "name": {
+    "key": "item.lootbox.blizzard_2023.name",
+    "type": "translation",
+    "lines": {
+      "en": "Frost Researcher Crate",
+      "ru": "Ящик исследователя холода"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

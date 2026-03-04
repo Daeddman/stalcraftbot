@@ -1,0 +1,21 @@
+{
+  "id": "m0p4j",
+  "category": "consumables",
+  "name": {
+    "key": "item.med.protector_2.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "2nd Class Radioprotectant",
+      "es": "Radioprotector de 2.ª clase",
+      "fr": "Radioprotecteur de 2e Classe",
+      "ko": "2등급 방사능 보호제",
+      "ru": "Радиопротектор второго класса"
+    }
+  },
+  "color": "RANK_STALKER",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

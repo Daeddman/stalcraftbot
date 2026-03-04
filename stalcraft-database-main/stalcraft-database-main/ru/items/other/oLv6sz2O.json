@@ -1,0 +1,17 @@
+{
+  "id": "oLv6sz2O",
+  "category": "other",
+  "name": {
+    "key": "item.filler.airdrop_3.name",
+    "type": "translation",
+    "lines": {
+      "en": "Large Merchant Delivery",
+      "ru": "Значительная поставка торговцу"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "XLN5GN7C",
+  "category": "other",
+  "name": {
+    "key": "item.lootbox.winter25.name",
+    "type": "translation",
+    "lines": {
+      "en": "Old Stuff",
+      "ru": "Старый Скарб"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

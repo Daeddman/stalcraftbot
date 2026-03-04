@@ -1,0 +1,17 @@
+{
+  "id": "kJUAEzWF",
+  "category": "other",
+  "name": {
+    "key": "item.filler.boss_limansk_1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Graft of Glowing Skin",
+      "ru": "Лоскут светящейся кожи"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

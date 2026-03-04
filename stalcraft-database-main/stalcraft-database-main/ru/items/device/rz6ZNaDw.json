@@ -1,0 +1,17 @@
+{
+  "id": "rz6ZNaDw",
+  "category": "device",
+  "name": {
+    "key": "item.device.dshd_sak3.name",
+    "type": "translation",
+    "lines": {
+      "en": "Wide range detector \"PIONEER-3\"",
+      "ru": "Детектор широкого диапазона «PIONEER-3»"
+    }
+  },
+  "color": "RANK_MASTER",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

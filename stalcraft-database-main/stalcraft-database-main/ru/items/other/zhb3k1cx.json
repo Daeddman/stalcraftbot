@@ -1,0 +1,17 @@
+{
+  "id": "zhb3k1cx",
+  "category": "other",
+  "name": {
+    "key": "item.lootbox.spring24.name",
+    "type": "translation",
+    "lines": {
+      "en": "Grace of Perun",
+      "ru": "Благодать Перуна"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

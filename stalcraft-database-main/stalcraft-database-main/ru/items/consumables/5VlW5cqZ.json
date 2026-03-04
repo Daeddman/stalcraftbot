@@ -1,0 +1,17 @@
+{
+  "id": "5VlW5cqZ",
+  "category": "consumables",
+  "name": {
+    "key": "item.crate.box_ammo_spb762.name",
+    "type": "translation",
+    "lines": {
+      "en": "Crate of 7.62 mm SBP Rounds",
+      "ru": "Ящик патронов 7.62 мм СБП"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

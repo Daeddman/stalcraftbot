@@ -1,0 +1,17 @@
+{
+  "id": "v4b9hQD2",
+  "category": "consumables",
+  "name": {
+    "key": "item.bag.12drob.name",
+    "type": "translation",
+    "lines": {
+      "en": "Pouch of 12x76 mm Birdshot",
+      "ru": "Сумка дроби 12х76 мм"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

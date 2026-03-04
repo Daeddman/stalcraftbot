@@ -1,0 +1,17 @@
+{
+  "id": "xF8LODaM",
+  "category": "other",
+  "name": {
+    "key": "go.barricade_army_living.name",
+    "type": "translation",
+    "lines": {
+      "en": "Military Barricade",
+      "ru": "Военная баррикада"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

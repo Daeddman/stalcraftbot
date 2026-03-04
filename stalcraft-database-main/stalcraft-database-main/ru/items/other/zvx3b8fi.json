@@ -1,0 +1,17 @@
+{
+  "id": "zvx3b8fi",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.l85_mod_3.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #3: Equalizer",
+      "ru": "Часть схемы #3: «Уравнитель»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

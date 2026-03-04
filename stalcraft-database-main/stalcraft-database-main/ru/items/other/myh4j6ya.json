@@ -1,0 +1,17 @@
+{
+  "id": "myh4j6ya",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.spanner_3.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #3: Spanner",
+      "ru": "Часть схемы #3: «Спаннер»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

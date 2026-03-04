@@ -1,0 +1,17 @@
+{
+  "id": "rA8fsgH1",
+  "category": "other",
+  "name": {
+    "key": "item.16713.name",
+    "type": "translation",
+    "lines": {
+      "en": "Aspic/Fluff Protoartifact",
+      "ru": "Протоартефакт «Холодца»/«Пуха»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

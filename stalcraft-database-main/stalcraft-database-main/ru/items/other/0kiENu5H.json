@@ -1,0 +1,17 @@
+{
+  "id": "0kiENu5H",
+  "category": "other",
+  "name": {
+    "key": "item.misc.pseudodog_tail_t2.name",
+    "type": "translation",
+    "lines": {
+      "en": "Wild Hound’s Tail",
+      "ru": "Хвост дикой гончей"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

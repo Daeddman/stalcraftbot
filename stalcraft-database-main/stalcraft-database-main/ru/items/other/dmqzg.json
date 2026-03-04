@@ -1,0 +1,21 @@
+{
+  "id": "dmqzg",
+  "category": "other",
+  "name": {
+    "key": "item.19819.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "Deterioration",
+      "es": "Deterioro",
+      "fr": "Détérioration",
+      "ko": "열화",
+      "ru": "«Износ»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

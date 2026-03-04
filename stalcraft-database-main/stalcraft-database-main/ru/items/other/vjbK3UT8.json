@@ -1,0 +1,17 @@
+{
+  "id": "vjbK3UT8",
+  "category": "other",
+  "name": {
+    "key": "item.misc.bullet_form.name",
+    "type": "translation",
+    "lines": {
+      "en": "Bullet Mold",
+      "ru": "Форма пули"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

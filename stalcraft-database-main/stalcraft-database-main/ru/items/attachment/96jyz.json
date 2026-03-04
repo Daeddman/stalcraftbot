@@ -1,0 +1,19 @@
+{
+  "id": "96jyz",
+  "category": "attachment",
+  "name": {
+    "key": "item.24100.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "Red Star Charm",
+      "es": "Amuleto Estrella roja",
+      "ru": "Брелок «Красная звезда»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

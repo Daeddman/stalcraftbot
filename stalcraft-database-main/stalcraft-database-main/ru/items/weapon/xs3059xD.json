@@ -1,0 +1,18 @@
+{
+  "id": "xs3059xD",
+  "category": "weapon",
+  "name": {
+    "key": "item.wpn.scarl_dayx.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "Legacy SCAR-L",
+      "ru": "SCAR-L «Наследие»"
+    }
+  },
+  "color": "RANK_MASTER",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

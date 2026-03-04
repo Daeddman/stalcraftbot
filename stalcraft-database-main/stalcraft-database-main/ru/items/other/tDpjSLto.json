@@ -1,0 +1,17 @@
+{
+  "id": "tDpjSLto",
+  "category": "other",
+  "name": {
+    "key": "item.resc.arm_stalker_unit.name",
+    "type": "translation",
+    "lines": {
+      "en": "Armor Component (Stalker)",
+      "ru": "Компонент брони (Сталкер)"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

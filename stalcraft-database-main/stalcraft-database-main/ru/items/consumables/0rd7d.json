@@ -1,0 +1,21 @@
+{
+  "id": "0rd7d",
+  "category": "consumables",
+  "name": {
+    "key": "item.med.protector_1.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "1st Class Radioprotectant",
+      "es": "Radioprotector de 1.ª clase",
+      "fr": "Radioprotecteur de 1ère Classe",
+      "ko": "1급 방사능 보호제",
+      "ru": "Радиопротектор первого класса"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

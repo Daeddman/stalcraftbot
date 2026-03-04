@@ -1,0 +1,17 @@
+{
+  "id": "wa7xl6Wc",
+  "category": "other",
+  "name": {
+    "key": "item.filler.npc_5.name",
+    "type": "translation",
+    "lines": {
+      "en": "Rubik’s Cube",
+      "ru": "Кубик Рубика"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

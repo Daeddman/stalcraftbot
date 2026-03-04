@@ -1,0 +1,17 @@
+{
+  "id": "rgd5u0cb",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.svu_mod_1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #1: Wave",
+      "ru": "Часть схемы #1: «Волна»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

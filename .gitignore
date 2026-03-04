@@ -1,0 +1,14 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+*.db
+*.sqlite
+*.log
+.idea/
+bot_log.txt
+test_*.txt
+certs/
+_tunnel.log
+_lt*.txt
+

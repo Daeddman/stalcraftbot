@@ -1,0 +1,17 @@
+{
+  "id": "Px7gNbMv",
+  "category": "other",
+  "name": {
+    "key": "item.filler.valuable_3.name",
+    "type": "translation",
+    "lines": {
+      "en": "Factory Tool Set",
+      "ru": "Комплект заводских инструментов"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

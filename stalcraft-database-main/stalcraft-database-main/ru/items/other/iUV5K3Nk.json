@@ -1,0 +1,17 @@
+{
+  "id": "iUV5K3Nk",
+  "category": "other",
+  "name": {
+    "key": "item.resc.arm_veteran.name",
+    "type": "translation",
+    "lines": {
+      "en": "Pack of Armor Components (Veteran)",
+      "ru": "Набор компонентов брони (Ветеран)"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

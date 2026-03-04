@@ -1,0 +1,17 @@
+{
+  "id": "qXZPikj5",
+  "category": "other",
+  "name": {
+    "key": "item.resc.wpn_veteran_unit.name",
+    "type": "translation",
+    "lines": {
+      "en": "Weapon Component (Veteran)",
+      "ru": "Компонент оружия (Ветеран)"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

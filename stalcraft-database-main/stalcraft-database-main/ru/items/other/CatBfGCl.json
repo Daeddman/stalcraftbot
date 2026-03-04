@@ -1,0 +1,17 @@
+{
+  "id": "CatBfGCl",
+  "category": "other",
+  "name": {
+    "key": "item.resc.wpn_veteran.name",
+    "type": "translation",
+    "lines": {
+      "en": "Pack of Weapon Components (Veteran)",
+      "ru": "Набор компонентов оружия (Ветеран)"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

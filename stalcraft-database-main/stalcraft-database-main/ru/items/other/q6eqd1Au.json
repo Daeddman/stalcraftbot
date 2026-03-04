@@ -1,0 +1,17 @@
+{
+  "id": "q6eqd1Au",
+  "category": "other",
+  "name": {
+    "key": "item.filler.watch.name",
+    "type": "translation",
+    "lines": {
+      "en": "Broken Watch",
+      "ru": "Сломанные часы"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

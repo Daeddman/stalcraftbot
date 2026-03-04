@@ -1,0 +1,17 @@
+{
+  "id": "pbb7n4xt",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.yorsh_4.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #4: Yorsh",
+      "ru": "Часть схемы #4: «Йорш»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

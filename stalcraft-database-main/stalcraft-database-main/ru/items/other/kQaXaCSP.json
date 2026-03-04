@@ -1,0 +1,17 @@
+{
+  "id": "kQaXaCSP",
+  "category": "other",
+  "name": {
+    "key": "item.filler.mob_3.name",
+    "type": "translation",
+    "lines": {
+      "en": "Mutant’s Tooth",
+      "ru": "Зуб мутанта"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

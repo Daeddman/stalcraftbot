@@ -1,0 +1,17 @@
+{
+  "id": "Ex5ioOif",
+  "category": "other",
+  "name": {
+    "key": "item.resc.arm_newbie_unit.name",
+    "type": "translation",
+    "lines": {
+      "en": "Armor Component (Newbie)",
+      "ru": "Компонент брони (Новичок)"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

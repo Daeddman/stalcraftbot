@@ -1,0 +1,17 @@
+{
+  "id": "aucjQRJN",
+  "category": "other",
+  "name": {
+    "key": "item.misc.canister_petrol.name",
+    "type": "translation",
+    "lines": {
+      "en": "Canister of Gas",
+      "ru": "Канистра с бензином"
+    }
+  },
+  "color": "RANK_NEWBIE",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

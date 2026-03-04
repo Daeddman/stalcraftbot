@@ -1,0 +1,17 @@
+{
+  "id": "arp7y6ea",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.hp_mod_1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #1: Dream",
+      "ru": "Часть схемы #1: «Мечта»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

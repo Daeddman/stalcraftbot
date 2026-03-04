@@ -1,0 +1,17 @@
+{
+  "id": "G9GsU7NG",
+  "category": "other",
+  "name": {
+    "key": "item.filler.valuable_5.name",
+    "type": "translation",
+    "lines": {
+      "en": "Dishes",
+      "ru": "Посуда"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

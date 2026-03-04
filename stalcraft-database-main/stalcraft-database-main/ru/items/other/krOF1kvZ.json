@@ -1,0 +1,17 @@
+{
+  "id": "krOF1kvZ",
+  "category": "other",
+  "name": {
+    "key": "item.filler.npc_limansk_5.name",
+    "type": "translation",
+    "lines": {
+      "en": "Old Token",
+      "ru": "Старый жетон"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

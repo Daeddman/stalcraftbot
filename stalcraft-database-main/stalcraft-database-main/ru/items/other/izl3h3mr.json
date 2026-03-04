@@ -1,0 +1,17 @@
+{
+  "id": "izl3h3mr",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.kedr_mod_2.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #2: Tsunami",
+      "ru": "Часть схемы #2: «Цунами»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

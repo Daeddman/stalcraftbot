@@ -1,0 +1,17 @@
+{
+  "id": "oel3x4lg",
+  "category": "other",
+  "name": {
+    "key": "item.lootbox.arm_camo.name",
+    "type": "translation",
+    "lines": {
+      "en": "Container with Armor Camouflage",
+      "ru": "Контейнер с камуфляжем для брони"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "AeEpXAZ4",
+  "category": "other",
+  "name": {
+    "key": "go.ny_box4.name",
+    "type": "translation",
+    "lines": {
+      "en": "Huge Gift",
+      "ru": "Огромный подарок"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

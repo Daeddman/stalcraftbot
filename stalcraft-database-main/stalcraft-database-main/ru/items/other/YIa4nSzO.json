@@ -1,0 +1,17 @@
+{
+  "id": "YIa4nSzO",
+  "category": "other",
+  "name": {
+    "key": "item.misc.balon_methane.name",
+    "type": "translation",
+    "lines": {
+      "en": "Methane Tank",
+      "ru": "Баллон с метаном"
+    }
+  },
+  "color": "RANK_VETERAN",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

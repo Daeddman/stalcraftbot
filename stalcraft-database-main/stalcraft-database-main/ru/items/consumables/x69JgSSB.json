@@ -1,0 +1,17 @@
+{
+  "id": "x69JgSSB",
+  "category": "consumables",
+  "name": {
+    "key": "item.crate.box_ammo_spb556.name",
+    "type": "translation",
+    "lines": {
+      "en": "Crate of 5.56 mm SBP Rounds",
+      "ru": "Ящик патронов 5.56 мм СБП"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

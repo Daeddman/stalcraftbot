@@ -1,0 +1,17 @@
+{
+  "id": "pmm1l5kb",
+  "category": "other",
+  "name": {
+    "key": "item.other.container.crown_arena",
+    "type": "translation",
+    "lines": {
+      "en": "Crown Arena Case",
+      "ru": "Ящик с Арены Ворона"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "J3rTGSLm",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.mp5_mod_2.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #2: Frog",
+      "ru": "Часть схемы #2: «Лягуха»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

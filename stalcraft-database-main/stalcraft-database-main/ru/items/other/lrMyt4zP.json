@@ -1,0 +1,17 @@
+{
+  "id": "lrMyt4zP",
+  "category": "other",
+  "name": {
+    "key": "item.misc.boar_hoof_t2.name",
+    "type": "translation",
+    "lines": {
+      "en": "Boar’s Hoof",
+      "ru": "Копыто кабана"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

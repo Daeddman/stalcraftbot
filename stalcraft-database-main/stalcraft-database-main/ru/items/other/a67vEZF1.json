@@ -1,0 +1,17 @@
+{
+  "id": "a67vEZF1",
+  "category": "other",
+  "name": {
+    "key": "item.misc.primary_bullet.name",
+    "type": "translation",
+    "lines": {
+      "en": "Bullet Casing",
+      "ru": "Пулевая болванка"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "rGXyBfEO",
+  "category": "other",
+  "name": {
+    "key": "item.filler.npc_limansk_3.name",
+    "type": "translation",
+    "lines": {
+      "en": "Psalms of the Murmur",
+      "ru": "Псалмы «Шепота»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

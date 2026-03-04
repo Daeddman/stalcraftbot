@@ -1,0 +1,21 @@
+{
+  "id": "wjooz",
+  "category": "other",
+  "name": {
+    "key": "item.camo.unique_wpn.hrenostrel_fg42.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "Crapfire",
+      "es": "Llamarada cadáver",
+      "fr": "Feu de Poubelle",
+      "ko": "쓰레기 불길",
+      "ru": "«Хренострел»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

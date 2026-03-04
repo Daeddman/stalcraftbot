@@ -1,0 +1,17 @@
+{
+  "id": "xiBNx5Hj",
+  "category": "other",
+  "name": {
+    "key": "item.misc.flesh_eye_t3.name",
+    "type": "translation",
+    "lines": {
+      "en": "Strong Piggy’s Eye",
+      "ru": "Глаз сильной хрюши"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

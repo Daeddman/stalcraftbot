@@ -1,0 +1,17 @@
+{
+  "id": "knfFNZKn",
+  "category": "consumables",
+  "name": {
+    "key": "item.bag.762exp.name",
+    "type": "translation",
+    "lines": {
+      "en": "Pouch of 7.62 mm Expanding Rounds",
+      "ru": "Сумка экспансивных патронов 7.62 мм"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

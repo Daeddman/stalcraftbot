@@ -1,0 +1,17 @@
+{
+  "id": "1WaDR1TK",
+  "category": "other",
+  "name": {
+    "key": "item.lootbox.ny24_case2.name",
+    "type": "translation",
+    "lines": {
+      "en": "Old Level 2 Case",
+      "ru": "Старый кейс 2-го уровня 2024"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

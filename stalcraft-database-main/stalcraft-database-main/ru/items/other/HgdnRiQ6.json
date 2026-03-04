@@ -1,0 +1,17 @@
+{
+  "id": "HgdnRiQ6",
+  "category": "other",
+  "name": {
+    "key": "item.filler.node_3.name",
+    "type": "translation",
+    "lines": {
+      "en": "Large Artifact Fragment",
+      "ru": "Крупный артефактный фрагмент"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

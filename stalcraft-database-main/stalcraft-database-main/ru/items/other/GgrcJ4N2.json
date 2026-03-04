@@ -1,0 +1,17 @@
+{
+  "id": "GgrcJ4N2",
+  "category": "other",
+  "name": {
+    "key": "item.resc.wpn_stalker.name",
+    "type": "translation",
+    "lines": {
+      "en": "Pack of Weapon Components (Stalker)",
+      "ru": "Набор компонентов оружия (Сталкер)"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "6o5CxHKF",
+  "category": "other",
+  "name": {
+    "key": "item.quest.kolenval_steel.name",
+    "type": "translation",
+    "lines": {
+      "en": "Steel crankshaft",
+      "ru": "Cтальной коленвал"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

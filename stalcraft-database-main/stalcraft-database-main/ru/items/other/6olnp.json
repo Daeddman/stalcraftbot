@@ -1,0 +1,20 @@
+{
+  "id": "6olnp",
+  "category": "other",
+  "name": {
+    "key": "item.brt.sever.fallout.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "Glowing Phlegm",
+      "es": "Flema brillante",
+      "fr": "Slime brillant",
+      "ru": "Светящаяся слизь"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

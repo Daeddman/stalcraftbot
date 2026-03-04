@@ -1,0 +1,17 @@
+{
+  "id": "XOaGqZls",
+  "category": "other",
+  "name": {
+    "key": "item.misc.dog_tail_t2.name",
+    "type": "translation",
+    "lines": {
+      "en": "Mutt’s Tail",
+      "ru": "Хвост шавки"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

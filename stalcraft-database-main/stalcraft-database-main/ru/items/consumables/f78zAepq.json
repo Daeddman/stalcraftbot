@@ -1,0 +1,17 @@
+{
+  "id": "f78zAepq",
+  "category": "consumables",
+  "name": {
+    "key": "item.16126.name",
+    "type": "translation",
+    "lines": {
+      "en": "Injector",
+      "ru": "Инъектор"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "7m4thIBn",
+  "category": "other",
+  "name": {
+    "key": "item.filler.valuable_2.name",
+    "type": "translation",
+    "lines": {
+      "en": "Military Radio Transmitter",
+      "ru": "Военный радиопередатчик"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

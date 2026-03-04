@@ -1,0 +1,17 @@
+{
+  "id": "pT6RnVng",
+  "category": "other",
+  "name": {
+    "key": "go.lighter.name",
+    "type": "translation",
+    "lines": {
+      "en": "Lighter",
+      "ru": "Зажигалка"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

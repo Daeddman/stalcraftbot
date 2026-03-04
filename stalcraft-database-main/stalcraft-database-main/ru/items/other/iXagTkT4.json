@@ -1,0 +1,17 @@
+{
+  "id": "iXagTkT4",
+  "category": "other",
+  "name": {
+    "key": "item.clan.resource3.name",
+    "type": "translation",
+    "lines": {
+      "en": "Crate of Rations",
+      "ru": "Ящик с продовольствием"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "baWs8ScW",
+  "category": "other",
+  "name": {
+    "key": "item.misc.primary_sleeve.name",
+    "type": "translation",
+    "lines": {
+      "en": "Cartridge Casing",
+      "ru": "Гильзовая болванка"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

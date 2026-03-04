@@ -1,0 +1,17 @@
+{
+  "id": "3Bu8anpH",
+  "category": "other",
+  "name": {
+    "key": "item.filler.mob_2.name",
+    "type": "translation",
+    "lines": {
+      "en": "Broken Claw",
+      "ru": "Сломанный коготь"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

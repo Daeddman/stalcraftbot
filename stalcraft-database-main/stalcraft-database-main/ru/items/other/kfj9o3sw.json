@@ -1,0 +1,17 @@
+{
+  "id": "kfj9o3sw",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.p99_mod_1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #1: Bee",
+      "ru": "Часть схемы #1: «Пчела»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

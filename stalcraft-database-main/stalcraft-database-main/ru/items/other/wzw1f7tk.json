@@ -1,0 +1,17 @@
+{
+  "id": "wzw1f7tk",
+  "category": "other",
+  "name": {
+    "key": "item.gachapon.newyear_2024.name",
+    "type": "translation",
+    "lines": {
+      "en": "Case with New Year 2024 Styles",
+      "ru": "Кейс с обликами «Аномальной Зимы»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

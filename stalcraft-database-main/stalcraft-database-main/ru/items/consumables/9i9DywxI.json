@@ -1,0 +1,17 @@
+{
+  "id": "9i9DywxI",
+  "category": "consumables",
+  "name": {
+    "key": "item.exp.homemade.name",
+    "type": "translation",
+    "lines": {
+      "en": "Jury-Rigged Grenade",
+      "ru": "Кустарная граната"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

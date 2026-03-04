@@ -1,0 +1,20 @@
+{
+  "id": "kr25j",
+  "category": "consumables",
+  "name": {
+    "key": "item.amm.12st_sessions.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "Large-Caliber Handmade Round",
+      "es": "Munición casera de gran calibre",
+      "fr": "Cartouche de Gros Calibre Artisanale",
+      "ru": "Крупнокалиберный самодельный патрон"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

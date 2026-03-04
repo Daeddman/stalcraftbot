@@ -1,0 +1,17 @@
+{
+  "id": "WBO04JY1",
+  "category": "other",
+  "name": {
+    "key": "item.misc.flesh_eye_t2.name",
+    "type": "translation",
+    "lines": {
+      "en": "Piggy’s Eye",
+      "ru": "Глаз хрюши"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "YiDkI5Q0",
+  "category": "other",
+  "name": {
+    "key": "item.24106.name",
+    "type": "translation",
+    "lines": {
+      "en": "Circle Charm",
+      "ru": "Брелок «Круговорот»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

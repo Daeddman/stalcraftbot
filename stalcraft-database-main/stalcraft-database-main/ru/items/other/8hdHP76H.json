@@ -1,0 +1,17 @@
+{
+  "id": "8hdHP76H",
+  "category": "other",
+  "name": {
+    "key": "item.25640.name",
+    "type": "translation",
+    "lines": {
+      "en": "Saboteur Skin",
+      "ru": "Скин «Диверсант»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "2IwPAkYv",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.mp5_mod_1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #1: Frog",
+      "ru": "Часть схемы #1: «Лягуха»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

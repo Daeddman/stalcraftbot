@@ -1,0 +1,17 @@
+{
+  "id": "o9a9nsqW",
+  "category": "other",
+  "name": {
+    "key": "item.quest.kolenval_castiron.name",
+    "type": "translation",
+    "lines": {
+      "en": "Cast-iron crankshaft",
+      "ru": "Чугунный коленвал"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

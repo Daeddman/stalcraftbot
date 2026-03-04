@@ -1,0 +1,17 @@
+{
+  "id": "KR2JfO3l",
+  "category": "other",
+  "name": {
+    "key": "item.filler.mining_1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Failsafe",
+      "ru": "Предохранитель"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

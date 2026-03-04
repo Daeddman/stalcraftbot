@@ -1,0 +1,17 @@
+{
+  "id": "pQEt3XNY",
+  "category": "backpacks",
+  "name": {
+    "key": "go.tournament_camp_respawn.name",
+    "type": "translation",
+    "lines": {
+      "en": "Mobile camp",
+      "ru": "Мобильный лагерь"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "ysq9q3ox",
+  "category": "other",
+  "name": {
+    "key": "item.lootbox.ny25_case5.name",
+    "type": "translation",
+    "lines": {
+      "en": "X-Mas Tree Level 5 Case 2025-2026",
+      "ru": "Кейс 5-го уровня Ёлочки 2025-2026"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

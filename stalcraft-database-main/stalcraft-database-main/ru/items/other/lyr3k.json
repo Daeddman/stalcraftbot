@@ -1,0 +1,20 @@
+{
+  "id": "lyr3k",
+  "category": "other",
+  "name": {
+    "key": "item.misc.warpcrate.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "Strange Crate",
+      "es": "Caja extraña",
+      "fr": "Étrange caisse",
+      "ru": "Странный ящик"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

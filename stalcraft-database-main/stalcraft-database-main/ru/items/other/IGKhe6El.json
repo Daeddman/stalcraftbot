@@ -1,0 +1,17 @@
+{
+  "id": "IGKhe6El",
+  "category": "other",
+  "name": {
+    "key": "item.resc.arm_newbie.name",
+    "type": "translation",
+    "lines": {
+      "en": "Pack of Armor Components (Newbie)",
+      "ru": "Набор компонентов брони (Новичок)"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

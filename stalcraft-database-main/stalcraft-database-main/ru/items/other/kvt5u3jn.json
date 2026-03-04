@@ -1,0 +1,17 @@
+{
+  "id": "kvt5u3jn",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.pm_mod_1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #1: Eternal Novice’s PM",
+      "ru": "Часть схемы #1: ПМ вечного новичка"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

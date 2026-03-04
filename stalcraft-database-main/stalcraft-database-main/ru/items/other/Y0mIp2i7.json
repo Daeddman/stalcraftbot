@@ -1,0 +1,17 @@
+{
+  "id": "Y0mIp2i7",
+  "category": "other",
+  "name": {
+    "key": "item.misc.boar_hoof_t1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Weak Boar’s Hoof",
+      "ru": "Копыто слабого кабана"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

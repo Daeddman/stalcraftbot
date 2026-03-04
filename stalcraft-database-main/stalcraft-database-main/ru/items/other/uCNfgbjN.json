@@ -1,0 +1,17 @@
+{
+  "id": "uCNfgbjN",
+  "category": "other",
+  "name": {
+    "key": "item.resc.wpn_newbie_unit.name",
+    "type": "translation",
+    "lines": {
+      "en": "Weapon Component (Newbie)",
+      "ru": "Компонент оружия (Новичок)"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

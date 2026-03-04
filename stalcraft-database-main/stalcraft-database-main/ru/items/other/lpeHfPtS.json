@@ -1,0 +1,17 @@
+{
+  "id": "lpeHfPtS",
+  "category": "other",
+  "name": {
+    "key": "item.misc.canister_diesel.name",
+    "type": "translation",
+    "lines": {
+      "en": "Canister of Diesel",
+      "ru": "Канистра с дизелем"
+    }
+  },
+  "color": "RANK_STALKER",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

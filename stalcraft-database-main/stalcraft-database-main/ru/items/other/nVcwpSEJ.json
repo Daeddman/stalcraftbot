@@ -1,0 +1,17 @@
+{
+  "id": "nVcwpSEJ",
+  "category": "other",
+  "name": {
+    "key": "item.resc.arm_master_unit.name",
+    "type": "translation",
+    "lines": {
+      "en": "Armor Component (Master)",
+      "ru": "Компонент брони (Мастер)"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

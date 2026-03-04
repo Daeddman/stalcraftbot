@@ -1,0 +1,17 @@
+{
+  "id": "mQa1w5wX",
+  "category": "other",
+  "name": {
+    "key": "item.filler.valuable_9.name",
+    "type": "translation",
+    "lines": {
+      "en": "Collectible Items",
+      "ru": "Коллекционные предметы"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

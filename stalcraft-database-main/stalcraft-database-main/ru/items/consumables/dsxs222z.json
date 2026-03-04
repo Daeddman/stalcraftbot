@@ -1,0 +1,17 @@
+{
+  "id": "dsxs222z",
+  "category": "consumables",
+  "name": {
+    "key": "item.exp.thunder.name",
+    "type": "translation",
+    "lines": {
+      "en": "Thunder",
+      "ru": "«Гром»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

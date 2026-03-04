@@ -1,0 +1,17 @@
+{
+  "id": "dsxs222y",
+  "category": "consumables",
+  "name": {
+    "key": "item.exp.plantain.name",
+    "type": "translation",
+    "lines": {
+      "en": "Plantain",
+      "ru": "«Подорожник»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,21 @@
+{
+  "id": "dmky5",
+  "category": "consumables",
+  "name": {
+    "key": "item.med.clearmind.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "“ClearMind+”",
+      "es": "\"ClearMind+\"",
+      "fr": "« ClearMind+ »",
+      "ko": "[정신정화+]",
+      "ru": "«ClearMind+»"
+    }
+  },
+  "color": "RANK_VETERAN",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

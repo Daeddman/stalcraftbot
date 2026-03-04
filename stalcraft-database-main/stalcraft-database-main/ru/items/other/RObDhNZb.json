@@ -1,0 +1,17 @@
+{
+  "id": "RObDhNZb",
+  "category": "other",
+  "name": {
+    "key": "item.filler.airdrop_4.name",
+    "type": "translation",
+    "lines": {
+      "en": "Huge Merchant Delivery",
+      "ru": "Крупная поставка торговцу"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "UYdYvayN",
+  "category": "other",
+  "name": {
+    "key": "item.lootbox.autumn24.name",
+    "type": "translation",
+    "lines": {
+      "en": "Black Present",
+      "ru": "Черный Презент"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

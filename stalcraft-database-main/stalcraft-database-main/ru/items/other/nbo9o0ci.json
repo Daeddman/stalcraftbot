@@ -1,0 +1,17 @@
+{
+  "id": "nbo9o0ci",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.l85_mod_1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #1: Equalizer",
+      "ru": "Часть схемы #1: «Уравнитель»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "R9euiU8Q",
+  "category": "other",
+  "name": {
+    "key": "item.misc.chimera_claw_t3.name",
+    "type": "translation",
+    "lines": {
+      "en": "Strong Fiend’s Claw",
+      "ru": "Коготь сильной бестии"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

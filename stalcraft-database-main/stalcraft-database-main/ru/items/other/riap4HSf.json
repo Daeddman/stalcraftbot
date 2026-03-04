@@ -1,0 +1,17 @@
+{
+  "id": "riap4HSf",
+  "category": "other",
+  "name": {
+    "key": "item.filler.outpost_7.name",
+    "type": "translation",
+    "lines": {
+      "en": "Box of Spare Parts",
+      "ru": "Ящик с запчастями"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

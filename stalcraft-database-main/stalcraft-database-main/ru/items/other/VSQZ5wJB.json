@@ -1,0 +1,17 @@
+{
+  "id": "VSQZ5wJB",
+  "category": "other",
+  "name": {
+    "key": "item.misc.sewing_needles.name",
+    "type": "translation",
+    "lines": {
+      "en": "Sewing Needles",
+      "ru": "Швейные иголки"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

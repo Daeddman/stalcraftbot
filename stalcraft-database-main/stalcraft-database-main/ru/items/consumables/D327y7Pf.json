@@ -1,0 +1,17 @@
+{
+  "id": "D327y7Pf",
+  "category": "consumables",
+  "name": {
+    "key": "item.16521.name",
+    "type": "translation",
+    "lines": {
+      "en": "Crate of 9 mm SBP Rounds",
+      "ru": "Ящик патронов 9 мм СБП"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

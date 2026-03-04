@@ -1,0 +1,17 @@
+{
+  "id": "wvg0t4vw",
+  "category": "other",
+  "name": {
+    "key": "item.lootbox.ny25_case7.name",
+    "type": "translation",
+    "lines": {
+      "en": "X-Mas Tree Level 7 Case 2025-2026",
+      "ru": "Кейс 7-го уровня Ёлочки 2025-2026"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

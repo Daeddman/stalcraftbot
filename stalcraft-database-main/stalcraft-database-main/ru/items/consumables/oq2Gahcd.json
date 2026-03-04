@@ -1,0 +1,17 @@
+{
+  "id": "oq2Gahcd",
+  "category": "consumables",
+  "name": {
+    "key": "item.bag.762st.name",
+    "type": "translation",
+    "lines": {
+      "en": "Pouch of 7.62 mm Rounds",
+      "ru": "Сумка патронов 7.62 мм"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,21 @@
+{
+  "id": "7lr29",
+  "category": "other",
+  "name": {
+    "key": "item.19822.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "Test Prototype TKB-0146M",
+      "es": "Prototipo de prueba TKB-0146M",
+      "fr": "Prototype dEssai TKB-0146M",
+      "ko": "시험용 프로토타입 TKB-0146M",
+      "ru": "«Тестовый образец» ТКБ-0146М"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

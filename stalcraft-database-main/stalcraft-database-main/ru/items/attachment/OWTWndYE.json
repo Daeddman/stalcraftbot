@@ -1,0 +1,17 @@
+{
+  "id": "OWTWndYE",
+  "category": "attachment",
+  "name": {
+    "key": "item.att.handgrip_ang4_f.name",
+    "type": "translation",
+    "lines": {
+      "en": "ANG4 Vertical Grip, Winter",
+      "ru": "Вертикальная рукоятка ANG4, зимняя"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "AHRfUZpw",
+  "category": "other",
+  "name": {
+    "key": "item.misc.flesh_eye_t1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Weak Piggy’s Eye",
+      "ru": "Глаз слабой хрюши"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

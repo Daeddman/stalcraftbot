@@ -1,0 +1,17 @@
+{
+  "id": "LkwM4Yh7",
+  "category": "other",
+  "name": {
+    "key": "item.resc.wpn_newbie.name",
+    "type": "translation",
+    "lines": {
+      "en": "Pack of Weapon Components (Newbie)",
+      "ru": "Набор компонентов оружия (Новичок)"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

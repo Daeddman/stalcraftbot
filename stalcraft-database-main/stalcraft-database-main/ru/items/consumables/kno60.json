@@ -1,0 +1,21 @@
+{
+  "id": "kno60",
+  "category": "consumables",
+  "name": {
+    "key": "item.med.psiblock_2.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "Neuron-22 PsyBlock",
+      "es": "Bloqueo psy Neuron-22",
+      "fr": "BloquePsy Neuro-22",
+      "ko": "뉴런-22 사이블록",
+      "ru": "Пси-блок «Нейрон-22»"
+    }
+  },
+  "color": "RANK_STALKER",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

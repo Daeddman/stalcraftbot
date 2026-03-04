@@ -1,0 +1,17 @@
+{
+  "id": "jDDnrxqH",
+  "category": "consumables",
+  "name": {
+    "key": "item.16515.name",
+    "type": "translation",
+    "lines": {
+      "en": "Crate of 12x76 mm Buckshot",
+      "ru": "Ящик картечи 12х76 мм"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

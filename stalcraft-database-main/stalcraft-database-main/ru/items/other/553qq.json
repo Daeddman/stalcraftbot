@@ -1,0 +1,20 @@
+{
+  "id": "553qq",
+  "category": "other",
+  "name": {
+    "key": "item.brt.sever.fallout_add.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "Nuclear Gelatin",
+      "es": "Gelatina nuclear",
+      "fr": "Gélatine nucléaire",
+      "ru": "Ядерный желатин"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

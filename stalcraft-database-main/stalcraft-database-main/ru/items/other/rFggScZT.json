@@ -1,0 +1,17 @@
+{
+  "id": "rFggScZT",
+  "category": "other",
+  "name": {
+    "key": "item.misc.krovosos_tentacles_t3.name",
+    "type": "translation",
+    "lines": {
+      "en": "Strong Ghoul’s Tentacle",
+      "ru": "Щупальца сильного упыря"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

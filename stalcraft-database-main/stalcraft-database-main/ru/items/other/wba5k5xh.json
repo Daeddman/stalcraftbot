@@ -1,0 +1,17 @@
+{
+  "id": "wba5k5xh",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.yorsh_3.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #3: Yorsh",
+      "ru": "Часть схемы #3: «Йорш»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

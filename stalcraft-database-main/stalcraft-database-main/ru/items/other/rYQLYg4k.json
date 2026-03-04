@@ -1,0 +1,17 @@
+{
+  "id": "rYQLYg4k",
+  "category": "other",
+  "name": {
+    "key": "go.regenerator_living.name",
+    "type": "translation",
+    "lines": {
+      "en": "Regenerator",
+      "ru": "«Регенератор»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

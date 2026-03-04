@@ -1,0 +1,21 @@
+{
+  "id": "j5mn7",
+  "category": "consumables",
+  "name": {
+    "key": "item.med.thermobarier_2.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "2nd Class ThermoBlock",
+      "es": "Inhibidor térmico de 2.ª clase",
+      "fr": "ThermoBloc de 2ème classe",
+      "ko": "2급 열 보호제",
+      "ru": "«Термобарьер» второго класса"
+    }
+  },
+  "color": "RANK_STALKER",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

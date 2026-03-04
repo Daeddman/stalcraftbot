@@ -1,0 +1,17 @@
+{
+  "id": "KvTIJWHw",
+  "category": "weapon",
+  "name": {
+    "key": "item.wpn.xm8s_a.name",
+    "type": "translation",
+    "lines": {
+      "en": "XM8S (A)",
+      "ru": "XM8S (А)"
+    }
+  },
+  "color": "RANK_MASTER",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "Vf5KvvEl",
+  "category": "consumables",
+  "name": {
+    "key": "item.bag.545st.name",
+    "type": "translation",
+    "lines": {
+      "en": "Pouch of 5.45 mm Rounds",
+      "ru": "Сумка патронов 5.45 мм"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

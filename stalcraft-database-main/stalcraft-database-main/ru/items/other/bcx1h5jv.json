@@ -1,0 +1,17 @@
+{
+  "id": "bcx1h5jv",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.svu_mod_2.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #2: Wave",
+      "ru": "Часть схемы #2: «Волна»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

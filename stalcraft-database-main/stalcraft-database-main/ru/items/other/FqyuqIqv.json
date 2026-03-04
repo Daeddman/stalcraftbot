@@ -1,0 +1,17 @@
+{
+  "id": "FqyuqIqv",
+  "category": "other",
+  "name": {
+    "key": "item.misc.gas_cylinder.name",
+    "type": "translation",
+    "lines": {
+      "en": "Gas Cylinder",
+      "ru": "Газовый баллон"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "qIoAqWKK",
+  "category": "consumables",
+  "name": {
+    "key": "item.med.warming_serum.name",
+    "type": "translation",
+    "lines": {
+      "en": "Warming Serum",
+      "ru": "Согревающая сыворотка"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

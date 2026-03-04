@@ -1,0 +1,20 @@
+{
+  "id": "7ynr",
+  "category": "consumables",
+  "name": {
+    "key": "item.exp.m381_2.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "M2 Grenade Round",
+      "es": "Proyectil de granada M2",
+      "fr": "Cartouche M2",
+      "ru": "Выстрел гранатометный M2"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

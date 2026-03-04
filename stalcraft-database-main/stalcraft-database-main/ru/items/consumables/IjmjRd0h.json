@@ -1,0 +1,17 @@
+{
+  "id": "IjmjRd0h",
+  "category": "consumables",
+  "name": {
+    "key": "item.crate.hotjack.name",
+    "type": "translation",
+    "lines": {
+      "en": "Hot Jack Crate",
+      "ru": "Ящик «Горячих Джеков»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

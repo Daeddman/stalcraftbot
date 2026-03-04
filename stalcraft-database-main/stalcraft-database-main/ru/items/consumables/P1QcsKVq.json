@@ -1,0 +1,17 @@
+{
+  "id": "P1QcsKVq",
+  "category": "consumables",
+  "name": {
+    "key": "item.pouch.apt_i.name",
+    "type": "translation",
+    "lines": {
+      "en": "Pouch of Personal First-Aid Kits",
+      "ru": "Подсумок с индивидуальными аптечками"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

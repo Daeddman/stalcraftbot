@@ -1,0 +1,17 @@
+{
+  "id": "sin6o7nc",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.spanner_2.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #2: Spanner",
+      "ru": "Часть схемы #2: «Спаннер»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

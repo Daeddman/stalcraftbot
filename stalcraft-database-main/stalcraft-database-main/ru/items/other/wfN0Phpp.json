@@ -1,0 +1,17 @@
+{
+  "id": "wfN0Phpp",
+  "category": "other",
+  "name": {
+    "key": "item.resc.arm_stalker.name",
+    "type": "translation",
+    "lines": {
+      "en": "Pack of Armor Components (Stalker)",
+      "ru": "Набор компонентов брони (Сталкер)"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

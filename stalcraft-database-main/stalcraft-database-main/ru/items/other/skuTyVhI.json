@@ -1,0 +1,17 @@
+{
+  "id": "skuTyVhI",
+  "category": "other",
+  "name": {
+    "key": "item.16710.name",
+    "type": "translation",
+    "lines": {
+      "en": "Discharge/Stasis Protoartifact",
+      "ru": "Протоартефакт «Разряда»/«Застоя»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

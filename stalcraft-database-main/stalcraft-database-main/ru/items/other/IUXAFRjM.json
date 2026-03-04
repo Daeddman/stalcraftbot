@@ -1,0 +1,17 @@
+{
+  "id": "IUXAFRjM",
+  "category": "other",
+  "name": {
+    "key": "item.clan.resource4.name",
+    "type": "translation",
+    "lines": {
+      "en": "Crate of Equipment",
+      "ru": "Ящик с оборудованием"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

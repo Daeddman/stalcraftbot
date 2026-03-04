@@ -1,0 +1,17 @@
+{
+  "id": "jptUfEGC",
+  "category": "other",
+  "name": {
+    "key": "item.filler.outpost_10.name",
+    "type": "translation",
+    "lines": {
+      "en": "Laptop",
+      "ru": "Ноутбук"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

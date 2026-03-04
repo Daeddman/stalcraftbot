@@ -1,0 +1,17 @@
+{
+  "id": "OEqGjmJy",
+  "category": "other",
+  "name": {
+    "key": "go.clan.extractor.name",
+    "type": "translation",
+    "lines": {
+      "en": "Chronodevice",
+      "ru": "Хроноустановка"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

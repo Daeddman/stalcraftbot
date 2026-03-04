@@ -1,0 +1,17 @@
+{
+  "id": "JKlN6qPj",
+  "category": "other",
+  "name": {
+    "key": "item.misc.dog_tail_t1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Weak Mutt’s Tail",
+      "ru": "Хвост слабой шавки"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

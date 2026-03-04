@@ -1,0 +1,17 @@
+{
+  "id": "uzv1r2to",
+  "category": "other",
+  "name": {
+    "key": "item.lootbox.summer24.name",
+    "type": "translation",
+    "lines": {
+      "en": "Tactical reserve",
+      "ru": "Тактический Запас"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

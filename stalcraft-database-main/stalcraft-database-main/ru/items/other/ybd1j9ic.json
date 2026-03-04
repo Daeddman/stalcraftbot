@@ -1,0 +1,17 @@
+{
+  "id": "ybd1j9ic",
+  "category": "other",
+  "name": {
+    "key": "item.gachapon.summer24.name",
+    "type": "translation",
+    "lines": {
+      "en": "Case with ZIVCAS Corporation styles",
+      "ru": "Кейс с обликами «Корпорации ZIVCAS»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

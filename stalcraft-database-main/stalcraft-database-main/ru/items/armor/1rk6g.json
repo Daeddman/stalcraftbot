@@ -1,0 +1,20 @@
+{
+  "id": "1rk6g",
+  "category": "armor",
+  "name": {
+    "key": "item.arm.kyrtka_bandit.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "Bandit Coat",
+      "es": "Abrigo de bandido",
+      "fr": "Veste de Bandit",
+      "ru": "Бандитский кожак"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

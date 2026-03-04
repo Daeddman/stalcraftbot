@@ -1,0 +1,17 @@
+{
+  "id": "hKPzvbS3",
+  "category": "other",
+  "name": {
+    "key": "item.key.halloween_2023.name",
+    "type": "translation",
+    "lines": {
+      "en": "Sponsors gift Coupon",
+      "ru": "Купон на «Спонсорский подгон»"
+    }
+  },
+  "color": "RANK_VETERAN",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

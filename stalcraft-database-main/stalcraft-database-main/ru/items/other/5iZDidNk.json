@@ -1,0 +1,17 @@
+{
+  "id": "5iZDidNk",
+  "category": "other",
+  "name": {
+    "key": "item.gachapon.autumn24.name",
+    "type": "translation",
+    "lines": {
+      "en": "Black Market Style Case",
+      "ru": "Кейс с обликами «Черного Рынка»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

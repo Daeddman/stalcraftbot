@@ -1,0 +1,17 @@
+{
+  "id": "2KNZNlCx",
+  "category": "other",
+  "name": {
+    "key": "item.filler.npc_3.name",
+    "type": "translation",
+    "lines": {
+      "en": "Toilet Paper",
+      "ru": "Туалетная бумага"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

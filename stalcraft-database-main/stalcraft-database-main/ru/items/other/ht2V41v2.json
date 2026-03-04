@@ -1,0 +1,17 @@
+{
+  "id": "ht2V41v2",
+  "category": "other",
+  "name": {
+    "key": "item.resc.wpn_stalker_unit.name",
+    "type": "translation",
+    "lines": {
+      "en": "Weapon Component (Stalker)",
+      "ru": "Компонент оружия (Сталкер)"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

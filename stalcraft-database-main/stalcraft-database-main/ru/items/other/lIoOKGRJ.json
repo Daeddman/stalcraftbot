@@ -1,0 +1,17 @@
+{
+  "id": "lIoOKGRJ",
+  "category": "other",
+  "name": {
+    "key": "go.barricade_ural_living.name",
+    "type": "translation",
+    "lines": {
+      "en": "Barricade from Ural Pieces",
+      "ru": "Баррикада из частей Урала"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

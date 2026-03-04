@@ -1,0 +1,17 @@
+{
+  "id": "zoj8e8fq",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.svt40_mod_2.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #2: AVT-40",
+      "ru": "Часть схемы #2: АВТ-40"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,8 @@
+{
+  "status": 400,
+  "type": "dict",
+  "count": 0,
+  "sample": {
+    "detail": "category parameter is required."
+  }
+}

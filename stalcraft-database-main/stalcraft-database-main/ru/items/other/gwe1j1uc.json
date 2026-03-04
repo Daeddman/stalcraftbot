@@ -1,0 +1,17 @@
+{
+  "id": "gwe1j1uc",
+  "category": "other",
+  "name": {
+    "key": "item.gachapon.blizzard_2023.name",
+    "type": "translation",
+    "lines": {
+      "en": "Case with Anomalous Blizzard Styles",
+      "ru": "Кейс с обликами «Аномального Бурана»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "nxc9y6yv",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.svt40_mod_1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #1: AVT-40",
+      "ru": "Часть схемы #1: АВТ-40"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "62zeLMPl",
+  "category": "consumables",
+  "name": {
+    "key": "item.bag.939st.name",
+    "type": "translation",
+    "lines": {
+      "en": "Pouch of 9x39 mm SP-5 Rounds",
+      "ru": "Сумка патронов 9x39 СП-5"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

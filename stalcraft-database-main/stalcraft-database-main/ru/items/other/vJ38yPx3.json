@@ -1,0 +1,17 @@
+{
+  "id": "vJ38yPx3",
+  "category": "other",
+  "name": {
+    "key": "item.gachapon.halloween_2023.name",
+    "type": "translation",
+    "lines": {
+      "en": "Case with Dead Man’s Marathon Styles",
+      "ru": "Кейс с обликами «Марафона мертвецов»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

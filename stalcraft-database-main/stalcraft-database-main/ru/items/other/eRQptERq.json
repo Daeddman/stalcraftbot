@@ -1,0 +1,17 @@
+{
+  "id": "eRQptERq",
+  "category": "other",
+  "name": {
+    "key": "item.misc.balon_propane.name",
+    "type": "translation",
+    "lines": {
+      "en": "Propane Tank",
+      "ru": "Баллон с пропаном"
+    }
+  },
+  "color": "RANK_STALKER",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

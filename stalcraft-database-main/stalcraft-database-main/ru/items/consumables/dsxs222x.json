@@ -1,0 +1,17 @@
+{
+  "id": "dsxs222x",
+  "category": "consumables",
+  "name": {
+    "key": "item.exp.snowstorm.name",
+    "type": "translation",
+    "lines": {
+      "en": "Snowstorm",
+      "ru": "«Вьюга»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

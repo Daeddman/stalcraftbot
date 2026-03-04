@@ -1,0 +1,17 @@
+{
+  "id": "ldh3w0jl",
+  "category": "other",
+  "name": {
+    "key": "item.lootbox.blizzard_2021.name",
+    "type": "translation",
+    "lines": {
+      "en": "Past Blizzard Crate",
+      "ru": "Ящик прошедшего Бурана"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "535Usksw",
+  "category": "other",
+  "name": {
+    "key": "item.misc.cat_tail_t1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Weak Cat’s Tail",
+      "ru": "Хвост слабой кошки"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

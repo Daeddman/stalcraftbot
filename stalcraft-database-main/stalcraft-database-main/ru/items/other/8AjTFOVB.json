@@ -1,0 +1,70 @@
+{
+  "id": "8AjTFOVB",
+  "category": "other",
+  "name": {
+    "type": "translation",
+    "key": "item.season_pass.bp_token.name",
+    "args": {},
+    "lines": {
+      "ru": "Сезонный Пропуск",
+      "en": "Season Pass"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": [
+    {
+      "type": "list",
+      "title": {
+        "type": "text",
+        "text": ""
+      },
+      "elements": [
+        {
+          "type": "key-value",
+          "key": {
+            "type": "translation",
+            "key": "core.tooltip.info.category",
+            "args": {},
+            "lines": {
+              "ru": "Класс",
+              "en": "Class"
+            }
+          },
+          "value": {
+            "type": "translation",
+            "key": "core.handbook.category.useful",
+            "args": {},
+            "lines": {
+              "ru": "Прочее",
+              "en": "Other"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "list",
+      "title": {
+        "type": "text",
+        "text": ""
+      },
+      "elements": [
+        {
+          "type": "text",
+          "text": {
+            "type": "translation",
+            "key": "item.season_pass.bp_token.desc",
+            "args": {},
+            "lines": {
+              "ru": "Сезонный пропуск. Открывает доступ к премиальным наградам боевого пропуска.",
+              "en": "Season pass. Unlocks access to premium battle pass rewards."
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

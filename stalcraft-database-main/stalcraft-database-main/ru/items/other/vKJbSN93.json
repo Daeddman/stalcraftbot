@@ -1,0 +1,17 @@
+{
+  "id": "vKJbSN93",
+  "category": "other",
+  "name": {
+    "key": "item.16711.name",
+    "type": "translation",
+    "lines": {
+      "en": "Lighter/Frost Protoartifact",
+      "ru": "Протоартефакт «Зажигалки»/Мороза"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

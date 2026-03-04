@@ -1,0 +1,17 @@
+{
+  "id": "wpFIlUYI",
+  "category": "other",
+  "name": {
+    "key": "item.filler.npc_9.name",
+    "type": "translation",
+    "lines": {
+      "en": "PDA with Data",
+      "ru": "ПДА с данными"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

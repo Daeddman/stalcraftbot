@@ -1,0 +1,17 @@
+{
+  "id": "MSvs6rFq",
+  "category": "consumables",
+  "name": {
+    "key": "item.create.box_ammo_spb545.name",
+    "type": "translation",
+    "lines": {
+      "en": "Crate of 5.45 mm SBP Rounds",
+      "ru": "Ящик патронов 5.45 мм СБП"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

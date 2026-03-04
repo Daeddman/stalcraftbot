@@ -1,0 +1,17 @@
+{
+  "id": "DLWlR7S8",
+  "category": "consumables",
+  "name": {
+    "key": "item.crate.box_ammo_spb939.name",
+    "type": "translation",
+    "lines": {
+      "en": "Crate of 9x39 mm SBP Rounds",
+      "ru": "Ящик патронов 9x39 СБП"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

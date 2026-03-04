@@ -1,0 +1,17 @@
+{
+  "id": "mzw6c9xo",
+  "category": "other",
+  "name": {
+    "key": "item.lootbox.incident_battlepack.name",
+    "type": "translation",
+    "lines": {
+      "en": "Dead Time Container",
+      "ru": "Контейнер «Мертвого времени»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "0QYUJCsr",
+  "category": "other",
+  "name": {
+    "key": "item.misc.chimera_claw_t1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Weak Fiend’s Claw",
+      "ru": "Коготь слабой бестии"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

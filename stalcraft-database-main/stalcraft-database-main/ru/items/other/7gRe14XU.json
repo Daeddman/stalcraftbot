@@ -1,0 +1,17 @@
+{
+  "id": "7gRe14XU",
+  "category": "other",
+  "name": {
+    "key": "item.empty_bottle.name",
+    "type": "translation",
+    "lines": {
+      "en": "Bottle",
+      "ru": "Бутылка"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

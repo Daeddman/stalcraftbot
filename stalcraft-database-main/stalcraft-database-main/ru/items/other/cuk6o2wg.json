@@ -1,0 +1,17 @@
+{
+  "id": "cuk6o2wg",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.yorsh_1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #1: Yorsh",
+      "ru": "Часть схемы #1: «Йорш»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

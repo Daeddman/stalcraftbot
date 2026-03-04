@@ -1,0 +1,21 @@
+{
+  "id": "qj9q6",
+  "category": "consumables",
+  "name": {
+    "key": "item.med.psiblock_3.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "Neuron-33 PsyBlock",
+      "es": "Bloqueo psy Neuron-33",
+      "fr": "BloquePsy Neuro-33",
+      "ko": "뉴런-33 사이블록",
+      "ru": "Пси-блок «Нейрон-33»"
+    }
+  },
+  "color": "RANK_VETERAN",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

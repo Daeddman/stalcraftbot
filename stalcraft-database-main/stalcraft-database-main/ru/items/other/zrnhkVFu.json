@@ -1,0 +1,17 @@
+{
+  "id": "zrnhkVFu",
+  "category": "other",
+  "name": {
+    "key": "item.misc.pseudogigant_eye_t1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Weak Behemoth’s Eye",
+      "ru": "Глаз слабого бурелома"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

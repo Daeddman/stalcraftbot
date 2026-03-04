@@ -1,0 +1,19 @@
+{
+  "id": "5lrg1",
+  "category": "armor",
+  "name": {
+    "key": "item.arm.pahan.name",
+    "args": {},
+    "type": "translation",
+    "lines": {
+      "en": "Kingpin Armored Suit",
+      "es": "Traje blindado Capo",
+      "ru": "Бронекостюм «Пахан»"
+    }
+  },
+  "color": "RANK_VETERAN",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "SJSpCipH",
+  "category": "other",
+  "name": {
+    "key": "item.misc.tushkan_head_t1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Weak Rat’s Head",
+      "ru": "Голова слабой крысы"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

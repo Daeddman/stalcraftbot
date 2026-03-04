@@ -1,0 +1,17 @@
+{
+  "id": "mud9qLFR",
+  "category": "other",
+  "name": {
+    "key": "item.filler.socket.name",
+    "type": "translation",
+    "lines": {
+      "en": "Three-Way Electrical Splitter",
+      "ru": "Тройник"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

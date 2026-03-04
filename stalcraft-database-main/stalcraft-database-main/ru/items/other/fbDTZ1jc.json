@@ -1,0 +1,17 @@
+{
+  "id": "fbDTZ1jc",
+  "category": "other",
+  "name": {
+    "key": "item.lootbox.ny24_case5.name",
+    "type": "translation",
+    "lines": {
+      "en": "Old Level 5 Case",
+      "ru": "Старый кейс 5-го уровня 2024"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

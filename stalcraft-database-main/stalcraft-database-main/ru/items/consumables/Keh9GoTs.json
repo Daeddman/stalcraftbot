@@ -1,0 +1,17 @@
+{
+  "id": "Keh9GoTs",
+  "category": "consumables",
+  "name": {
+    "key": "item.bag.556exp.name",
+    "type": "translation",
+    "lines": {
+      "en": "Pouch of 5.56 mm Expanding Rounds",
+      "ru": "Сумка экспансивных патронов 5.56 мм"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

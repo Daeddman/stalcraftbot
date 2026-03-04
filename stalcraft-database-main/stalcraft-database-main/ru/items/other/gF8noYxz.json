@@ -1,0 +1,17 @@
+{
+  "id": "gF8noYxz",
+  "category": "other",
+  "name": {
+    "key": "item.lootbox.ravent_2023.name",
+    "type": "translation",
+    "lines": {
+      "en": "Gladiator Loot",
+      "ru": "Гладиаторский хабар"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

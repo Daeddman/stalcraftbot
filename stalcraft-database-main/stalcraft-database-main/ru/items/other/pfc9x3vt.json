@@ -1,0 +1,17 @@
+{
+  "id": "pfc9x3vt",
+  "category": "other",
+  "name": {
+    "key": "item.lootbox.faction_weapon.name",
+    "type": "translation",
+    "lines": {
+      "en": "Weapons Case",
+      "ru": "Оружейный кейс"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

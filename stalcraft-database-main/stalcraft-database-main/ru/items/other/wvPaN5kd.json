@@ -1,0 +1,17 @@
+{
+  "id": "wvPaN5kd",
+  "category": "other",
+  "name": {
+    "key": "item.lootbox.ny24_case3.name",
+    "type": "translation",
+    "lines": {
+      "en": "Old Level 3 Case",
+      "ru": "Старый кейс 3-го уровня 2024"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

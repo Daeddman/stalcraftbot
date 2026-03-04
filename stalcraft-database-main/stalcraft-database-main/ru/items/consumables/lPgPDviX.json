@@ -1,0 +1,18 @@
+{
+  "id": "lPgPDviX",
+  "category": "consumables",
+  "name": {
+    "key": "item.med.desperol.name",
+    "type": "translation",
+    "lines": {
+      "en": "Desperol",
+      "es": "Desperol",
+      "ru": "Десперол"
+    }
+  },
+  "color": "RANK_STALKER",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

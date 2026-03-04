@@ -1,0 +1,17 @@
+{
+  "id": "xkv4i6fz",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.hp_mod_3.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #3: Dream",
+      "ru": "Часть схемы #3: «Мечта»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

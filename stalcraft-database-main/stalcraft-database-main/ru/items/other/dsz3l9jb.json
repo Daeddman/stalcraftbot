@@ -1,0 +1,17 @@
+{
+  "id": "dsz3l9jb",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.spanner_4.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #4: Spanner",
+      "ru": "Часть схемы #4: «Спаннер»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "azq5t9so",
+  "category": "artefact",
+  "name": {
+    "key": "item.artefact.other_arts.regalia",
+    "type": "translation",
+    "lines": {
+      "en": "Regalia",
+      "ru": "Регалий"
+    }
+  },
+  "color": "EXCLUSIVE",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "z2clUJuo",
+  "category": "other",
+  "name": {
+    "key": "item.filler.valuable_6.name",
+    "type": "translation",
+    "lines": {
+      "en": "Medical Instruments",
+      "ru": "Медицинские инструменты"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "qOGG3q1d",
+  "category": "backpacks",
+  "name": {
+    "key": "item.16127.name",
+    "type": "translation",
+    "lines": {
+      "en": "Backpack",
+      "ru": "Рюкзак"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

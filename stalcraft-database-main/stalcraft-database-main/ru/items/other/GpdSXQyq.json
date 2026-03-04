@@ -1,0 +1,17 @@
+{
+  "id": "GpdSXQyq",
+  "category": "other",
+  "name": {
+    "key": "item.filler.npc_6.name",
+    "type": "translation",
+    "lines": {
+      "en": "Filter",
+      "ru": "Фильтр"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

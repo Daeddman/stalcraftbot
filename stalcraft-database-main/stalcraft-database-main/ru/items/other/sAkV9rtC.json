@@ -1,0 +1,17 @@
+{
+  "id": "sAkV9rtC",
+  "category": "other",
+  "name": {
+    "key": "item.resc.arm_veteran_unit.name",
+    "type": "translation",
+    "lines": {
+      "en": "Armor Component (Veteran)",
+      "ru": "Компонент брони (Ветеран)"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "8AizvZAF",
+  "category": "consumables",
+  "name": {
+    "key": "item.16550.name",
+    "type": "translation",
+    "lines": {
+      "en": "Box of MRE",
+      "ru": "Коробка ИРП"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

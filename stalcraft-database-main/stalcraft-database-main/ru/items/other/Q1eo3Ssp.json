@@ -1,0 +1,17 @@
+{
+  "id": "Q1eo3Ssp",
+  "category": "other",
+  "name": {
+    "key": "item.misc.aceton.name",
+    "type": "translation",
+    "lines": {
+      "en": "Paint Stripper",
+      "ru": "Растворитель"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

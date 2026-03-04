@@ -1,0 +1,18 @@
+{
+  "id": "XLF5kXBU",
+  "category": "consumables",
+  "name": {
+    "key": "item.med.clarinol.name",
+    "type": "translation",
+    "lines": {
+      "en": "Clarinol",
+      "es": "Clarinol",
+      "ru": "Кларинол"
+    }
+  },
+  "color": "RANK_STALKER",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

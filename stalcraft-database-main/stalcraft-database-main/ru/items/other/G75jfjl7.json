@@ -1,0 +1,17 @@
+{
+  "id": "G75jfjl7",
+  "category": "other",
+  "name": {
+    "key": "item.filler.airdrop_1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Small Merchant Delivery",
+      "ru": "Малая поставка торговцу"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

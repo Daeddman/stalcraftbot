@@ -1,0 +1,17 @@
+{
+  "id": "QHw9J3gS",
+  "category": "other",
+  "name": {
+    "key": "item.24322.name",
+    "type": "translation",
+    "lines": {
+      "en": "Bat Charm",
+      "ru": "Брелок «Летучая мышь»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "NWMXZE66",
+  "category": "other",
+  "name": {
+    "key": "item.filler.airdrop_2.name",
+    "type": "translation",
+    "lines": {
+      "en": "Common Merchant Delivery",
+      "ru": "Обычная поставка торговцу"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "sch5n6uf",
+  "category": "other",
+  "name": {
+    "key": "item.lootbox.wpn_camo.name",
+    "type": "translation",
+    "lines": {
+      "en": "Container with Weapon Camouflage",
+      "ru": "Контейнер с оружейным камуфляжем"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

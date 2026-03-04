@@ -1,0 +1,17 @@
+{
+  "id": "zls9v1cw",
+  "category": "other",
+  "name": {
+    "key": "item.scheme.kedr_mod_1.name",
+    "type": "translation",
+    "lines": {
+      "en": "Schematic #1: Tsunami",
+      "ru": "Часть схемы #1: «Цунами»"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "2w5jGvy7",
+  "category": "other",
+  "name": {
+    "key": "item.resc.wpn_master_unit.name",
+    "type": "translation",
+    "lines": {
+      "en": "Weapon Component (Master)",
+      "ru": "Компонент оружия (Мастер)"
+    }
+  },
+  "color": "DEFAULT",
+  "status": {
+    "state": ""
+  },
+  "infoBlocks": []
+}
