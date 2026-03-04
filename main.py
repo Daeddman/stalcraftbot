@@ -26,6 +26,7 @@ from services.item_loader import item_db
 from services.scanner import scan_auction
 from services.db_updater import update_game_database, scheduled_db_update
 from services.wiki_sync import sync_from_wiki
+from services.discovery import run_discovery_scan, sync_official_db_to_registry
 from bot.handlers import router
 from web.app import app as fastapi_app
 
@@ -216,6 +217,13 @@ async def main() -> None:
         return
     logger.info("✅ Загружено %d предметов", item_db.total_items)
 
+    # Синхронизируем official DB → ItemRegistry
+    try:
+        added = sync_official_db_to_registry()
+        logger.info("📋 Registry sync: +%d предметов", added)
+    except Exception as exc:
+        logger.error("❌ Registry sync ошибка: %s", exc)
+
     # SSL
     cert_path, key_path = ensure_ssl_certs()
 
@@ -251,6 +259,23 @@ async def main() -> None:
         name="Синхронизация с stalcraft.wiki",
         misfire_grace_time=300,
     )
+
+    # Discovery-сканер (полный обход аукциона)
+    async def _discovery_job():
+        try:
+            await run_discovery_scan()
+        except Exception as exc:
+            logger.error("❌ Discovery scan ошибка: %s", exc)
+
+    scheduler.add_job(
+        _discovery_job, "interval",
+        seconds=45,
+        id="discovery_scan",
+        name="Discovery: полный обход аукциона",
+        misfire_grace_time=60,
+        max_instances=1,
+    )
+
     scheduler.start()
 
     # URL

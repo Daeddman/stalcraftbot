@@ -14,6 +14,7 @@ from config import GAME_DB_DIR, STALCRAFT_REGION, BASE_DIR
 import web.routers.catalog as catalog
 import web.routers.auction as auction
 import web.routers.tracking as tracking
+import web.routers.discovery as discovery
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +35,7 @@ app.add_middleware(
 app.include_router(catalog.router, prefix="/api")
 app.include_router(auction.router, prefix="/api")
 app.include_router(tracking.router, prefix="/api")
+app.include_router(discovery.router, prefix="/api")
 
 # ── Статика ──
 app.mount("/icons", StaticFiles(directory=str(ICONS_DIR)), name="icons")

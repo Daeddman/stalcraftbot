@@ -95,6 +95,113 @@ class Alert(Base):
         return f"<Alert {self.item_id} q{self.quality}+{self.upgrade_level} -{self.discount_percent:.0f}%>"
 
 
+# ══════════════════════════════════════════════════════════════
+#  Discovery: Registry предметов (живёт независимо от official DB)
+# ══════════════════════════════════════════════════════════════
+
+class ItemRegistry(Base):
+    """
+    Любой предмет, о котором мы знаем.
+    source: official_db | wiki | observed | manual
+    """
+    __tablename__ = "items_registry"
+
+    item_id = Column(String(128), primary_key=True)
+    name = Column(String(256), nullable=True)
+    category = Column(String(128), nullable=True)
+    icon_url = Column(String(512), nullable=True)
+    color = Column(String(64), default="DEFAULT")
+    source = Column(String(32), default="observed")
+    is_official_db = Column(Boolean, default=False)
+    extra_json = Column(Text, nullable=True)
+    first_seen_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    last_seen_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+# ══════════════════════════════════════════════════════════════
+#  Discovery: Активные лоты (текущий снимок — upsert по lot_id)
+# ══════════════════════════════════════════════════════════════
+
+class ActiveLot(Base):
+    __tablename__ = "active_lots"
+
+    lot_id = Column(String(256), primary_key=True)
+    item_id = Column(String(128), nullable=False, index=True)
+    region = Column(String(8), default="ru")
+
+    start_price = Column(BigInteger, nullable=True)
+    buyout_price = Column(BigInteger, nullable=True)
+    current_price = Column(BigInteger, nullable=True)
+    amount = Column(Integer, default=1)
+
+    quality = Column(Integer, default=-1)
+    upgrade_level = Column(Integer, default=0)
+    additional_json = Column(Text, nullable=True)
+
+    start_time = Column(String(64), nullable=True)
+    end_time = Column(String(64), nullable=True)
+
+    first_seen_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    last_seen_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+# ══════════════════════════════════════════════════════════════
+#  Discovery: События лотов (created / updated / disappeared)
+# ══════════════════════════════════════════════════════════════
+
+class LotEvent(Base):
+    __tablename__ = "lot_events"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    lot_id = Column(String(256), nullable=False, index=True)
+    item_id = Column(String(128), nullable=False, index=True)
+    event_type = Column(String(32), nullable=False)  # created | updated | disappeared
+    price = Column(BigInteger, nullable=True)
+    amount = Column(Integer, nullable=True)
+    details_json = Column(Text, nullable=True)
+    event_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+# ══════════════════════════════════════════════════════════════
+#  Discovery: Агрегированные ценовые сэмплы (для графиков)
+# ══════════════════════════════════════════════════════════════
+
+class PriceSample(Base):
+    __tablename__ = "price_samples"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    item_id = Column(String(128), nullable=False, index=True)
+    region = Column(String(8), default="ru")
+
+    min_price = Column(BigInteger, nullable=True)
+    median_price = Column(BigInteger, nullable=True)
+    avg_price = Column(BigInteger, nullable=True)
+    max_price = Column(BigInteger, nullable=True)
+    lots_count = Column(Integer, default=0)
+    total_amount = Column(Integer, default=0)
+
+    sampled_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+# ══════════════════════════════════════════════════════════════
+#  Discovery: Текущая статистика цены (быстрый доступ — upsert)
+# ══════════════════════════════════════════════════════════════
+
+class ItemPriceStats(Base):
+    __tablename__ = "item_price_stats"
+
+    item_id = Column(String(128), primary_key=True)
+    region = Column(String(8), default="ru")
+
+    min_price = Column(BigInteger, nullable=True)
+    median_price = Column(BigInteger, nullable=True)
+    avg_price = Column(BigInteger, nullable=True)
+    lots_count = Column(Integer, default=0)
+    total_amount = Column(Integer, default=0)
+
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
 # ── Создание движка и сессии ──
 
 engine = create_engine(f"sqlite:///{DB_PATH}", echo=False)
@@ -103,5 +210,15 @@ SessionLocal = sessionmaker(bind=engine)
 
 def init_db() -> None:
     """Создать все таблицы в БД."""
+    # WAL mode для лучшей параллельной работы
+    from sqlalchemy import event as sa_event
+
+    @sa_event.listens_for(engine, "connect")
+    def _set_sqlite_pragma(dbapi_conn, _):
+        cursor = dbapi_conn.cursor()
+        cursor.execute("PRAGMA journal_mode=WAL")
+        cursor.execute("PRAGMA synchronous=NORMAL")
+        cursor.close()
+
     Base.metadata.create_all(engine)
 

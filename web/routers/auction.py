@@ -7,8 +7,14 @@ router = APIRouter(tags=["auction"])
 
 
 @router.get("/auction/{item_id}/lots")
-async def lots(item_id: str, limit: int = 20, offset: int = 0):
-    data = await get_active_lots(item_id, limit=limit, offset=offset, additional=True)
+async def lots(
+    item_id: str, limit: int = 20, offset: int = 0,
+    sort: str = "buyout_price", order: str = "asc",
+):
+    data = await get_active_lots(
+        item_id, limit=limit, offset=offset,
+        sort=sort, order=order, additional=True,
+    )
     return data
 
 

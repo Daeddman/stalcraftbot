@@ -29,8 +29,8 @@ DEAL_THRESHOLD_PERCENT: int = int(os.getenv("DEAL_THRESHOLD_PERCENT", "70"))
 DB_UPDATE_INTERVAL_HOURS: int = int(os.getenv("DB_UPDATE_INTERVAL_HOURS", "6"))
 
 # ── Web App ──
-WEBAPP_HOST: str = os.getenv("WEBAPP_HOST", "10.156.0.2")
-WEBAPP_PORT: int = int(os.getenv("WEBAPP_PORT", "8080"))
+WEBAPP_HOST: str = os.getenv("WEBAPP_HOST", "")
+WEBAPP_PORT: int = int(os.getenv("WEBAPP_PORT", ""))
 WEBAPP_URL: str = os.getenv("WEBAPP_URL", "")  # публичный HTTPS URL для Telegram WebApp
 
 # ── Rate Limiting ──

@@ -1,6 +1,7 @@
 """API отслеживания предметов."""
 from fastapi import APIRouter
 from pydantic import BaseModel
+from config import RANK_NAMES
 from db.repository import (
     get_active_tracked_items,
     add_tracked_item,
@@ -45,7 +46,7 @@ async def get_tracked():
             "category": t.category,
             "icon": _track_icon(gi),
             "color": gi.color if gi else "DEFAULT",
-            "rank_emoji": gi.rank_emoji if gi else "",
+            "rank_name": RANK_NAMES.get(gi.color, "") if gi else "",
             "api_supported": gi.api_supported if gi else True,
             "avg_24h": get_avg_price(t.item_id, hours=24),
             "avg_7d": get_avg_sale_price(t.item_id, hours=168),
