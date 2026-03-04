@@ -15,6 +15,7 @@ import web.routers.catalog as catalog
 import web.routers.auction as auction
 import web.routers.tracking as tracking
 import web.routers.discovery as discovery
+import web.routers.game as game
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +37,7 @@ app.include_router(catalog.router, prefix="/api")
 app.include_router(auction.router, prefix="/api")
 app.include_router(tracking.router, prefix="/api")
 app.include_router(discovery.router, prefix="/api")
+app.include_router(game.router, prefix="/api")
 
 # ── Статика ──
 app.mount("/icons", StaticFiles(directory=str(ICONS_DIR)), name="icons")
