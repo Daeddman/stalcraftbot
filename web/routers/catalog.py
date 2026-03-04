@@ -6,6 +6,15 @@ from config import CATEGORY_NAMES, RANK_NAMES
 router = APIRouter(tags=["catalog"])
 
 
+def _cat_name(cat_id: str) -> str:
+    """Русское название категории с fallback."""
+    if cat_id in CATEGORY_NAMES:
+        return CATEGORY_NAMES[cat_id]
+    # Fallback: берём последний сегмент, заменяем _ на пробел
+    last = cat_id.split("/")[-1].replace("_", " ")
+    return last.capitalize()
+
+
 @router.get("/categories")
 async def get_categories():
     """Дерево категорий."""
@@ -18,12 +27,12 @@ async def get_categories():
         for sub in subs:
             children.append({
                 "id": sub,
-                "name": CATEGORY_NAMES.get(sub, sub.split("/")[-1].replace("_", " ").title()),
+                "name": _cat_name(sub),
                 "count": len(item_db.get_by_category(sub)),
             })
         result.append({
             "id": cat,
-            "name": CATEGORY_NAMES.get(cat, cat.title()),
+            "name": _cat_name(cat),
             "count": count,
             "children": children,
         })
