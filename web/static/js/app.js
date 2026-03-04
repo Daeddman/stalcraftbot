@@ -25,9 +25,9 @@ function render(h){ A.innerHTML='<div class="page">'+h+'</div>'; A.scrollTop=0; 
 function parseQU(add) {
   if (!add) return { q: -1, u: 0 };
   let q = (add.qlt != null) ? Number(add.qlt) : -1;
-  let ub = add.upgrade_bonus || 0;
-  let u = 0;
-  if (ub > 0) u = Math.max(1, Math.min(15, Math.round(ub / 0.05)));
+  // Заточка хранится в "ptn" (potency), NOT "upgrade_bonus"
+  let ptn = add.ptn || 0;
+  let u = Math.max(0, Math.min(15, Math.round(ptn)));
   return { q, u };
 }
 

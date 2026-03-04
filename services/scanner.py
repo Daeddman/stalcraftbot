@@ -39,7 +39,7 @@ def _parse_additional(lot: dict[str, Any]) -> tuple[int, int]:
     """
     Извлечь quality и upgrade_level из additional полей лота.
     qlt: -1..5 (качество/редкость артефакта)
-    upgrade_bonus: float → upgrade_level 0..15
+    ptn: 0..15 (заточка артефакта — potency)
     """
     add = lot.get("additional", {})
     if not add:
@@ -49,15 +49,11 @@ def _parse_additional(lot: dict[str, Any]) -> tuple[int, int]:
     if qlt is None:
         qlt = -1
 
-    upgrade_bonus = add.get("upgrade_bonus", 0.0)
-    if upgrade_bonus and upgrade_bonus > 0:
-        # Каждый уровень заточки даёт +5% бонуса (0.05 per level)
-        # Но это может быть другая формула — используем round
-        upgrade_level = min(15, max(0, round(upgrade_bonus * 20)))  # *20 = /0.05
-        if upgrade_level == 0 and upgrade_bonus > 0.01:
-            upgrade_level = 1
-    else:
-        upgrade_level = 0
+    # Заточка хранится в поле "ptn" (potency), а НЕ в "upgrade_bonus"
+    ptn = add.get("ptn", 0)
+    if ptn is None:
+        ptn = 0
+    upgrade_level = min(15, max(0, int(ptn)))
 
     return int(qlt), int(upgrade_level)
 

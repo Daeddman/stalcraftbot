@@ -45,8 +45,9 @@ def _parse_additional(lot: dict) -> tuple[int, int]:
     qlt = add.get("qlt", -1)
     if qlt is None:
         qlt = -1
-    ub = add.get("upgrade_bonus", 0.0) or 0.0
-    upgrade = min(15, max(0, round(ub * 20))) if ub > 0 else 0
+    # Заточка в поле "ptn" (potency), НЕ "upgrade_bonus"
+    ptn = add.get("ptn", 0) or 0
+    upgrade = min(15, max(0, int(ptn)))
     return int(qlt), int(upgrade)
 
 

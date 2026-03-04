@@ -225,6 +225,7 @@ def get_quality_breakdown(item_id: str, hours: int = 168) -> list[dict]:
     """
     Разбивка цен по (quality, upgrade_level) для предмета.
     Возвращает [{quality, upgrade_level, avg_price, min_price, count}, ...]
+    Пропускает quality=-1 (неизвестное).
     """
     with SessionLocal() as session:
         since = datetime.now(timezone.utc) - timedelta(hours=hours)
@@ -238,6 +239,7 @@ def get_quality_breakdown(item_id: str, hours: int = 168) -> list[dict]:
             )
             .where(SaleRecord.item_id == item_id)
             .where(SaleRecord.recorded_at >= since)
+            .where(SaleRecord.quality >= 0)
             .group_by(SaleRecord.quality, SaleRecord.upgrade_level)
             .order_by(SaleRecord.quality, SaleRecord.upgrade_level)
         )
