@@ -39,16 +39,15 @@ async function getEmission(){
 function emiHTML(d){
   if(!d)return '';
   const now=Date.now();
-  const cs=d.currentEmissionStart?new Date(d.currentEmissionStart).getTime():0;
-  const ce=d.currentEmissionEnd?new Date(d.currentEmissionEnd).getTime():0;
+  // API returns: currentStart/currentEnd or previousStart/previousEnd
+  const cs=d.currentStart?new Date(d.currentStart).getTime():0;
+  const ce=d.currentEnd?new Date(d.currentEnd).getTime():0;
   const isOn=cs>0&&ce>0&&now>=cs&&now<ce;
   if(isOn){
     const left=ce-now;
     return '<div class="emi"><div class="emi-dot on"></div><div class="emi-text">☢️ Выброс идёт</div><div class="emi-timer">'+fmtMs(left)+'</div></div>';
   }
-  // Зона чиста — показываем когда был последний
-  const ps=d.previousEmissionStart?new Date(d.previousEmissionStart).getTime():0;
-  const pe=d.previousEmissionEnd?new Date(d.previousEmissionEnd).getTime():0;
+  const pe=d.previousEnd?new Date(d.previousEnd).getTime():0;
   let info='';
   if(pe>0)info=fmtAgo(now-pe)+' назад';
   return '<div class="emi"><div class="emi-dot off"></div><div class="emi-text">Зона чиста</div><div class="emi-timer">'+info+'</div></div>';

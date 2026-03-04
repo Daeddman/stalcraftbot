@@ -26,6 +26,6 @@ async def get_emission(region: str = STALCRAFT_REGION) -> dict[str, Any]:
         return data
     except Exception as exc:
         logger.warning("Ошибка получения emission: %s", exc)
-        return _cache or {"currentEmissionStart": None, "currentEmissionEnd": None,
-                          "previousEmissionStart": None, "previousEmissionEnd": None}
+        return _cache or {"currentStart": None, "currentEnd": None,
+                          "previousStart": None, "previousEnd": None}
 
