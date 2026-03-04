@@ -29,7 +29,7 @@ DEAL_THRESHOLD_PERCENT: int = int(os.getenv("DEAL_THRESHOLD_PERCENT", "70"))
 DB_UPDATE_INTERVAL_HOURS: int = int(os.getenv("DB_UPDATE_INTERVAL_HOURS", "6"))
 
 # ── Web App ──
-WEBAPP_HOST: str = os.getenv("WEBAPP_HOST", "0.0.0.0")
+WEBAPP_HOST: str = os.getenv("WEBAPP_HOST", "10.156.0.2")
 WEBAPP_PORT: int = int(os.getenv("WEBAPP_PORT", "8080"))
 WEBAPP_URL: str = os.getenv("WEBAPP_URL", "")  # публичный HTTPS URL для Telegram WebApp
 
@@ -65,12 +65,27 @@ CATEGORY_NAMES: dict[str, str] = {
     "weapon_style": "🎨 Стили оружия",
 }
 
-# ── Цвета рангов ──
+# ── Ранги предметов (цвета Stalcraft) ──
+# Отмычка (DEFAULT) — Белый
+# Новичок (NEWBIE) — Ярко-зелёный
+# Сталкер (STALKER) — Синий
+# Ветеран (VETERAN) — Розовый
+# Мастер (MASTER) — Красный
+# Легенда (LEGEND) — Жёлтый/Золотой
 RANK_EMOJI: dict[str, str] = {
     "DEFAULT": "⬜",
     "RANK_NEWBIE": "🟢",
     "RANK_STALKER": "🔵",
-    "RANK_VETERAN": "🟣",
-    "RANK_MASTER": "🟠",
-    "RANK_LEGEND": "🔴",
+    "RANK_VETERAN": "🩷",
+    "RANK_MASTER": "🔴",
+    "RANK_LEGEND": "🟡",
+}
+
+RANK_NAMES: dict[str, str] = {
+    "DEFAULT": "Отмычка",
+    "RANK_NEWBIE": "Новичок",
+    "RANK_STALKER": "Сталкер",
+    "RANK_VETERAN": "Ветеран",
+    "RANK_MASTER": "Мастер",
+    "RANK_LEGEND": "Легенда",
 }

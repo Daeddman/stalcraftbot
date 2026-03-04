@@ -14,9 +14,16 @@ router = APIRouter(tags=["tracking"])
 
 
 def _track_icon(gi) -> str:
-    if not gi or not gi.icon_path or gi.icon_path.strip() == "":
+    if not gi:
         return ""
     p = gi.icon_path
+    if not p or p.strip() == "":
+        # Для wiki-предметов пробуем кастомную иконку
+        if not gi.api_supported:
+            return f"/custom-icons/{gi.item_id}.png"
+        return ""
+    if p.startswith("http"):
+        return p
     if p.startswith("/icons/"):
         return p
     return f"/icons/{p.lstrip('/')}"
@@ -39,6 +46,7 @@ async def get_tracked():
             "icon": _track_icon(gi),
             "color": gi.color if gi else "DEFAULT",
             "rank_emoji": gi.rank_emoji if gi else "",
+            "api_supported": gi.api_supported if gi else True,
             "avg_24h": get_avg_price(t.item_id, hours=24),
             "avg_7d": get_avg_sale_price(t.item_id, hours=168),
         })

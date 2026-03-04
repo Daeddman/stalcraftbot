@@ -80,6 +80,11 @@ async def scan_auction() -> None:
 
     for item in tracked:
         try:
+            # Пропускаем предметы, которые не поддерживаются API (8-символьные wiki-ID)
+            from services.item_loader import item_db
+            if not item_db.is_api_supported(item.item_id):
+                logger.debug("Пропускаю %s (%s) — не поддерживается API", item.item_id, item.name)
+                continue
             await _scan_item(item.item_id, item.name)
         except Exception as exc:
             logger.error("Ошибка при сканировании %s: %s", item.item_id, exc)

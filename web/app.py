@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from config import GAME_DB_DIR, STALCRAFT_REGION
+from config import GAME_DB_DIR, STALCRAFT_REGION, BASE_DIR
 import web.routers.catalog as catalog
 import web.routers.auction as auction
 import web.routers.tracking as tracking
@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 STATIC_DIR = Path(__file__).parent / "static"
 ICONS_DIR = GAME_DB_DIR / STALCRAFT_REGION / "icons"
+CUSTOM_ICONS_DIR = BASE_DIR / "custom_icons"
 
 app = FastAPI(title="PerekupHelper", docs_url=None, redoc_url=None)
 
@@ -36,6 +37,9 @@ app.include_router(tracking.router, prefix="/api")
 
 # ── Статика ──
 app.mount("/icons", StaticFiles(directory=str(ICONS_DIR)), name="icons")
+# Кастомные иконки (wiki-предметы, загруженные вручную)
+if CUSTOM_ICONS_DIR.exists():
+    app.mount("/custom-icons", StaticFiles(directory=str(CUSTOM_ICONS_DIR)), name="custom_icons")
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 

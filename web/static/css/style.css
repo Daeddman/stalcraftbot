@@ -667,3 +667,47 @@ table.lt { width: 100%; border-collapse: collapse; font-size: 11px; }
   margin-bottom: 4px;
 }
 .banner-sub { font-size: 11px; color: var(--t3); }
+
+/* ── Warning Box (API unavailable) ── */
+.warn-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(224, 155, 55, 0.06);
+  border: 1px solid rgba(224, 155, 55, 0.2);
+  border-left: 3px solid #e09b37;
+  border-radius: var(--r);
+  padding: 14px;
+  margin: 10px 0;
+}
+.warn-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.warn-text {
+  font-size: 12px;
+  color: var(--t2);
+  line-height: 1.5;
+}
+.warn-text b {
+  color: #e09b37;
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* ── Wiki Badge ── */
+.badge-wiki {
+  display: inline-block;
+  font-size: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(224, 155, 55, 0.15);
+  color: #e09b37;
+  border-radius: 3px;
+  padding: 1px 4px;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+

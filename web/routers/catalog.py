@@ -77,6 +77,7 @@ async def get_item(item_id: str):
         "rank_emoji": item.rank_emoji,
         "icon": _icon_url(item),
         "is_artefact": is_art,
+        "api_supported": item.api_supported,
         "stats": stats,
         "prices": {
             "avg_24h": get_avg_price(item_id, hours=24),
@@ -96,7 +97,12 @@ def _icon_url(item) -> str:
     """Формирует URL иконки."""
     p = item.icon_path
     if not p or p.strip() == "":
+        # Для wiki-предметов (8-char ID) пробуем кастомную иконку
+        if not item.api_supported:
+            return f"/custom-icons/{item.item_id}.png"
         return ""
+    if p.startswith("http"):
+        return p  # CDN URL
     if p.startswith("/icons/"):
         return p  # уже правильный путь
     return f"/icons/{p.lstrip('/')}"
@@ -111,6 +117,7 @@ def _item_short(item):
         "color": item.color,
         "rank_emoji": item.rank_emoji,
         "icon": _icon_url(item),
+        "api_supported": item.api_supported,
     }
 
 

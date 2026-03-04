@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════
-   PerekupHelper SPA — v2 complete redesign
+   PerekupHelper SPA — v3 fixed
    ═══════════════════════════════════════════ */
 const A = document.getElementById('app');
 function go(h) { location.hash = h; }
@@ -118,7 +118,7 @@ async function P_cat(cat, pg) {
   h += '<div class="hdr">' + (d.items[0] ? d.items[0].category_name : cat) + '</div><div class="sub">' + d.total + ' предметов</div>';
   h += PP(S.catPP, [10, 20, 50, 100], 'cat');
   h += '<div class="card">';
-  for (const i of d.items) h += R(i.id, i.icon, i.name, '', i.color, null);
+  for (const i of d.items) h += R(i.id, i.icon, i.name, '', i.color, null, i.api_supported);
   h += '</div>';
   if (d.pages > 1) h += PG(pg, d.pages, function(p) { return "P_cat('" + cat + "'," + p + ")"; });
   render(h);
@@ -130,21 +130,32 @@ async function P_item(id) {
   const [item, tr] = await Promise.all([API.get('/api/items/' + id), API.get('/api/tracked')]);
   if (item.error) { render('<div class="empty"><div class="empty-i">❌</div><div class="empty-t">Предмет не найден</div></div>'); return; }
   const isTr = tr.some(t => t.item_id === id);
+  const apiOk = item.api_supported !== false;
   let h = '<a class="back" onclick="history.back()">← Назад</a>';
   h += '<div class="hero"><div class="hero-img">' + ICO(item.icon) + '</div><div class="hero-r"><div class="hero-t rk-' + item.color + '"><span class="in">' + item.name + '</span></div><div class="hero-s">' + item.category_name + '</div></div></div>';
-  h += '<div class="pblk"><div class="pt">💰 Цены</div>';
-  if (item.is_artefact && item.quality_breakdown.length) {
-    for (const b of item.quality_breakdown) h += '<div class="pr"><span class="pl">' + qb(b.quality) + upg(b.upgrade_level) + '</span><span class="pv">' + fmt(b.avg_price) + ' ₽ <small style="color:var(--t3)">(' + b.count + ')</small></span></div>';
-  } else if (item.prices.avg_24h || item.prices.avg_7d) {
-    if (item.prices.avg_24h) h += '<div class="pr"><span class="pl">Средняя 24ч</span><span class="pv">' + fmt(item.prices.avg_24h) + ' ₽</span></div>';
-    if (item.prices.avg_7d) h += '<div class="pr"><span class="pl">Средняя 7д</span><span class="pv">' + fmt(item.prices.avg_7d) + ' ₽</span></div>';
-  } else { h += '<div class="pr"><span class="pl" style="opacity:.5">Добавь в отслеживание для сбора цен</span></div>'; }
-  h += '</div>';
+
+  if (apiOk) {
+    h += '<div class="pblk"><div class="pt">💰 Цены</div>';
+    if (item.is_artefact && item.quality_breakdown.length) {
+      for (const b of item.quality_breakdown) h += '<div class="pr"><span class="pl">' + qb(b.quality) + upg(b.upgrade_level) + '</span><span class="pv">' + fmt(b.avg_price) + ' ₽ <small style="color:var(--t3)">(' + b.count + ')</small></span></div>';
+    } else if (item.prices.avg_24h || item.prices.avg_7d) {
+      if (item.prices.avg_24h) h += '<div class="pr"><span class="pl">Средняя 24ч</span><span class="pv">' + fmt(item.prices.avg_24h) + ' ₽</span></div>';
+      if (item.prices.avg_7d) h += '<div class="pr"><span class="pl">Средняя 7д</span><span class="pv">' + fmt(item.prices.avg_7d) + ' ₽</span></div>';
+    } else { h += '<div class="pr"><span class="pl" style="opacity:.5">Добавь в отслеживание для сбора цен</span></div>'; }
+    h += '</div>';
+  } else {
+    h += '<div class="warn-box"><span class="warn-icon">⚠️</span><div class="warn-text"><b>Аукцион недоступен</b><br>Этот предмет не поддерживается официальным API Stalcraft. Данные по ценам и лотам отсутствуют.</div></div>';
+  }
+
   h += '<div class="bgrp">';
-  if (isTr) h += '<button class="btn btn-r" onclick="haptic(\'medium\');UT(\'' + id + '\')">✕ Убрать</button>';
-  else h += '<button class="btn btn-g" onclick="haptic(\'medium\');TK(\'' + id + '\')">📌 Отслеживать</button>';
-  h += '<a class="btn btn-o" href="#/auction/' + id + '" onclick="haptic()">📊 Лоты</a></div>';
-  if (item.stats.length) {
+  if (apiOk) {
+    if (isTr) h += '<button class="btn btn-r" onclick="haptic(\'medium\');UT(\'' + id + '\')">✕ Убрать</button>';
+    else h += '<button class="btn btn-g" onclick="haptic(\'medium\');TK(\'' + id + '\')">📌 Отслеживать</button>';
+    h += '<a class="btn btn-o" href="#/auction/' + id + '" onclick="haptic()">📊 Лоты</a>';
+  }
+  h += '</div>';
+
+  if (item.stats && item.stats.length) {
     h += '<div class="sec">Характеристики</div><div class="card" style="padding:10px 12px"><div class="stl">';
     for (const s of item.stats) { let c = ''; if (s.color === '53C353') c = 'sg'; else if (s.color === 'C15252') c = 'sr'; h += '<div class="str"><span class="stk">' + s.key + '</span><span class="stv ' + c + '">' + s.value + '</span></div>'; }
     h += '</div></div>';
@@ -158,12 +169,21 @@ async function UT(id) { await API.del('/api/tracked/' + id); toast('✕ Убра
 async function P_auc(id, lp, sp) {
   lp = lp || 1; sp = sp || 1;
   render('<div class="ld">Загрузка лотов</div>');
+
+  const item = await API.get('/api/items/' + id);
+  if (item.api_supported === false) {
+    let h = '<a class="back" href="#/item/' + id + '">← ' + (item.name || id) + '</a>';
+    h += '<div class="hdr">📊 Аукцион</div>';
+    h += '<div class="warn-box"><span class="warn-icon">⚠️</span><div class="warn-text"><b>Аукцион недоступен</b><br>Этот предмет не поддерживается официальным API Stalcraft.<br>Данные по ценам и лотам отсутствуют.</div></div>';
+    render(h);
+    return;
+  }
+
   const lOff = (lp - 1) * S.lotPP, sOff = (sp - 1) * S.salePP;
-  const [ld, hd, pd, item] = await Promise.all([
+  const [ld, hd, pd] = await Promise.all([
     API.get('/api/auction/' + id + '/lots?limit=' + S.lotPP + '&offset=' + lOff),
     API.get('/api/auction/' + id + '/history?limit=' + S.salePP + '&offset=' + sOff),
     API.get('/api/auction/' + id + '/prices'),
-    API.get('/api/items/' + id)
   ]);
   const lots = ld.lots || [], sales = hd.prices || [], isA = item.is_artefact, nm = item.name || id;
   const lTotal = ld.total || 0, sTotal = hd.total || 0;
@@ -222,7 +242,7 @@ async function DS(q) {
   try {
     const it = await API.get('/api/search?q=' + encodeURIComponent(q) + '&limit=30');
     if (!it.length) { b.innerHTML = '<div class="empty"><div class="empty-i">🤷</div><div class="empty-t">Ничего не найдено</div></div>'; return; }
-    let h = '<div class="card">'; for (const i of it) h += R(i.id, i.icon, i.name, i.category_name, i.color, null); h += '</div>'; b.innerHTML = h;
+    let h = '<div class="card">'; for (const i of it) h += R(i.id, i.icon, i.name, i.category_name, i.color, null, i.api_supported); h += '</div>'; b.innerHTML = h;
   } catch (e) { b.innerHTML = '<div class="empty"><div class="empty-i">⚠️</div><div class="empty-t">Ошибка поиска</div></div>'; }
 }
 
@@ -234,7 +254,7 @@ async function P_tracked() {
   if (!tr.length) {
     h += '<div class="empty"><div class="empty-i">📭</div><div class="empty-t">Пока ничего не отслеживается</div><button class="btn btn-g" style="margin:16px auto 0;width:auto;padding:12px 28px" onclick="go(\'#/catalog\')">Перейти в каталог</button></div>';
   } else {
-    h += '<div class="card">'; for (const t of tr) h += R(t.item_id, t.icon, t.name, '', t.color, t.avg_24h); h += '</div>';
+    h += '<div class="card">'; for (const t of tr) h += R(t.item_id, t.icon, t.name, '', t.color, t.avg_24h, t.api_supported); h += '</div>';
   }
   render(h);
 }
@@ -244,9 +264,10 @@ function ICO(src) {
   if (!src || src === '/icons/' || src === '') return '<div class="no-icon">📦</div>';
   return '<img src="' + src + '" onerror="this.parentElement.innerHTML=\'<div class=\\\'no-icon\\\'>📦</div>\'" loading="lazy">';
 }
-function R(id, icon, name, tag, color, price) {
+function R(id, icon, name, tag, color, price, apiSupported) {
   const p = price ? '<div class="ip">' + fmt(price) + ' ₽</div>' : '';
-  return '<div class="irow rk-' + (color || 'DEFAULT') + '" onclick="haptic();go(\'#/item/' + id + '\')"><div class="irow-icon">' + ICO(icon) + '</div><div class="ib"><div class="in">' + name + '</div>' + (tag ? '<div class="it">' + tag + '</div>' : '') + '</div>' + p + '</div>';
+  const noApi = (apiSupported === false) ? '<span class="badge-wiki" title="Не поддерживается API">wiki</span>' : '';
+  return '<div class="irow rk-' + (color || 'DEFAULT') + '" onclick="haptic();go(\'#/item/' + id + '\')"><div class="irow-icon">' + ICO(icon) + '</div><div class="ib"><div class="in">' + name + noApi + '</div>' + (tag ? '<div class="it">' + tag + '</div>' : '') + '</div>' + p + '</div>';
 }
 function PG(cur, tot, fn) {
   return '<div class="pgr"><button ' + (cur <= 1 ? 'disabled' : '') + ' onclick="' + fn(cur - 1) + '">‹</button><span class="pi">' + cur + ' / ' + tot + '</span><button ' + (cur >= tot ? 'disabled' : '') + ' onclick="' + fn(cur + 1) + '">›</button></div>';

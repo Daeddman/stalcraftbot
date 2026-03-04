@@ -14,6 +14,12 @@ from api.auth import token_manager
 
 logger = logging.getLogger(__name__)
 
+
+class InvalidItemError(Exception):
+    """API вернул 400 'Invalid item id' — предмет не поддерживается."""
+    pass
+
+
 # Семафор для ограничения параллельных запросов
 _semaphore = asyncio.Semaphore(MAX_REQUESTS_PER_SECOND)
 
@@ -88,6 +94,18 @@ class StalcraftClient:
                         )
                         await asyncio.sleep(wait)
                         continue
+
+                    # 400 Invalid item id — предмет не поддерживается API
+                    if resp.status_code == 400:
+                        try:
+                            body = resp.json()
+                            title = body.get("title", "")
+                            if "Invalid item id" in title:
+                                raise InvalidItemError(title)
+                        except InvalidItemError:
+                            raise
+                        except Exception:
+                            pass
 
                     # Другие ошибки — выбрасываем сразу
                     resp.raise_for_status()

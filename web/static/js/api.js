@@ -30,7 +30,7 @@ function fmtDate(s) {
   return s.replace('T',' ').slice(0,16);
 }
 
-const Q_NAME = { '-1':'???', 0:'Обычный', 1:'Необычный', 2:'Особый', 3:'Редкий', 4:'Легендарный', 5:'Исключительный' };
+const Q_NAME = { '-1':'???', 0:'Обычный', 1:'Необычный', 2:'Особый', 3:'Редкий', 4:'Исключительный', 5:'Легендарный' };
 const Q_CSS = { '-1':'q--1', 0:'q-0', 1:'q-1', 2:'q-2', 3:'q-3', 4:'q-4', 5:'q-5' };
 function qb(q) { return `<span class="qb ${Q_CSS[q]||''}">${Q_NAME[q]||'?'}</span>`; }
 function upg(u) { return u > 0 ? `<span class="upg">+${u}</span>` : ''; }

@@ -32,6 +32,11 @@ class GameItem:
         return RANK_EMOJI.get(self.color, "⬜")
 
     @property
+    def api_supported(self) -> bool:
+        """Короткие ID (≤5 символов) поддерживаются Stalcraft API, 8-символьные wiki-ID — нет."""
+        return len(self.item_id) <= 5
+
+    @property
     def category_name(self) -> str:
         return CATEGORY_NAMES.get(self.category, self.category)
 
@@ -172,6 +177,13 @@ class ItemDatabase:
     def get(self, item_id: str) -> GameItem | None:
         """Получить предмет по ID."""
         return self._items.get(item_id)
+
+    def is_api_supported(self, item_id: str) -> bool:
+        """Проверить, поддерживается ли предмет официальным Stalcraft API."""
+        item = self._items.get(item_id)
+        if item:
+            return item.api_supported
+        return len(item_id) <= 5
 
     def get_categories(self) -> list[str]:
         """Список всех категорий."""
