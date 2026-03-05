@@ -23,7 +23,8 @@ class UpdateStatus(BaseModel):
     sold_price: Optional[int] = None
 
 @router.get("/market")
-async def list_market(item_id: str = "", listing_type: str = "", status: str = "active", page: int = 1, per_page: int = 20):
+async def list_market(item_id: str = "", listing_type: str = "", status: str = "active",
+                      search: str = "", page: int = 1, per_page: int = 20):
     per_page = max(1, min(per_page, 50))
     offset = (page - 1) * per_page
     with SessionLocal() as session:
@@ -34,6 +35,8 @@ async def list_market(item_id: str = "", listing_type: str = "", status: str = "
             q = q.filter(MarketListing.item_id == item_id)
         if listing_type:
             q = q.filter(MarketListing.listing_type == listing_type)
+        if search:
+            q = q.filter(MarketListing.item_name.ilike(f"%{search}%"))
         total = q.count()
         rows = q.order_by(MarketListing.created_at.desc()).offset(offset).limit(per_page).all()
         items = []

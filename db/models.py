@@ -293,6 +293,18 @@ class MarketListing(Base):
     expires_at = Column(DateTime, nullable=True)
 
 
+# ══════════════════════════════════════════════════════════════
+#  Уведомления о выбросе (per-user)
+# ══════════════════════════════════════════════════════════════
+
+class EmissionNotifySetting(Base):
+    __tablename__ = "emission_notify_settings"
+
+    telegram_id = Column(BigInteger, primary_key=True)
+    enabled = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
 # ── Создание движка и сессии ──
 
 engine = create_engine(f"sqlite:///{DB_PATH}", echo=False)

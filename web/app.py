@@ -66,10 +66,16 @@ async def index():
 
 
 # Любой неизвестный путь → SPA (для hash-routing это не нужно, но на всякий)
+# ВАЖНО: статические маршруты (/static, /icons и т.д.) обслуживаются mount-ами выше,
+# но catch-all route может перехватить их раньше. Поэтому явно исключаем.
+_STATIC_PREFIXES = ("static/", "icons/", "custom-icons/", "uploads/", "api/")
+
+
 @app.get("/{full_path:path}")
 async def spa_fallback(full_path: str):
-    file = STATIC_DIR / full_path
-    if file.is_file():
-        return FileResponse(str(file))
+    # Если путь начинается со статического префикса — 404, а не index.html
+    if any(full_path.startswith(p) for p in _STATIC_PREFIXES):
+        from fastapi.responses import JSONResponse
+        return JSONResponse({"error": "not_found"}, status_code=404)
     return FileResponse(str(STATIC_DIR / "index.html"))
 

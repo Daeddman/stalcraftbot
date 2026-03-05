@@ -28,6 +28,7 @@ from services.db_updater import update_game_database, scheduled_db_update
 from services.wiki_sync import sync_from_wiki
 from services.discovery import run_discovery_scan, sync_official_db_to_registry
 from services.history_sync import run_incremental_job, run_full_download_job, init_sync_states
+from services.alerter import check_emission_and_notify
 from web.routers.marketplace import expire_old_listings
 from bot.handlers import router
 from web.app import app as fastapi_app
@@ -143,6 +144,9 @@ async def on_startup(bot: Bot) -> None:
     await bot.set_my_commands([
         BotCommand(command="start", description="🏪 Открыть приложение"),
         BotCommand(command="scan", description="🔄 Сканировать аукцион"),
+        BotCommand(command="emission", description="☢️ Статус выброса"),
+        BotCommand(command="emission_on", description="🔔 Вкл. уведомления о выбросе"),
+        BotCommand(command="emission_off", description="🔕 Выкл. уведомления о выбросе"),
         BotCommand(command="help", description="📖 Помощь"),
     ])
     logger.info("✅ Telegram-бот запущен!")
@@ -331,6 +335,22 @@ async def main() -> None:
         id="expire_listings",
         name="Экспирация листингов",
         misfire_grace_time=120,
+    )
+
+    # Проверка выброса и рассылка уведомлений
+    async def _emission_check_job():
+        try:
+            await check_emission_and_notify()
+        except Exception as exc:
+            logger.error("❌ Emission check ошибка: %s", exc)
+
+    scheduler.add_job(
+        _emission_check_job, "interval",
+        seconds=30,
+        id="emission_check",
+        name="Проверка выброса",
+        misfire_grace_time=30,
+        max_instances=1,
     )
 
     scheduler.start()

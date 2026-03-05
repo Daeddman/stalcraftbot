@@ -110,3 +110,87 @@ async def send_status_message(text: str) -> bool:
     except Exception as exc:
         logger.error("Ошибка отправки: %s", exc)
         return False
+
+
+# ══════════════════════════════════════════════════════════════
+#  Уведомления о выбросе
+# ══════════════════════════════════════════════════════════════
+
+_last_emission_active: bool | None = None  # None = неизвестно, True = идёт, False = чисто
+
+
+async def check_emission_and_notify():
+    """
+    Проверяет статус выброса и рассылает уведомления подписчикам
+    при изменении состояния (начался / закончился).
+    """
+    global _last_emission_active
+    from api.emission import get_emission
+    from db.models import SessionLocal, EmissionNotifySetting
+    from datetime import datetime, timezone
+
+    try:
+        data = await get_emission()
+    except Exception as exc:
+        logger.debug("Emission check error: %s", exc)
+        return
+
+    # Определяем текущее состояние
+    now = datetime.now(timezone.utc)
+    cs = data.get("currentStart")
+    ce = data.get("currentEnd")
+    is_active = False
+    if cs and ce:
+        try:
+            start = datetime.fromisoformat(cs.replace("Z", "+00:00"))
+            end = datetime.fromisoformat(ce.replace("Z", "+00:00"))
+            is_active = start <= now <= end
+        except Exception:
+            pass
+
+    # Первый запуск — запоминаем без уведомлений
+    if _last_emission_active is None:
+        _last_emission_active = is_active
+        return
+
+    # Нет изменений
+    if is_active == _last_emission_active:
+        return
+
+    _last_emission_active = is_active
+
+    # Готовим сообщение
+    if is_active:
+        text = "☢️ <b>Выброс начался!</b>\n\n🚨 Немедленно укройтесь в безопасном месте!"
+    else:
+        text = "✅ <b>Выброс завершён</b>\n\n🌤 Зона снова безопасна. Можно выходить."
+
+    # Рассылаем подписчикам
+    bot = _get_bot()
+    if not bot:
+        return
+
+    with SessionLocal() as session:
+        subscribers = session.query(EmissionNotifySetting).filter_by(enabled=True).all()
+        tg_ids = [s.telegram_id for s in subscribers]
+
+    if not tg_ids:
+        # Если нет подписчиков, отправляем хотя бы в основной чат
+        if TELEGRAM_CHAT_ID:
+            try:
+                await bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=text, parse_mode=ParseMode.HTML)
+            except Exception:
+                pass
+        return
+
+    sent = 0
+    for tg_id in tg_ids:
+        try:
+            await bot.send_message(chat_id=tg_id, text=text, parse_mode=ParseMode.HTML)
+            sent += 1
+        except Exception as exc:
+            logger.debug("Emission notify error for %s: %s", tg_id, exc)
+
+    event = "начался" if is_active else "завершён"
+    logger.info("☢️ Выброс %s — уведомлено %d/%d", event, sent, len(tg_ids))
+
