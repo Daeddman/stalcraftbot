@@ -20,7 +20,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from config import TELEGRAM_BOT_TOKEN, SCAN_INTERVAL_MINUTES, WEBAPP_HOST, WEBAPP_PORT, WEBAPP_URL, DB_UPDATE_INTERVAL_HOURS
+from config import TELEGRAM_BOT_TOKEN, WEBAPP_HOST, WEBAPP_PORT, WEBAPP_URL, DB_UPDATE_INTERVAL_HOURS
 from db.models import init_db
 from services.item_loader import item_db
 from services.db_updater import update_game_database, scheduled_db_update

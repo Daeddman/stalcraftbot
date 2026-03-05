@@ -233,15 +233,25 @@ def update_priorities():
 # ══════════════════════════════════════════════════════════════
 
 async def run_incremental_job():
-    """Job: инкрементальная синхронизация tracked предметов."""
+    """Job: инкрементальная синхронизация — подгружает новые продажи для всех предметов с sync state."""
     with SessionLocal() as session:
-        tracked = [t.item_id for t in session.query(TrackedItem).filter_by(is_active=True).all()]
+        # Get items that have completed full download (they need incremental updates)
+        # + tracked items (priority)
+        states = (
+            session.query(HistorySyncState)
+            .filter(HistorySyncState.full_download_done == True)
+            .filter(HistorySyncState.status != "syncing")
+            .order_by(HistorySyncState.priority, HistorySyncState.last_sync_at.asc().nullsfirst())
+            .limit(20)
+            .all()
+        )
+        item_ids = [s.item_id for s in states]
 
-    if not tracked:
+    if not item_ids:
         return
 
     total = 0
-    for item_id in tracked:
+    for item_id in item_ids:
         try:
             added = await incremental_sync(item_id)
             total += added
@@ -254,7 +264,7 @@ async def run_incremental_job():
                 session.commit()
 
     if total:
-        logger.info("📥 Incremental sync: +%d новых записей для %d предметов", total, len(tracked))
+        logger.info("📥 Incremental sync: +%d новых записей для %d предметов", total, len(item_ids))
 
 
 async def run_full_download_job():
