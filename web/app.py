@@ -3,6 +3,7 @@ FastAPI-приложение PerekupHelper.
 Раздаёт SPA-фронтенд и REST API для каталога, аукциона, отслеживания.
 """
 import logging
+import os
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -16,12 +17,17 @@ import web.routers.auction as auction
 import web.routers.tracking as tracking
 import web.routers.discovery as discovery
 import web.routers.game as game
+import web.routers.users as users
+import web.routers.chat as chat
+import web.routers.marketplace as marketplace
+import web.routers.sync as sync
 
 logger = logging.getLogger(__name__)
 
 STATIC_DIR = Path(__file__).parent / "static"
 ICONS_DIR = GAME_DB_DIR / STALCRAFT_REGION / "icons"
 CUSTOM_ICONS_DIR = BASE_DIR / "custom_icons"
+UPLOADS_DIR = BASE_DIR / "uploads"
 
 app = FastAPI(title="PerekupHelper", docs_url=None, redoc_url=None)
 
@@ -38,12 +44,19 @@ app.include_router(auction.router, prefix="/api")
 app.include_router(tracking.router, prefix="/api")
 app.include_router(discovery.router, prefix="/api")
 app.include_router(game.router, prefix="/api")
+app.include_router(users.router, prefix="/api")
+app.include_router(chat.router, prefix="/api")
+app.include_router(marketplace.router, prefix="/api")
+app.include_router(sync.router, prefix="/api")
 
 # ── Статика ──
 app.mount("/icons", StaticFiles(directory=str(ICONS_DIR)), name="icons")
 # Кастомные иконки (wiki-предметы, загруженные вручную)
 if CUSTOM_ICONS_DIR.exists():
     app.mount("/custom-icons", StaticFiles(directory=str(CUSTOM_ICONS_DIR)), name="custom_icons")
+# Загруженные файлы (аватары и т.д.)
+os.makedirs(UPLOADS_DIR / "avatars", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 

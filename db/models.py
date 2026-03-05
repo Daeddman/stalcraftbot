@@ -13,6 +13,8 @@ from sqlalchemy import (
     Boolean,
     BigInteger,
     Text,
+    UniqueConstraint,
+    Index,
     create_engine,
 )
 from sqlalchemy.orm import declarative_base, sessionmaker
@@ -61,6 +63,10 @@ class SaleRecord(Base):
     """Историческая запись продажи (из /history)."""
 
     __tablename__ = "sale_records"
+    __table_args__ = (
+        UniqueConstraint("item_id", "time_sold", "price", "amount", name="uq_sale_dedup"),
+        Index("ix_sale_item_time", "item_id", "time_sold"),
+    )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     item_id = Column(String(128), nullable=False, index=True)
@@ -200,6 +206,91 @@ class ItemPriceStats(Base):
     total_amount = Column(Integer, default=0)
 
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+# ══════════════════════════════════════════════════════════════
+#  History Sync: состояние выгрузки истории по предмету
+# ══════════════════════════════════════════════════════════════
+
+class HistorySyncState(Base):
+    __tablename__ = "history_sync_state"
+
+    item_id = Column(String(128), primary_key=True)
+    total_api = Column(Integer, default=0)        # total из API
+    total_stored = Column(Integer, default=0)      # сколько скачано
+    newest_stored_time = Column(String(64), nullable=True)  # ISO время самой новой записи
+    oldest_stored_offset = Column(Integer, default=0)  # до какого offset дошли при полной выгрузке
+    full_download_done = Column(Boolean, default=False)
+    priority = Column(Integer, default=2)  # 0=tracked, 1=popular, 2=all
+    status = Column(String(16), default="idle")  # idle/syncing/done/error
+    last_sync_at = Column(DateTime, nullable=True)
+    error_msg = Column(String(256), nullable=True)
+
+
+# ══════════════════════════════════════════════════════════════
+#  Social: Пользователи
+# ══════════════════════════════════════════════════════════════
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    telegram_id = Column(BigInteger, unique=True, nullable=False, index=True)
+    telegram_username = Column(String(128), nullable=True)
+    display_name = Column(String(128), nullable=False, default="Сталкер")
+    game_nickname = Column(String(128), nullable=True)
+    discord = Column(String(128), nullable=True)
+    bio = Column(Text, nullable=True)
+    avatar_url = Column(String(512), nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc),
+                        onupdate=lambda: datetime.now(timezone.utc))
+
+
+# ══════════════════════════════════════════════════════════════
+#  Social: Чат
+# ══════════════════════════════════════════════════════════════
+
+class ChatMessage(Base):
+    __tablename__ = "chat_messages"
+    __table_args__ = (
+        Index("ix_chat_channel_created", "channel", "created_at"),
+    )
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, nullable=False, index=True)
+    channel = Column(String(32), default="general", index=True)
+    text = Column(Text, nullable=False)
+    reply_to_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+# ══════════════════════════════════════════════════════════════
+#  Social: Торговая площадка
+# ══════════════════════════════════════════════════════════════
+
+class MarketListing(Base):
+    __tablename__ = "market_listings"
+    __table_args__ = (
+        Index("ix_market_status_item", "status", "item_id"),
+    )
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, nullable=False, index=True)
+    item_id = Column(String(128), nullable=False, index=True)
+    item_name = Column(String(256), default="")
+    listing_type = Column(String(8), default="sell")  # sell / buy
+    price = Column(BigInteger, nullable=False)
+    amount = Column(Integer, default=1)
+    quality = Column(Integer, default=-1)
+    upgrade_level = Column(Integer, default=0)
+    description = Column(Text, nullable=True)
+    contact_method = Column(String(32), default="telegram")
+    status = Column(String(16), default="active")  # active / sold / expired / cancelled
+    sold_price = Column(BigInteger, nullable=True)  # фактическая цена продажи
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    expires_at = Column(DateTime, nullable=True)
 
 
 # ── Создание движка и сессии ──

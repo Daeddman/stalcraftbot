@@ -27,6 +27,8 @@ from services.scanner import scan_auction
 from services.db_updater import update_game_database, scheduled_db_update
 from services.wiki_sync import sync_from_wiki
 from services.discovery import run_discovery_scan, sync_official_db_to_registry
+from services.history_sync import run_incremental_job, run_full_download_job, init_sync_states
+from web.routers.marketplace import expire_old_listings
 from bot.handlers import router
 from web.app import app as fastapi_app
 
@@ -224,6 +226,12 @@ async def main() -> None:
     except Exception as exc:
         logger.error("❌ Registry sync ошибка: %s", exc)
 
+    # Инициализация HistorySyncState для всех предметов
+    try:
+        init_sync_states()
+    except Exception as exc:
+        logger.error("❌ init_sync_states ошибка: %s", exc)
+
     # SSL
     cert_path, key_path = ensure_ssl_certs()
 
@@ -274,6 +282,55 @@ async def main() -> None:
         name="Discovery: полный обход аукциона",
         misfire_grace_time=60,
         max_instances=1,
+    )
+
+    # Инкрементальная синхронизация истории (tracked items)
+    async def _incremental_sync_job():
+        try:
+            await run_incremental_job()
+        except Exception as exc:
+            logger.error("❌ Incremental sync ошибка: %s", exc)
+
+    scheduler.add_job(
+        _incremental_sync_job, "interval",
+        minutes=5,
+        id="incremental_sync",
+        name="Инкрементальная синхронизация истории",
+        misfire_grace_time=120,
+        max_instances=1,
+    )
+
+    # Полная выгрузка истории (фоновая, по одному предмету за раз)
+    async def _full_download_job():
+        try:
+            await run_full_download_job()
+        except Exception as exc:
+            logger.error("❌ Full download ошибка: %s", exc)
+
+    scheduler.add_job(
+        _full_download_job, "interval",
+        seconds=30,
+        id="full_download",
+        name="Полная выгрузка истории продаж",
+        misfire_grace_time=60,
+        max_instances=1,
+    )
+
+    # Экспирация листингов маркетплейса
+    def _expire_listings_job():
+        try:
+            expired = expire_old_listings()
+            if expired:
+                logger.info("⏰ Экспирировано %d листингов", expired)
+        except Exception as exc:
+            logger.error("❌ Expire listings ошибка: %s", exc)
+
+    scheduler.add_job(
+        _expire_listings_job, "interval",
+        minutes=30,
+        id="expire_listings",
+        name="Экспирация листингов",
+        misfire_grace_time=120,
     )
 
     scheduler.start()
