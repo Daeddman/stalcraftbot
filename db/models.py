@@ -366,9 +366,9 @@ SessionLocal = sessionmaker(bind=engine)
 
 
 def init_db() -> None:
-    """Создать все таблицы в БД."""
+    """Создать все таблицы в БД и мигрировать недостающие колонки."""
     # WAL mode для лучшей параллельной работы
-    from sqlalchemy import event as sa_event
+    from sqlalchemy import event as sa_event, inspect as sa_inspect, text
 
     @sa_event.listens_for(engine, "connect")
     def _set_sqlite_pragma(dbapi_conn, _):
@@ -379,3 +379,60 @@ def init_db() -> None:
 
     Base.metadata.create_all(engine)
 
+    # ── Auto-migrate: добавляем недостающие колонки ──
+    _migrate_columns()
+
+
+def _migrate_columns():
+    """
+    Сравнивает модели SQLAlchemy с реальной схемой SQLite.
+    Добавляет недостающие колонки через ALTER TABLE.
+    Работает только для добавления — не удаляет и не меняет типы.
+    """
+    import logging
+    from sqlalchemy import inspect as sa_inspect, text
+
+    log = logging.getLogger(__name__)
+
+    inspector = sa_inspect(engine)
+    existing_tables = inspector.get_table_names()
+
+    with engine.connect() as conn:
+        for table_name, table_obj in Base.metadata.tables.items():
+            if table_name not in existing_tables:
+                continue  # create_all уже создаст новые таблицы
+
+            existing_cols = {c["name"] for c in inspector.get_columns(table_name)}
+
+            for col in table_obj.columns:
+                if col.name in existing_cols:
+                    continue
+
+                # Определяем SQL-тип
+                col_type = col.type.compile(engine.dialect)
+
+                # Определяем DEFAULT
+                default_clause = ""
+                if col.default is not None:
+                    if col.default.is_scalar:
+                        val = col.default.arg
+                        if isinstance(val, bool):
+                            default_clause = f" DEFAULT {1 if val else 0}"
+                        elif isinstance(val, (int, float)):
+                            default_clause = f" DEFAULT {val}"
+                        elif isinstance(val, str):
+                            default_clause = f" DEFAULT '{val}'"
+                    # callable defaults (like datetime.now) не могут быть в DDL
+                elif col.nullable is not False:
+                    default_clause = " DEFAULT NULL"
+
+                sql = f"ALTER TABLE {table_name} ADD COLUMN {col.name} {col_type}{default_clause}"
+                try:
+                    conn.execute(text(sql))
+                    log.info("✅ Миграция: %s.%s добавлена", table_name, col.name)
+                except Exception as e:
+                    # Колонка может уже существовать (race condition или duplicate)
+                    if "duplicate column" not in str(e).lower():
+                        log.warning("⚠️ Миграция %s.%s: %s", table_name, col.name, e)
+
+        conn.commit()

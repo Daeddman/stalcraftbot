@@ -4,12 +4,14 @@ FastAPI-приложение PerekupHelper.
 """
 import logging
 import os
+import time
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from config import GAME_DB_DIR, STALCRAFT_REGION, BASE_DIR
 import web.routers.catalog as catalog
@@ -29,7 +31,25 @@ ICONS_DIR = GAME_DB_DIR / STALCRAFT_REGION / "icons"
 CUSTOM_ICONS_DIR = BASE_DIR / "custom_icons"
 UPLOADS_DIR = BASE_DIR / "uploads"
 
+# Версия для cache-busting (timestamp при старте сервера)
+APP_VERSION = str(int(time.time()))
+
 app = FastAPI(title="PerekupHelper", docs_url=None, redoc_url=None)
+
+
+# ── Middleware: запрет кеширования JS/CSS/HTML ──
+class NoCacheStaticMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        path = request.url.path
+        if path.endswith((".js", ".css", ".html")) or path == "/":
+            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
+        return response
+
+
+app.add_middleware(NoCacheStaticMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
@@ -63,6 +83,11 @@ app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 @app.get("/")
 async def index():
     return FileResponse(str(STATIC_DIR / "index.html"))
+
+
+@app.get("/api/version")
+async def version():
+    return {"v": APP_VERSION}
 
 
 # Любой неизвестный путь → SPA (для hash-routing это не нужно, но на всякий)
