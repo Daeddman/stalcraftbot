@@ -4,7 +4,6 @@ import time
 import logging
 from fastapi import APIRouter
 from api.auction import get_active_lots, get_price_history
-from db.repository import get_quality_breakdown, get_avg_price, get_avg_sale_price
 
 logger = logging.getLogger(__name__)
 
@@ -118,13 +117,4 @@ def _cleanup_hist_cache():
     for k in expired:
         del _hist_cache[k]
 
-
-@router.get("/auction/{item_id}/prices")
-async def price_summary(item_id: str):
-    """Сводка цен из нашей БД (средние, разбивка по качеству)."""
-    return {
-        "avg_24h": get_avg_price(item_id, hours=24),
-        "avg_7d": get_avg_sale_price(item_id, hours=168),
-        "breakdown": get_quality_breakdown(item_id, hours=168),
-    }
 
