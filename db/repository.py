@@ -65,19 +65,22 @@ def upgrade_str(level: int) -> str:
 # ══════════════════════════════════════════════════════════════
 
 
-def get_active_tracked_items() -> list[TrackedItem]:
-    """Все активные отслеживаемые предметы."""
+def get_active_tracked_items(user_id: int = None) -> list[TrackedItem]:
+    """Все активные отслеживаемые предметы (для конкретного пользователя или все)."""
     with SessionLocal() as session:
         stmt = select(TrackedItem).where(TrackedItem.is_active.is_(True))
+        if user_id is not None:
+            stmt = stmt.where(TrackedItem.user_id == user_id)
         return list(session.scalars(stmt).all())
 
 
-def add_tracked_item(item_id: str, name: str, category: str = "") -> TrackedItem:
+def add_tracked_item(item_id: str, name: str, category: str = "", user_id: int = None) -> TrackedItem:
     """Добавить предмет в отслеживание."""
     with SessionLocal() as session:
-        existing = session.scalar(
-            select(TrackedItem).where(TrackedItem.item_id == item_id)
-        )
+        q = select(TrackedItem).where(TrackedItem.item_id == item_id)
+        if user_id is not None:
+            q = q.where(TrackedItem.user_id == user_id)
+        existing = session.scalar(q)
         if existing:
             existing.is_active = True
             existing.name = name
@@ -85,19 +88,20 @@ def add_tracked_item(item_id: str, name: str, category: str = "") -> TrackedItem
             session.refresh(existing)
             return existing
 
-        item = TrackedItem(item_id=item_id, name=name, category=category)
+        item = TrackedItem(item_id=item_id, name=name, category=category, user_id=user_id)
         session.add(item)
         session.commit()
         session.refresh(item)
         return item
 
 
-def remove_tracked_item(item_id: str) -> bool:
+def remove_tracked_item(item_id: str, user_id: int = None) -> bool:
     """Деактивировать отслеживание предмета."""
     with SessionLocal() as session:
-        item = session.scalar(
-            select(TrackedItem).where(TrackedItem.item_id == item_id)
-        )
+        q = select(TrackedItem).where(TrackedItem.item_id == item_id)
+        if user_id is not None:
+            q = q.where(TrackedItem.user_id == user_id)
+        item = session.scalar(q)
         if item:
             item.is_active = False
             session.commit()

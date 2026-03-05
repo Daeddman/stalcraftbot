@@ -13,8 +13,6 @@ from db.repository import (
     save_price_records,
     save_sale_records,
 )
-from services.analyzer import analyze_item
-from services.alerter import send_deal_alert
 
 logger = logging.getLogger(__name__)
 
@@ -132,8 +130,3 @@ async def _scan_item(item_id: str, item_name: str) -> None:
     except Exception as exc:
         logger.warning("[%s] Не удалось получить историю: %s", item_name, exc)
 
-    # ── 3. Анализ и алерты ──
-    if lots:
-        deals = analyze_item(item_id, item_name, lots, is_artefact=is_art)
-        for deal in deals:
-            await send_deal_alert(deal)

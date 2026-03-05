@@ -197,6 +197,16 @@ async def get_reviews(user_id: int):
 
 def _full_user_dict(u: User) -> dict:
     """Full user dict (for /me endpoint — includes private fields)."""
+    # Count unread notifications
+    unread = 0
+    try:
+        with SessionLocal() as session:
+            unread = session.query(UserNotification).filter_by(
+                user_id=u.id, is_read=False
+            ).count()
+    except Exception:
+        pass
+
     return {
         "id": u.id,
         "telegram_id": u.telegram_id,
@@ -208,6 +218,7 @@ def _full_user_dict(u: User) -> dict:
         "avatar_url": u.avatar_url,
         "chat_color": u.chat_color,
         "reputation": u.reputation or 0,
+        "unread_count": unread,
         "created_at": u.created_at.isoformat() + "Z" if u.created_at else None,
     }
 

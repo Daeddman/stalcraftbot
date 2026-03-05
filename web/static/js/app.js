@@ -20,6 +20,22 @@ function cS(k,v){_c.set(k,{v,t:Date.now()})}
 let _te;
 function toast(m){if(!_te){_te=document.createElement('div');_te.className='toast';document.body.appendChild(_te)}_te.textContent=m;_te.classList.add('show');setTimeout(()=>_te.classList.remove('show'),2200)}
 
+/* ── Unread badge on chat tab ── */
+async function _updateUnreadBadge(){
+  try{
+    const me=await getMe();
+    if(!me)return;
+    const cnt=me.unread_count||0;
+    const chatTab=document.querySelector('#tab-bar .tab[data-route="#/chat"]');
+    if(!chatTab)return;
+    let badge=chatTab.querySelector('.tab-badge');
+    if(cnt>0){
+      if(!badge){badge=document.createElement('span');badge.className='tab-badge';chatTab.style.position='relative';chatTab.appendChild(badge)}
+      badge.textContent=cnt>9?'9+':cnt;
+    } else if(badge){badge.remove()}
+  }catch(e){}
+}
+
 /* ── Render ── */
 function render(h){A.innerHTML='<div class="page">'+h+'</div>';A.scrollTop=0}
 
@@ -60,6 +76,8 @@ async function route(){
   });
   if(tg&&pg){tg.BackButton.show();tg.BackButton.offClick(_goBack);tg.BackButton.onClick(_goBack)}
   else if(tg){tg.BackButton.hide()}
+  // Update unread badge
+  _updateUnreadBadge();
   try{
     if(!pg||h==='#/')await P_home();
     else if(pg==='item')await P_item(p[1]);
@@ -494,10 +512,10 @@ function userColor(u){
   return colors[id%colors.length];
 }
 function repBadge(r){
-  if(!r&&r!==0)return'';
+  if(!r)return'';
   if(r>0)return'<span class="rep pos">+'+r+'</span>';
   if(r<0)return'<span class="rep neg">'+r+'</span>';
-  return'<span class="rep zero">0</span>';
+  return'';
 }
 async function P_chat(channel){
   channel=channel||S.chatCh||'general';
@@ -605,7 +623,7 @@ async function P_profile(sub){
   }
   _me=me;
   const av=me.avatar_url?'<img src="'+me.avatar_url+'" alt="">':'👤';
-  const rep=me.reputation>0?'<span class="rep pos">+'+me.reputation+'</span>':(me.reputation<0?'<span class="rep neg">'+me.reputation+'</span>':'<span class="rep zero">0</span>');
+  const rep=me.reputation>0?'<span class="rep pos">+'+me.reputation+'</span>':(me.reputation<0?'<span class="rep neg">'+me.reputation+'</span>':'');
   let h='<div class="profile-header">';
   h+='<div class="profile-avatar" onclick="document.getElementById(\'av-upload\').click()">'+av+'<input type="file" id="av-upload" accept="image/*" style="display:none" onchange="uploadAvatar(this)"></div>';
   h+='<div class="profile-info"><div class="profile-name">'+me.display_name+' '+rep+'</div>';
@@ -678,7 +696,7 @@ async function P_user(uid){
   const u=await API.get('/api/users/'+uid);
   if(u.error){render('<a class="back" onclick="history.back()">← Назад</a>'+emptyMsg('Не найден'));return}
   const av=u.avatar_url?'<img src="'+u.avatar_url+'" alt="">':'👤';
-  const rep=u.reputation>0?'<span class="rep pos">+'+u.reputation+'</span>':(u.reputation<0?'<span class="rep neg">'+u.reputation+'</span>':'<span class="rep zero">0</span>');
+  const rep=u.reputation>0?'<span class="rep pos">+'+u.reputation+'</span>':(u.reputation<0?'<span class="rep neg">'+u.reputation+'</span>':'');
   let h='<a class="back" onclick="history.back()">← Назад</a>';
   h+='<div class="profile-header">';
   h+='<div class="profile-avatar" style="cursor:default;border-color:var(--brd)">'+av+'</div>';

@@ -1,5 +1,5 @@
-"""API отслеживания предметов."""
-from fastapi import APIRouter
+"""API отслеживания предметов (избранное — per-user)."""
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from config import RANK_NAMES
 from db.repository import (
@@ -7,6 +7,8 @@ from db.repository import (
     add_tracked_item,
     remove_tracked_item,
 )
+from db.models import User
+from web.auth import get_current_user, require_user
 from services.item_loader import item_db
 
 router = APIRouter(tags=["tracking"])
@@ -17,7 +19,6 @@ def _track_icon(gi) -> str:
         return ""
     p = gi.icon_path
     if not p or p.strip() == "":
-        # Для wiki-предметов пробуем кастомную иконку
         if not gi.api_supported:
             return f"/custom-icons/{gi.item_id}.png"
         return ""
@@ -33,8 +34,9 @@ class TrackRequest(BaseModel):
 
 
 @router.get("/tracked")
-async def get_tracked():
-    items = get_active_tracked_items()
+async def get_tracked(user: User = Depends(get_current_user)):
+    uid = user.id if user else None
+    items = get_active_tracked_items(user_id=uid)
     result = []
     for t in items:
         gi = item_db.get(t.item_id)
@@ -51,16 +53,16 @@ async def get_tracked():
 
 
 @router.post("/tracked")
-async def track_item(req: TrackRequest):
+async def track_item(req: TrackRequest, user: User = Depends(require_user)):
     gi = item_db.get(req.item_id)
     if not gi:
         return {"error": "not_found"}
-    add_tracked_item(req.item_id, gi.name_ru, gi.category)
+    add_tracked_item(req.item_id, gi.name_ru, gi.category, user_id=user.id)
     return {"ok": True, "name": gi.name_ru}
 
 
 @router.delete("/tracked/{item_id}")
-async def untrack_item(item_id: str):
-    ok = remove_tracked_item(item_id)
+async def untrack_item(item_id: str, user: User = Depends(require_user)):
+    ok = remove_tracked_item(item_id, user_id=user.id)
     return {"ok": ok}
 

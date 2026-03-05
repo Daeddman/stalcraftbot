@@ -25,19 +25,20 @@ Base = declarative_base()
 
 
 class TrackedItem(Base):
-    """Предметы, которые мы отслеживаем на аукционе."""
+    """Предметы, которые пользователь отслеживает (избранное — per-user)."""
 
     __tablename__ = "tracked_items"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    item_id = Column(String(128), unique=True, nullable=False, index=True)
+    item_id = Column(String(128), nullable=False, index=True)
+    user_id = Column(Integer, nullable=True, default=None, index=True)
     name = Column(String(256), nullable=False)
     category = Column(String(128), default="")
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     def __repr__(self) -> str:
-        return f"<TrackedItem {self.item_id} '{self.name}'>"
+        return f"<TrackedItem {self.item_id} user={self.user_id}>"
 
 
 class PriceRecord(Base):

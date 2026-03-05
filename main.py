@@ -23,7 +23,6 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from config import TELEGRAM_BOT_TOKEN, SCAN_INTERVAL_MINUTES, WEBAPP_HOST, WEBAPP_PORT, WEBAPP_URL, DB_UPDATE_INTERVAL_HOURS
 from db.models import init_db
 from services.item_loader import item_db
-from services.scanner import scan_auction
 from services.db_updater import update_game_database, scheduled_db_update
 from services.wiki_sync import sync_from_wiki
 from services.discovery import run_discovery_scan, sync_official_db_to_registry
@@ -256,13 +255,6 @@ async def main() -> None:
 
     # Планировщик
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(
-        scan_auction, "interval",
-        minutes=SCAN_INTERVAL_MINUTES,
-        id="auction_scan",
-        name="Сканирование аукциона",
-        misfire_grace_time=60,
-    )
     scheduler.add_job(
         scheduled_db_update, "interval",
         hours=DB_UPDATE_INTERVAL_HOURS,
