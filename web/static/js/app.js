@@ -84,25 +84,25 @@ window.addEventListener('load',route);
 /* ═══════════ HOME ═══════════ */
 async function P_home(){
   render('<div class="ld">Загрузка</div>');
-  const [emi,mkt,tr]=await Promise.all([
+  const [emi,mkt,pop]=await Promise.all([
     getEmi(),
     API.get('/api/market?status=active&per_page=6').catch(()=>({items:[]})),
-    API.get('/api/tracked').catch(()=>[]),
+    API.get('/api/popular?limit=8').catch(()=>[]),
   ]);
   let h='';
   h+=emiHTML(emi);
   h+='<div class="quick-row">';
   h+='<div class="quick-card" onclick="go(\'#/search\')"><div class="quick-icon">🔍</div><div class="quick-label">Поиск</div></div>';
-  h+='<div class="quick-card" onclick="go(\'#/tracked\')"><div class="quick-icon">⭐</div><div class="quick-label">Избранное</div>'+(tr.length?'<div class="quick-badge">'+tr.length+'</div>':'')+'</div>';
+  h+='<div class="quick-card" onclick="go(\'#/tracked\')"><div class="quick-icon">⭐</div><div class="quick-label">Избранное</div></div>';
   h+='<div class="quick-card" onclick="go(\'#/market\')"><div class="quick-icon">🏪</div><div class="quick-label">Маркет</div></div>';
   h+='</div>';
-  if(tr.length){
-    h+='<div class="sec">⭐ Избранное</div><div class="hscroll">';
-    for(const t of tr){h+='<div class="hcard" onclick="haptic();go(\'#/item/'+t.item_id+'\')"><div class="hcard-img">'+ICO(t.icon)+'</div><div class="hcard-name">'+t.name+'</div></div>'}
+  if(pop&&pop.length){
+    h+='<div class="sec">🔥 Популярные предметы</div><div class="hscroll">';
+    for(const i of pop){h+='<div class="hcard rk-'+(i.color||'DEFAULT')+'" onclick="haptic();go(\'#/item/'+i.id+'\')"><div class="hcard-img">'+ICO(i.icon)+'</div><div class="hcard-name" style="color:var(--rk-'+colorCssVar(i.color)+')">'+i.name+'</div></div>'}
     h+='</div>';
   }
   if(mkt.items&&mkt.items.length){
-    h+='<div class="sec">🔥 Новые на маркете</div>';
+    h+='<div class="sec">🏪 Новые на маркете</div>';
     for(const l of mkt.items)h+=marketCard(l);
     h+='<button class="btn btn-o btn-sm" style="margin-top:8px" onclick="go(\'#/market\')">Все объявления →</button>';
   } else {
@@ -110,6 +110,11 @@ async function P_home(){
     h+='<div class="empty"><div class="empty-t" style="padding:18px 0">Пока нет объявлений.<br>Будьте первым!</div><button class="btn btn-g btn-sm" style="margin:10px auto 0" onclick="go(\'#/market-create\')">+ Создать объявление</button></div>';
   }
   render(h);
+}
+/* Map rank color to CSS var name */
+function colorCssVar(c){
+  const m={'DEFAULT':'def','RANK_NEWBIE':'new','RANK_STALKER':'stk','RANK_VETERAN':'vet','RANK_MASTER':'mas','RANK_LEGEND':'leg'};
+  return m[c]||'def';
 }
 
 /* ═══════════ ITEM ═══════════ */
@@ -139,7 +144,7 @@ async function P_item(id){
     h+=warnBox('Аукцион недоступен','Предмет не поддерживается API.');
   }
   h+='</div>';
-  if(ok)h+='<button class="btn btn-b btn-sm" style="margin-top:6px" onclick="go(\'#/market-create\');setTimeout(()=>loadPreItem(\''+id+'\'),100)">🏪 Продать на маркете</button>';
+  if(ok)h+='<button class="btn btn-b btn-sm" style="margin-top:6px" onclick="go(\'#/market-create\');setTimeout(()=>selectMcItem(\''+id+'\'),200)">🏪 Продать на маркете</button>';
   if(item.stats&&item.stats.length){
     h+='<div class="sec">Характеристики</div><div class="card" style="padding:10px 12px"><div class="stl">';
     for(const s of item.stats){let c='';if(s.color==='53C353')c='sg';else if(s.color==='C15252')c='sr';h+='<div class="str"><span class="stk">'+s.key+'</span><span class="stv '+c+'">'+s.value+'</span></div>'}
@@ -160,10 +165,9 @@ async function P_auc(id,lp,sp){
   const lOff=(lp-1)*S.lotPP,sOff=(sp-1)*S.salePP;
   let histUrl='/api/auction/'+id+'/history?limit='+S.salePP+'&offset='+sOff;
   if(isA&&S.saleQlt!=='all')histUrl+='&quality='+S.saleQlt;
-  const [ld,hd,pd]=await Promise.all([
+  const [ld,hd]=await Promise.all([
     API.get('/api/auction/'+id+'/lots?limit='+S.lotPP+'&offset='+lOff+'&sort='+S.lotSort+'&order='+S.lotOrder),
-    API.get(histUrl),
-    API.get('/api/auction/'+id+'/prices')]);
+    API.get(histUrl)]);
   const lots=(ld.lots||[]).slice(0,S.lotPP),sales=(hd.prices||[]).slice(0,S.salePP);
   const lTotal=ld.total||lots.length,sTotal=hd.total||sales.length;
   const lPages=Math.max(1,Math.ceil(lTotal/S.lotPP));
@@ -171,11 +175,6 @@ async function P_auc(id,lp,sp){
   _ctx.aucId=id;_ctx.lp=lp;_ctx.sp=sp;
   let h='<a class="back" href="#/item/'+id+'">← '+nm+'</a>';
   h+='<div class="hdr">📊 Аукцион</div>';
-  if(pd.breakdown&&pd.breakdown.length){
-    h+='<div class="pblk"><div class="pt">Средние по качеству (7д)</div>';
-    for(const b of pd.breakdown)h+='<div class="pr"><span class="pl">'+qb(b.quality)+upg(b.upgrade_level)+'</span><span class="pv">~'+fmt(b.avg_price)+' ₽ <small style="color:var(--t3)">мин.'+fmt(b.min_price)+' ('+b.count+')</small></span></div>';
-    h+='</div>';
-  }
   h+='<div class="sec">Активные лоты · '+fmtK(lTotal)+'</div>';
   h+=sortBar([['buyout_price|asc','Цена ↑'],['buyout_price|desc','Цена ↓'],['time_created|desc','Новые']],S.lotSort+'|'+S.lotOrder,'setLS');
   h+=ppSel(S.lotPP,[10,20,50],'lot');
@@ -339,10 +338,12 @@ function marketCard(l){
   const ico=l.icon?'<img src="'+l.icon+'" alt="" onerror="this.parentElement.innerHTML=\'📦\'">':'📦';
   const tp=l.listing_type==='buy'?'<span class="mcard-type buy">Покупка</span>':'<span class="mcard-type sell">Продажа</span>';
   let meta=tp;
-  if(l.quality>=0)meta+=qb(l.quality);
-  if(l.upgrade_level>0)meta+=upg(l.upgrade_level);
+  // Quality only for artefacts
+  if(l.is_artefact && l.quality>=0)meta+=qb(l.quality);
+  if(l.is_artefact && l.upgrade_level>0)meta+=upg(l.upgrade_level);
+  const nameColor=l.color?'style="color:var(--rk-'+colorCssVar(l.color)+')"':'';
   return'<div class="mcard" onclick="go(\'#/user/'+((l.user&&l.user.id)||0)+'\')">'
-    +'<div class="mcard-head"><div class="mcard-icon">'+ico+'</div><div class="mcard-info"><div class="mcard-name">'+l.item_name+'</div><div class="mcard-meta">'+meta+'</div></div></div>'
+    +'<div class="mcard-head"><div class="mcard-icon">'+ico+'</div><div class="mcard-info"><div class="mcard-name" '+nameColor+'>'+l.item_name+'</div><div class="mcard-meta">'+meta+'</div></div></div>'
     +'<div class="mcard-price">'+fmt(l.price)+' ₽'+(l.amount>1?' × '+l.amount:'')+'</div>'
     +(l.description?'<div style="font-size:11px;color:var(--t2);margin-top:6px">'+l.description+'</div>':'')
     +'<div class="mcard-bottom"><div class="mcard-user"><div class="mcard-avatar">'+av+'</div><span>'+uname+urep+'</span></div><div class="mcard-time">'+fmtSaleDate(l.created_at)+'</div></div>'
@@ -350,27 +351,32 @@ function marketCard(l){
 }
 
 /* ═══════════ MARKET CREATE ═══════════ */
+let _mcItemData=null;
 function P_market_create(){
-  const params=new URLSearchParams(location.hash.split('?')[1]||'');
-  const preItem=params.get('item')||'';
+  _mcItemData=null;
   let h='<a class="back" href="#/market">← Маркет</a>';
   h+='<div class="hdr">📝 Новое объявление</div><div class="sub">Объявление действует 2 дня</div>';
   h+='<div class="form-group"><label>Предмет</label><input id="mc-search" placeholder="Поиск предмета..."></div>';
   h+='<div id="mc-results"></div>';
-  h+='<input type="hidden" id="mc-item-id" value="'+preItem+'">';
+  h+='<input type="hidden" id="mc-item-id" value="">';
   h+='<div id="mc-selected"></div>';
   h+='<div class="form-group"><label>Тип</label><select id="mc-type"><option value="sell">Продажа</option><option value="buy">Покупка</option></select></div>';
   h+='<div class="form-group"><label>Цена (₽)</label><input id="mc-price" type="number" placeholder="100000"></div>';
   h+='<div class="form-group"><label>Количество</label><input id="mc-amount" type="number" value="1" min="1"></div>';
+  h+='<div id="mc-quality-block" style="display:none">';
   h+='<div class="form-group"><label>Качество</label><select id="mc-qlt"><option value="-1">Без качества</option><option value="0">Обычный</option><option value="1">Необычный</option><option value="2">Особый</option><option value="3">Редкий</option><option value="4">Исключительный</option><option value="5">Легендарный</option></select></div>';
   h+='<div class="form-group"><label>Заточка</label><input id="mc-upg" type="number" value="0" min="0" max="15"></div>';
+  h+='</div>';
   h+='<div class="form-group"><label>Описание</label><textarea id="mc-desc" rows="3" placeholder="Дополнительная информация..."></textarea></div>';
   h+='<button class="btn btn-g" onclick="submitListing()">🏪 Опубликовать</button>';
   render(h);
   const si=document.getElementById('mc-search');
   let st;
   si.addEventListener('input',e=>{clearTimeout(st);st=setTimeout(()=>mcSearch(e.target.value),250)});
-  if(preItem)loadPreItem(preItem);
+}
+function _showQualityBlock(show){
+  const b=document.getElementById('mc-quality-block');
+  if(b)b.style.display=show?'block':'none';
 }
 async function mcSearch(q){
   const b=document.getElementById('mc-results');
@@ -378,30 +384,43 @@ async function mcSearch(q){
   try{
     const it=await API.get('/api/search?q='+encodeURIComponent(q)+'&limit=10');
     if(!it.length){b.innerHTML='<div style="font-size:11px;color:var(--t3);padding:8px 0">Ничего не найдено</div>';return}
-    b.innerHTML=it.map(i=>'<div class="irow" onclick="selectMcItem(\''+i.id+'\',\''+esc(i.name)+'\')"><div class="irow-icon">'+ICO(i.icon)+'</div><div class="ib"><div class="in">'+i.name+'</div></div></div>').join('');
+    b.innerHTML=it.map(i=>'<div class="irow" onclick="selectMcItem(\''+i.id+'\')"><div class="irow-icon">'+ICO(i.icon)+'</div><div class="ib"><div class="in">'+i.name+'</div></div></div>').join('');
   }catch(e){b.innerHTML=''}
 }
-function selectMcItem(id,name){
+async function selectMcItem(id){
   document.getElementById('mc-item-id').value=id;
   document.getElementById('mc-results').innerHTML='';
   document.getElementById('mc-search').value='';
-  document.getElementById('mc-selected').innerHTML='<div class="card" style="padding:10px 12px;margin:8px 0"><div style="font-weight:800">✅ '+name+'</div><div style="font-size:10px;color:var(--t3)">ID: '+id+'</div></div>';
+  try{
+    const d=await API.get('/api/items/'+id);
+    _mcItemData=d;
+    const nameColor=d.color?'style="color:var(--rk-'+colorCssVar(d.color)+')"':'';
+    document.getElementById('mc-selected').innerHTML='<div class="card" style="padding:10px 12px;margin:8px 0"><div style="font-weight:800" '+nameColor+'>✅ '+d.name+'</div><div style="font-size:10px;color:var(--t3)">'+d.category_name+'</div></div>';
+    // Show quality block only for artefacts and weapon modules
+    const needQuality=d.is_artefact||(d.category&&(d.category.startsWith('weapon/')||d.category.includes('module')));
+    _showQualityBlock(!!needQuality);
+  }catch(e){
+    document.getElementById('mc-selected').innerHTML='<div class="card" style="padding:10px 12px;margin:8px 0"><div style="font-weight:800">✅ '+id+'</div></div>';
+    _showQualityBlock(false);
+  }
 }
 async function loadPreItem(id){
-  try{const d=await API.get('/api/items/'+id);if(d&&!d.error)selectMcItem(id,d.name)}catch(e){}
+  try{await selectMcItem(id)}catch(e){}
 }
 async function submitListing(){
   const id=document.getElementById('mc-item-id').value;
   if(!id){toast('Выберите предмет');return}
   const price=parseInt(document.getElementById('mc-price').value);
   if(!price||price<=0){toast('Укажите цену');return}
+  const qBlock=document.getElementById('mc-quality-block');
+  const showQ=qBlock&&qBlock.style.display!=='none';
   const d={
     item_id:id,
     listing_type:document.getElementById('mc-type').value,
     price:price,
     amount:parseInt(document.getElementById('mc-amount').value)||1,
-    quality:parseInt(document.getElementById('mc-qlt').value),
-    upgrade_level:parseInt(document.getElementById('mc-upg').value)||0,
+    quality:showQ?parseInt(document.getElementById('mc-qlt').value):-1,
+    upgrade_level:showQ?(parseInt(document.getElementById('mc-upg').value)||0):0,
     description:document.getElementById('mc-desc').value.trim(),
   };
   try{
