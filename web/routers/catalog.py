@@ -121,35 +121,73 @@ async def search_items(
 
 @router.get("/popular")
 async def popular_items(limit: int = 8):
-    """Самые отслеживаемые (популярные) предметы."""
+    """Самые популярные предметы — по количеству продаж за 7 дней или по количеству отслеживаний."""
+    from datetime import datetime, timezone, timedelta
     limit = max(1, min(limit, 20))
-    with SessionLocal() as session:
-        # Count how many times each item is tracked
-        rows = session.query(
-            TrackedItem.item_id, func.count(TrackedItem.id).label("cnt")
-        ).filter(TrackedItem.is_active == True).group_by(
-            TrackedItem.item_id
-        ).order_by(func.count(TrackedItem.id).desc()).limit(limit * 2).all()
 
     result = []
-    for item_id, cnt in rows:
-        gi = item_db.get(item_id)
-        if gi:
-            d = _item_short(gi)
-            d["track_count"] = cnt
-            result.append(d)
-        if len(result) >= limit:
-            break
+    seen_ids = set()
 
-    # If not enough tracked, fill with some artefacts
+    # 1) Items with most sales in last 7 days
+    with SessionLocal() as session:
+        cutoff = datetime.now(timezone.utc) - timedelta(days=7)
+        try:
+            from db.models import SaleRecord
+            sale_rows = session.query(
+                SaleRecord.item_id, func.count(SaleRecord.id).label("cnt")
+            ).filter(SaleRecord.sold_at >= cutoff).group_by(
+                SaleRecord.item_id
+            ).order_by(func.count(SaleRecord.id).desc()).limit(limit * 3).all()
+
+            for item_id, cnt in sale_rows:
+                if item_id in seen_ids:
+                    continue
+                gi = item_db.get(item_id)
+                if gi:
+                    d = _item_short(gi)
+                    d["activity"] = cnt
+                    result.append(d)
+                    seen_ids.add(item_id)
+                if len(result) >= limit:
+                    break
+        except Exception:
+            pass
+
+    # 2) Tracked items fallback
     if len(result) < limit:
-        arts = item_db.get_all_in_category_tree("artefact")
-        arts.sort(key=lambda x: x.name_ru)
-        for a in arts[:limit - len(result)]:
-            if not any(r["id"] == a.item_id for r in result):
+        with SessionLocal() as session:
+            rows = session.query(
+                TrackedItem.item_id, func.count(TrackedItem.id).label("cnt")
+            ).filter(TrackedItem.is_active == True).group_by(
+                TrackedItem.item_id
+            ).order_by(func.count(TrackedItem.id).desc()).limit(limit * 2).all()
+            for item_id, cnt in rows:
+                if item_id in seen_ids:
+                    continue
+                gi = item_db.get(item_id)
+                if gi:
+                    d = _item_short(gi)
+                    d["activity"] = cnt
+                    result.append(d)
+                    seen_ids.add(item_id)
+                if len(result) >= limit:
+                    break
+
+    # 3) Fill with known popular artefacts if still not enough
+    if len(result) < limit:
+        popular_arts = ["graviton", "kolobok", "mama", "crystal", "flash", "snowflake",
+                        "kompas", "gravi", "night_star", "fireball"]
+        all_items = item_db.get_all_in_category_tree("artefact")
+        for a in all_items:
+            if a.item_id in seen_ids:
+                continue
+            if any(pa in a.name_ru.lower() or pa in a.item_id.lower() for pa in popular_arts):
                 d = _item_short(a)
-                d["track_count"] = 0
+                d["activity"] = 0
                 result.append(d)
+                seen_ids.add(a.item_id)
+            if len(result) >= limit:
+                break
 
     return result
 

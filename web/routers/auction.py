@@ -12,7 +12,7 @@ router = APIRouter(tags=["auction"])
 
 # ── Кеш отфильтрованной истории (item_id, quality) → {prices, ts} ──
 _hist_cache: dict[tuple[str, int], dict] = {}
-_HIST_CACHE_TTL = 120  # секунд
+_HIST_CACHE_TTL = 300  # секунд (5 мин)
 
 
 @router.get("/auction/{item_id}/lots")
@@ -70,10 +70,11 @@ async def history(
 async def _fetch_filtered_history(item_id: str, quality: int) -> list[dict]:
     """
     Загружает историю продаж из API и фильтрует по quality.
-    Сканирует до 10000 записей (50 батчей по 200).
+    Сканирует до 2000 записей, останавливается если нашли 200+ подходящих.
     """
     fetch_limit = 200
-    max_scan = 10000
+    max_scan = 2000
+    max_collect = 200
     collected = []
     api_offset = 0
     total_scanned = 0
@@ -89,7 +90,7 @@ async def _fetch_filtered_history(item_id: str, quality: int) -> list[dict]:
 
         for p in prices:
             add = p.get("additional") or {}
-            qlt = add.get("qlt", -1)
+            qlt = add.get("qlt")
             if qlt is not None and int(qlt) == quality:
                 collected.append(p)
 
@@ -98,9 +99,10 @@ async def _fetch_filtered_history(item_id: str, quality: int) -> list[dict]:
 
         if api_offset >= api_total:
             break
+        if len(collected) >= max_collect:
+            break
 
-        # Задержка для rate-limit
-        await asyncio.sleep(0.35)
+        await asyncio.sleep(0.25)
 
     logger.info(
         "History filter: item=%s qlt=%d scanned=%d found=%d",

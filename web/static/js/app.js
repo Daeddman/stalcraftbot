@@ -168,7 +168,14 @@ async function P_auc(id,lp,sp){
   const [ld,hd]=await Promise.all([
     API.get('/api/auction/'+id+'/lots?limit='+S.lotPP+'&offset='+lOff+'&sort='+S.lotSort+'&order='+S.lotOrder),
     API.get(histUrl)]);
-  const lots=(ld.lots||[]).slice(0,S.lotPP),sales=(hd.prices||[]).slice(0,S.salePP);
+  let lots=(ld.lots||[]).slice(0,S.lotPP);
+  // Client-side sort fallback (API may not always honor sort)
+  if(S.lotSort==='buyout_price'){
+    lots.sort((a,b)=>{const pa=a.buyoutPrice||a.currentPrice||a.startPrice||0,pb=b.buyoutPrice||b.currentPrice||b.startPrice||0;return S.lotOrder==='asc'?pa-pb:pb-pa});
+  } else if(S.lotSort==='time_created'){
+    lots.sort((a,b)=>{const ta=new Date(a.startTime||0).getTime(),tb=new Date(b.startTime||0).getTime();return S.lotOrder==='desc'?tb-ta:ta-tb});
+  }
+  const sales=(hd.prices||[]).slice(0,S.salePP);
   const lTotal=ld.total||lots.length,sTotal=hd.total||sales.length;
   const lPages=Math.max(1,Math.ceil(lTotal/S.lotPP));
   const sPages=Math.max(1,Math.ceil(sTotal/S.salePP));
@@ -590,8 +597,8 @@ function startChatPoll(ch){
 async function P_profile(sub){
   if(sub==='edit'){await P_profile_edit();return}
   render('<div class="ld">Загрузка</div>');
-  let me;
-  try{me=await API.get('/api/me')}catch(e){}
+  let me,emiS;
+  try{[me,emiS]=await Promise.all([API.get('/api/me'),API.get('/api/emission/settings').catch(()=>({enabled:false}))])}catch(e){}
   if(!me||!me.id){
     render('<div class="hdr">👤 Профиль</div><div class="empty"><div class="empty-i">🔐</div><div class="empty-t">Откройте через Telegram Mini App для авторизации</div></div>');
     return;
@@ -610,7 +617,21 @@ async function P_profile(sub){
   h+='<button class="btn btn-o" onclick="go(\'#/profile/edit\')">✏️ Редактировать</button>';
   h+='<div style="margin-top:14px"><button class="btn btn-o" onclick="go(\'#/tracked\')">⭐ Избранное</button></div>';
   h+='<div style="margin-top:8px"><button class="btn btn-o" onclick="go(\'#/market-my\')">📋 Мои объявления</button></div>';
+  // Emission notifications settings
+  h+='<div class="sec" style="margin-top:18px">⚙️ Настройки</div>';
+  const emiOn=emiS&&emiS.enabled;
+  h+='<div class="card" style="padding:12px;display:flex;align-items:center;justify-content:space-between">';
+  h+='<div><div style="font-weight:700;font-size:13px">☢️ Уведомления о выбросе</div><div style="font-size:11px;color:var(--t3)">Уведомление при начале и конце выброса</div></div>';
+  h+='<button class="btn btn-sm '+(emiOn?'btn-r':'btn-g')+'" onclick="toggleEmission()" style="flex-shrink:0">'+(emiOn?'🔕 Выкл':'🔔 Вкл')+'</button>';
+  h+='</div>';
   render(h);
+}
+async function toggleEmission(){
+  try{
+    const r=await API.post('/api/emission/settings',{});
+    toast(r.enabled?'🔔 Уведомления включены':'🔕 Уведомления выключены');
+    P_profile();
+  }catch(e){toast('❌ Ошибка')}
 }
 async function P_profile_edit(){
   render('<div class="ld">Загрузка</div>');
@@ -628,15 +649,16 @@ async function P_profile_edit(){
 }
 async function saveProfile(){
   const d={
-    display_name:document.getElementById('pe-name').value.trim(),
-    game_nickname:document.getElementById('pe-game').value.trim(),
-    discord:document.getElementById('pe-disc').value.trim(),
-    bio:document.getElementById('pe-bio').value.trim(),
+    display_name:document.getElementById('pe-name').value.trim()||null,
+    game_nickname:document.getElementById('pe-game').value.trim()||null,
+    discord:document.getElementById('pe-disc').value.trim()||null,
+    bio:document.getElementById('pe-bio').value.trim()||null,
   };
   try{
-    await API.put('/api/me',d);
+    const r=await API.put('/api/me',d);
+    if(r&&r.error){toast('❌ '+r.error);return}
     toast('✅ Сохранено');_me=null;go('#/profile');
-  }catch(e){toast('❌ Ошибка')}
+  }catch(e){toast('❌ Ошибка: '+e.message)}
 }
 async function uploadAvatar(input){
   if(!input.files[0])return;

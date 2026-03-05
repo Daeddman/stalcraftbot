@@ -368,7 +368,7 @@ SessionLocal = sessionmaker(bind=engine)
 def init_db() -> None:
     """Создать все таблицы в БД и мигрировать недостающие колонки."""
     # WAL mode для лучшей параллельной работы
-    from sqlalchemy import event as sa_event, inspect as sa_inspect, text
+    from sqlalchemy import event as sa_event
 
     @sa_event.listens_for(engine, "connect")
     def _set_sqlite_pragma(dbapi_conn, _):

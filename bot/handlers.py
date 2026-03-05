@@ -22,51 +22,37 @@ logger = logging.getLogger(__name__)
 router = Router()
 
 
-def _webapp_kb() -> InlineKeyboardMarkup:
-    """Клавиатура: WebApp кнопка если HTTPS, иначе ссылка."""
+def _get_webapp_url() -> str:
+    """Нормализуем WEBAPP_URL: добавляем https:// если забыли, убираем trailing slash."""
     import config
-    url = config.WEBAPP_URL or ""
-    buttons = []
+    url = (config.WEBAPP_URL or "").strip().rstrip("/")
+    if url and not url.startswith("http"):
+        url = "https://" + url
+    return url
 
-    if url.startswith("https://"):
-        # Кнопка Mini App (открывается прямо внутри Telegram)
+
+def _webapp_kb() -> InlineKeyboardMarkup:
+    """Клавиатура: WebApp кнопка (Mini App внутри Telegram)."""
+    url = _get_webapp_url()
+    buttons = []
+    if url:
         buttons.append([InlineKeyboardButton(
             text="🏪 Открыть приложение",
             web_app=WebAppInfo(url=url),
         )])
-    elif url:
-        # Простая ссылка (откроется в браузере)
-        buttons.append([InlineKeyboardButton(
-            text="🏪 Открыть в браузере",
-            url=url,
-        )])
-
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
 @router.message(CommandStart())
 async def cmd_start(message: Message) -> None:
-    import config
-    url = config.WEBAPP_URL or ""
-
-    if url.startswith("https://"):
-        text = (
-            "🏪 <b>PerekupHelper</b> — торговая площадка Stalcraft\n\n"
-            "📊 Аукцион — лоты и история продаж\n"
-            "🏪 Маркет — объявления игроков\n"
-            "💬 Чат — общение и сделки\n"
-            "☢️ Выброс — уведомления в реальном времени\n\n"
-            "👇 Открой приложение кнопкой в меню бота"
-        )
-    else:
-        text = (
-            "🏪 <b>PerekupHelper</b> — торговая площадка Stalcraft\n\n"
-            "📊 Аукцион • 🏪 Маркет • 💬 Чат • ☢️ Выброс\n\n"
-            f"🌐 Приложение: <code>{url or 'http://localhost:8080'}</code>\n\n"
-            "⚠️ Для Mini App нужен HTTPS.\n"
-            "Задай <code>WEBAPP_URL</code> в .env"
-        )
-
+    text = (
+        "🏪 <b>PerekupHelper</b> — торговая площадка Stalcraft\n\n"
+        "📊 Аукцион — лоты и история продаж\n"
+        "🏪 Маркет — объявления игроков\n"
+        "💬 Чат — общение и сделки\n"
+        "☢️ Выброс — уведомления в реальном времени\n\n"
+        "👇 Нажми кнопку ниже или кнопку меню слева от поля ввода"
+    )
     await message.answer(text, parse_mode=ParseMode.HTML, reply_markup=_webapp_kb())
 
 

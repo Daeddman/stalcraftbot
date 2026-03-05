@@ -1,7 +1,9 @@
 """API роутер: выброс, кланы, персонажи."""
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from api.emission import get_emission
 from api.characters import get_clan_info, get_clan_members, get_character_profile
+from db.models import SessionLocal, EmissionNotifySetting, User
+from web.auth import get_current_user, require_user
 
 router = APIRouter(tags=["game"])
 
@@ -9,6 +11,30 @@ router = APIRouter(tags=["game"])
 @router.get("/emission")
 async def emission():
     return await get_emission()
+
+
+@router.get("/emission/settings")
+async def emission_settings(user: User = Depends(get_current_user)):
+    """Получить настройки уведомлений о выбросе."""
+    if not user:
+        return {"enabled": False, "authenticated": False}
+    with SessionLocal() as session:
+        s = session.query(EmissionNotifySetting).filter_by(telegram_id=user.telegram_id).first()
+        return {"enabled": s.enabled if s else False, "authenticated": True}
+
+
+@router.post("/emission/settings")
+async def toggle_emission(user: User = Depends(require_user)):
+    """Переключить уведомления о выбросе."""
+    with SessionLocal() as session:
+        s = session.query(EmissionNotifySetting).filter_by(telegram_id=user.telegram_id).first()
+        if s:
+            s.enabled = not s.enabled
+        else:
+            s = EmissionNotifySetting(telegram_id=user.telegram_id, enabled=True)
+            session.add(s)
+        session.commit()
+        return {"enabled": s.enabled}
 
 
 @router.get("/clan/{clan_id}")

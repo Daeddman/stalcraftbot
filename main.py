@@ -149,16 +149,19 @@ async def on_startup(bot: Bot) -> None:
         BotCommand(command="help", description="📖 Помощь"),
     ])
     # Set menu button to open webapp directly
-    if WEBAPP_URL and WEBAPP_URL.startswith("https://"):
+    webapp_url = (WEBAPP_URL or "").strip().rstrip("/")
+    if webapp_url and not webapp_url.startswith("http"):
+        webapp_url = "https://" + webapp_url
+    if webapp_url:
         from aiogram.types import MenuButtonWebApp, WebAppInfo
         try:
             await bot.set_chat_menu_button(
                 menu_button=MenuButtonWebApp(
                     text="🏪 Открыть",
-                    web_app=WebAppInfo(url=WEBAPP_URL),
+                    web_app=WebAppInfo(url=webapp_url),
                 )
             )
-            logger.info("✅ MenuButton WebApp установлена: %s", WEBAPP_URL)
+            logger.info("✅ MenuButton WebApp установлена: %s", webapp_url)
         except Exception as e:
             logger.warning("⚠️ Не удалось установить MenuButton: %s", e)
     logger.info("✅ Telegram-бот запущен!")

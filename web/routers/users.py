@@ -46,14 +46,16 @@ async def get_me(user: User = Depends(get_current_user)):
 async def update_me(data: ProfileUpdate, user: User = Depends(require_user)):
     with SessionLocal() as session:
         u = session.query(User).filter_by(id=user.id).first()
-        if data.display_name is not None:
-            u.display_name = data.display_name[:128]
+        if not u:
+            return {"error": "Пользователь не найден"}
+        if data.display_name is not None and data.display_name.strip():
+            u.display_name = data.display_name.strip()[:128]
         if data.game_nickname is not None:
-            u.game_nickname = data.game_nickname[:128] or None
+            u.game_nickname = data.game_nickname.strip()[:128] or None
         if data.discord is not None:
-            u.discord = data.discord[:128] or None
+            u.discord = data.discord.strip()[:128] or None
         if data.bio is not None:
-            u.bio = data.bio[:500] or None
+            u.bio = data.bio.strip()[:500] or None
         if data.chat_color is not None:
             if data.chat_color in CHAT_COLORS or (data.chat_color.startswith("#") and len(data.chat_color) == 7):
                 u.chat_color = data.chat_color

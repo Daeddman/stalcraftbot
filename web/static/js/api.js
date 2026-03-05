@@ -45,9 +45,9 @@ function fmtDate(s) {
   return s.replace('T', ' ').slice(0, 16);
 }
 
-const Q_NAME = { '-1': '???', 0: 'Обычный', 1: 'Необычный', 2: 'Особый', 3: 'Редкий', 4: 'Исключительный', 5: 'Легендарный' };
-const Q_CSS = { '-1': 'q--1', 0: 'q-0', 1: 'q-1', 2: 'q-2', 3: 'q-3', 4: 'q-4', 5: 'q-5' };
-function qb(q) { return `<span class="qb ${Q_CSS[q] || ''}">${Q_NAME[q] || '?'}</span>`; }
+const Q_NAME = { 0: 'Обычный', 1: 'Необычный', 2: 'Особый', 3: 'Редкий', 4: 'Исключительный', 5: 'Легендарный' };
+const Q_CSS = { 0: 'q-0', 1: 'q-1', 2: 'q-2', 3: 'q-3', 4: 'q-4', 5: 'q-5' };
+function qb(q) { if(q < 0 || q == null) return '<span class="qb">—</span>'; return `<span class="qb ${Q_CSS[q] || ''}">${Q_NAME[q] || '—'}</span>`; }
 function upg(u) { return u > 0 ? `<span class="upg">+${u}</span>` : ''; }
 function haptic(t) { if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred(t || 'light'); }
 
