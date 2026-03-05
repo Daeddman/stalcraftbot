@@ -139,7 +139,7 @@ async function P_item(id){
     h+=warnBox('Аукцион недоступен','Предмет не поддерживается API.');
   }
   h+='</div>';
-  if(ok)h+='<button class="btn btn-b btn-sm" style="margin-top:6px" onclick="go(\'#/market-create?item='+id+'\')">🏪 Продать на маркете</button>';
+  if(ok)h+='<button class="btn btn-b btn-sm" style="margin-top:6px" onclick="go(\'#/market-create\');setTimeout(()=>loadPreItem(\''+id+'\'),100)">🏪 Продать на маркете</button>';
   if(item.stats&&item.stats.length){
     h+='<div class="sec">Характеристики</div><div class="card" style="padding:10px 12px"><div class="stl">';
     for(const s of item.stats){let c='';if(s.color==='53C353')c='sg';else if(s.color==='C15252')c='sr';h+='<div class="str"><span class="stk">'+s.key+'</span><span class="stv '+c+'">'+s.value+'</span></div>'}
@@ -164,8 +164,8 @@ async function P_auc(id,lp,sp){
     API.get('/api/auction/'+id+'/lots?limit='+S.lotPP+'&offset='+lOff+'&sort='+S.lotSort+'&order='+S.lotOrder),
     API.get(histUrl),
     API.get('/api/auction/'+id+'/prices')]);
-  const lots=ld.lots||[],sales=hd.prices||[];
-  const lTotal=ld.total||0,sTotal=hd.total||0;
+  const lots=(ld.lots||[]).slice(0,S.lotPP),sales=(hd.prices||[]).slice(0,S.salePP);
+  const lTotal=ld.total||lots.length,sTotal=hd.total||sales.length;
   const lPages=Math.max(1,Math.ceil(lTotal/S.lotPP));
   const sPages=Math.max(1,Math.ceil(sTotal/S.salePP));
   _ctx.aucId=id;_ctx.lp=lp;_ctx.sp=sp;
@@ -335,6 +335,7 @@ async function P_market(sub){
 function marketCard(l){
   const av=l.user&&l.user.avatar_url?'<img src="'+l.user.avatar_url+'" alt="">':'👤';
   const uname=l.user?l.user.display_name:'Аноним';
+  const urep=l.user&&l.user.reputation?repBadge(l.user.reputation):'';
   const ico=l.icon?'<img src="'+l.icon+'" alt="" onerror="this.parentElement.innerHTML=\'📦\'">':'📦';
   const tp=l.listing_type==='buy'?'<span class="mcard-type buy">Покупка</span>':'<span class="mcard-type sell">Продажа</span>';
   let meta=tp;
@@ -344,7 +345,7 @@ function marketCard(l){
     +'<div class="mcard-head"><div class="mcard-icon">'+ico+'</div><div class="mcard-info"><div class="mcard-name">'+l.item_name+'</div><div class="mcard-meta">'+meta+'</div></div></div>'
     +'<div class="mcard-price">'+fmt(l.price)+' ₽'+(l.amount>1?' × '+l.amount:'')+'</div>'
     +(l.description?'<div style="font-size:11px;color:var(--t2);margin-top:6px">'+l.description+'</div>':'')
-    +'<div class="mcard-bottom"><div class="mcard-user"><div class="mcard-avatar">'+av+'</div><span>'+uname+'</span></div><div class="mcard-time">'+fmtSaleDate(l.created_at)+'</div></div>'
+    +'<div class="mcard-bottom"><div class="mcard-user"><div class="mcard-avatar">'+av+'</div><span>'+uname+urep+'</span></div><div class="mcard-time">'+fmtSaleDate(l.created_at)+'</div></div>'
     +'</div>';
 }
 
@@ -459,19 +460,52 @@ function statusRu(s){return{active:'Активно',sold:'Продано',expire
 
 /* ═══════════ CHAT ═══════════ */
 let _chatPoll=null;
+// Generate deterministic color from user ID
+function userColor(u){
+  if(u&&u.chat_color)return u.chat_color;
+  const colors=['#e57373','#f06292','#ba68c8','#9575cd','#7986cb','#64b5f6','#4fc3f7','#4dd0e1','#4db6ac','#81c784','#aed581','#dce775','#fff176','#ffd54f','#ffb74d','#ff8a65'];
+  const id=u?u.id:0;
+  return colors[id%colors.length];
+}
+function repBadge(r){
+  if(!r&&r!==0)return'';
+  if(r>0)return'<span class="rep pos">+'+r+'</span>';
+  if(r<0)return'<span class="rep neg">'+r+'</span>';
+  return'<span class="rep zero">0</span>';
+}
 async function P_chat(channel){
   channel=channel||S.chatCh||'general';
   S.chatCh=channel;saveS();
   if(_chatPoll){clearTimeout(_chatPoll);_chatPoll=null}
+  const isDM=channel.startsWith('dm:');
   render('<div class="ld">Загрузка</div>');
-  const [channels,msgs]=await Promise.all([
-    API.get('/api/chat/channels'),
-    API.get('/api/chat/'+channel+'/messages?limit=50'),
-  ]);
+
   let h='<div class="hdr">💬 Чат</div>';
+
+  // Tabs: Общий, Торговый, Личные
   h+='<div class="chat-channels">';
-  for(const ch of channels)h+='<div class="chat-ch'+(ch.id===channel?' act':'')+'" onclick="go(\'#/chat/'+ch.id+'\')">'+ch.name+'</div>';
+  h+='<div class="chat-ch'+(channel==='general'?' act':'')+'" onclick="go(\'#/chat/general\')">💬 Общий</div>';
+  h+='<div class="chat-ch'+(channel==='trading'?' act':'')+'" onclick="go(\'#/chat/trading\')">💰 Торговый</div>';
+  h+='<div class="chat-ch'+(channel==='dm-list'?' act':'')+'" onclick="go(\'#/chat/dm-list\')">✉️ Личные</div>';
   h+='</div>';
+
+  if(channel==='dm-list'){
+    // DM list
+    try{
+      const dms=await API.get('/api/chat/dm-list');
+      if(!dms.length){h+=emptyMsg('Нет личных сообщений');} else {
+        for(const d of dms){
+          const av=d.user&&d.user.avatar_url?'<img src="'+d.user.avatar_url+'" alt="">':'✉️';
+          const name=d.user?d.user.display_name:'Пользователь';
+          h+='<div class="dm-item" onclick="go(\'#/chat/'+d.channel+'\')"><div class="dm-item-av">'+av+'</div><div class="dm-item-info"><div class="dm-item-name">'+name+'</div><div class="dm-item-last">'+d.last_message+'</div></div><div class="dm-item-time">'+fmtSaleDate(d.last_at)+'</div></div>';
+        }
+      }
+    }catch(e){h+=emptyMsg('Авторизуйтесь через Telegram')}
+    render(h);
+    return;
+  }
+
+  const msgs=await API.get('/api/chat/'+channel+'/messages?limit=50');
   h+='<div class="chat-msgs" id="chat-msgs">';
   if(!msgs.length)h+='<div class="empty"><div class="empty-t">Пока нет сообщений. Напишите первым! 💬</div></div>';
   for(const m of msgs)h+=chatMsg(m);
@@ -484,10 +518,11 @@ async function P_chat(channel){
   startChatPoll(channel);
 }
 function chatMsg(m){
-  const av=m.user&&m.user.avatar_url?'<img src="'+m.user.avatar_url+'" alt="">':'👤';
-  const name=m.user?m.user.display_name:'Аноним';
-  const uid=m.user?m.user.id:0;
-  return'<div class="chat-msg"><div class="chat-msg-av" onclick="go(\'#/user/'+uid+'\')">'+av+'</div><div class="chat-msg-body"><div class="chat-msg-head"><span class="chat-msg-name" onclick="go(\'#/user/'+uid+'\')">'+name+'</span><span class="chat-msg-time">'+fmtChatTime(m.created_at)+'</span></div><div class="chat-msg-text">'+escHtml(m.text)+'</div></div></div>';
+  const u=m.user||{id:0,display_name:'Аноним'};
+  const av=u.avatar_url?'<img src="'+u.avatar_url+'" alt="">':'👤';
+  const color=userColor(u);
+  const rep=repBadge(u.reputation);
+  return'<div class="chat-msg"><div class="chat-msg-av" onclick="go(\'#/user/'+u.id+'\')">'+av+'</div><div class="chat-msg-body"><div class="chat-msg-head"><span class="chat-msg-name" style="color:'+color+'" onclick="go(\'#/user/'+u.id+'\')">'+u.display_name+'</span>'+rep+'<span class="chat-msg-time">'+fmtChatTime(m.created_at)+'</span></div><div class="chat-msg-text">'+escHtml(m.text)+'</div></div></div>';
 }
 function fmtChatTime(s){
   if(!s)return'';
@@ -500,7 +535,7 @@ async function sendChat(ch){
   inp.value='';
   try{
     const r=await API.post('/api/chat/'+ch+'/messages',{text:text});
-    if(r.error){toast('❌ '+r.error);return}
+    if(r.error){toast('❌ '+r.error);inp.value=text;return}
     const box=document.getElementById('chat-msgs');
     if(box){
       const emp=box.querySelector('.empty');if(emp)emp.remove();
@@ -508,7 +543,7 @@ async function sendChat(ch){
       box.scrollTop=box.scrollHeight;
       _ctx.chatLastId=r.id;
     }
-  }catch(e){toast('❌ Авторизуйтесь через Telegram')}
+  }catch(e){toast('❌ Авторизуйтесь через Telegram');inp.value=text}
 }
 function startChatPoll(ch){
   async function poll(){
@@ -544,12 +579,12 @@ async function P_profile(sub){
   }
   _me=me;
   const av=me.avatar_url?'<img src="'+me.avatar_url+'" alt="">':'👤';
+  const rep=me.reputation>0?'<span class="rep pos">+'+me.reputation+'</span>':(me.reputation<0?'<span class="rep neg">'+me.reputation+'</span>':'<span class="rep zero">0</span>');
   let h='<div class="profile-header">';
   h+='<div class="profile-avatar" onclick="document.getElementById(\'av-upload\').click()">'+av+'<input type="file" id="av-upload" accept="image/*" style="display:none" onchange="uploadAvatar(this)"></div>';
-  h+='<div class="profile-info"><div class="profile-name">'+me.display_name+'</div>';
+  h+='<div class="profile-info"><div class="profile-name">'+me.display_name+' '+rep+'</div>';
   h+='<div class="profile-sub">';
   if(me.game_nickname)h+='🎮 '+me.game_nickname+'<br>';
-  if(me.telegram_username)h+='📱 @'+me.telegram_username+'<br>';
   if(me.discord)h+='💬 '+me.discord;
   h+='</div></div></div>';
   if(me.bio)h+='<div class="card" style="padding:12px"><div style="font-size:12px;color:var(--t2)">'+me.bio+'</div></div>';
@@ -602,20 +637,28 @@ async function P_user(uid){
   const u=await API.get('/api/users/'+uid);
   if(u.error){render('<a class="back" onclick="history.back()">← Назад</a>'+emptyMsg('Не найден'));return}
   const av=u.avatar_url?'<img src="'+u.avatar_url+'" alt="">':'👤';
+  const rep=u.reputation>0?'<span class="rep pos">+'+u.reputation+'</span>':(u.reputation<0?'<span class="rep neg">'+u.reputation+'</span>':'<span class="rep zero">0</span>');
   let h='<a class="back" onclick="history.back()">← Назад</a>';
   h+='<div class="profile-header">';
   h+='<div class="profile-avatar" style="cursor:default;border-color:var(--brd)">'+av+'</div>';
-  h+='<div class="profile-info"><div class="profile-name">'+u.display_name+'</div>';
+  h+='<div class="profile-info"><div class="profile-name">'+u.display_name+' '+rep+'</div>';
   h+='<div class="profile-sub">';
   if(u.game_nickname)h+='🎮 '+u.game_nickname+'<br>';
-  if(u.telegram_username)h+='📱 @'+u.telegram_username+'<br>';
   if(u.discord)h+='💬 '+u.discord;
+  if(u.followers_count)h+='<br>👥 '+u.followers_count+' подписчиков';
   h+='</div></div></div>';
   if(u.bio)h+='<div class="card" style="padding:12px"><div style="font-size:12px;color:var(--t2)">'+u.bio+'</div></div>';
   h+='<div class="bgrp">';
-  if(u.telegram_username)h+='<a class="btn btn-b btn-sm" href="https://t.me/'+u.telegram_username+'" target="_blank">📱 Telegram</a>';
-  h+='<button class="btn btn-o btn-sm" onclick="initDM('+uid+')">💬 Написать</button>';
+  if(!u.is_self){
+    h+='<button class="btn btn-o btn-sm" onclick="initDM('+uid+')">💬 Написать</button>';
+    if(u.is_following){
+      h+='<button class="btn btn-r btn-sm" onclick="unfollowUser('+uid+')">✕ Отписаться</button>';
+    } else {
+      h+='<button class="btn btn-b btn-sm" onclick="followUser('+uid+')">👤 Подписаться</button>';
+    }
+  }
   h+='</div>';
+  // User's marketplace listings
   const mkt=await API.get('/api/market?status=active&per_page=10');
   const userListings=(mkt.items||[]).filter(l=>l.user&&l.user.id===parseInt(uid));
   if(userListings.length){
@@ -627,8 +670,15 @@ async function P_user(uid){
 async function initDM(uid){
   try{
     const r=await API.get('/api/chat/dm/'+uid);
+    if(r.error){toast('❌ '+r.error);return}
     if(r.channel)go('#/chat/'+r.channel);
   }catch(e){toast('❌ Авторизуйтесь через Telegram')}
+}
+async function followUser(uid){
+  try{await API.post('/api/users/'+uid+'/follow',{});toast('👤 Подписка');P_user(uid)}catch(e){toast('❌ Ошибка')}
+}
+async function unfollowUser(uid){
+  try{await API.del('/api/users/'+uid+'/follow');toast('✕ Отписка');P_user(uid)}catch(e){toast('❌ Ошибка')}
 }
 
 /* ═══════════ HELPERS ═══════════ */

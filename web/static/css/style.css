@@ -1,14 +1,14 @@
 /* ═══════════════════════════════════════════
-   PerekupHelper v8 — Stalcraft Trading Hub
+   PerekupHelper v10 — Stalcraft Trading Hub
    Premium dark gaming UI, mobile-first
    ═══════════════════════════════════════════ */
 :root{
-  --bg:#08080e;--bg1:#0c0c14;--bg2:#101018;--bg3:#16161f;
-  --surf:#0d0d16;--surf2:#121220;--surf3:#18182a;
-  --brd:rgba(255,255,255,.05);--brd2:rgba(255,255,255,.08);--brd3:rgba(255,255,255,.12);
+  --bg:#0e0e18;--bg1:#121220;--bg2:#161624;--bg3:#1c1c2e;
+  --surf:#131320;--surf2:#181830;--surf3:#1e1e38;
+  --brd:rgba(255,255,255,.06);--brd2:rgba(255,255,255,.10);--brd3:rgba(255,255,255,.14);
   --acc:#d4a43a;--acc2:#c4942a;--acc-g:rgba(212,164,58,.15);--acc-bg:rgba(212,164,58,.04);
   --red:#ef4444;--grn:#22c55e;--blue:#3b82f6;--pink:#ec4899;--gold:#eab308;--purple:#a855f7;
-  --t:#e8e8f0;--t2:#8888a0;--t3:#555570;
+  --t:#eaeaf2;--t2:#9090a8;--t3:#606078;
   --rk-def:#9ca3af;--rk-new:#22c55e;--rk-stk:#3b82f6;--rk-vet:#ec4899;--rk-mas:#ef4444;--rk-leg:#eab308;
   --r:14px;--r-sm:8px;--r-xs:6px;--tab:58px;--safe:env(safe-area-inset-bottom,0px);
   --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
@@ -16,7 +16,7 @@
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{background:var(--bg);color:var(--t);font-family:var(--font);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);min-height:100vh;min-height:100dvh;overflow:hidden}
+body{background:var(--bg);min-height:100vh;min-height:100dvh;overflow-x:hidden}
 
 /* ── App container ── */
 #app{position:fixed;top:0;left:0;right:0;bottom:calc(var(--tab) + var(--safe));overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
@@ -247,7 +247,7 @@ table.lt{width:100%;border-collapse:collapse;font-size:11px}
 .chat-channels::-webkit-scrollbar{display:none}
 .chat-ch{background:var(--surf);border:1px solid var(--brd);border-radius:20px;padding:8px 16px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.12s;flex-shrink:0}
 .chat-ch.act{border-color:var(--acc);color:var(--acc);background:var(--acc-bg)}
-.chat-msgs{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;min-height:200px;max-height:calc(100vh - 280px);overflow-y:auto}
+.chat-msgs{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;flex:1;min-height:0;max-height:calc(100vh - 260px);overflow-y:auto;padding-bottom:8px}
 .chat-msg{display:flex;gap:8px;padding:8px 0}
 .chat-msg-av{width:28px;height:28px;border-radius:50%;background:var(--surf2);border:1px solid var(--brd);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer}
 .chat-msg-av img{width:100%;height:100%;object-fit:cover}
@@ -257,7 +257,7 @@ table.lt{width:100%;border-collapse:collapse;font-size:11px}
 .chat-msg-name:hover{text-decoration:underline}
 .chat-msg-time{font-size:9px;color:var(--t3)}
 .chat-msg-text{font-size:12px;color:var(--t);line-height:1.5;word-break:break-word}
-.chat-input{display:flex;gap:8px;background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);padding:8px 12px;position:sticky;bottom:0}
+.chat-input{display:flex;gap:8px;background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);padding:8px 12px;margin-top:auto;position:sticky;bottom:0;z-index:10}
 .chat-input input{flex:1;background:transparent;border:none;color:var(--t);font-size:13px;outline:none;font-family:var(--font)}
 .chat-input input::placeholder{color:var(--t3)}
 .chat-input button{background:var(--acc);color:#111;border:none;border-radius:var(--r-sm);padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer;transition:.12s;font-family:var(--font)}
@@ -308,3 +308,23 @@ table.lt{width:100%;border-collapse:collapse;font-size:11px}
 .tabs{display:flex;gap:4px;margin-bottom:14px;border-bottom:1px solid var(--brd);padding-bottom:8px}
 .tab-btn{background:none;border:none;color:var(--t3);font-size:12px;font-weight:700;padding:6px 14px;cursor:pointer;border-radius:var(--r-xs);transition:.12s;font-family:var(--font)}
 .tab-btn.act{color:var(--acc);background:var(--acc-bg)}
+
+/* ── Reputation Badge ── */
+.rep{display:inline-flex;align-items:center;gap:2px;font-size:10px;font-weight:800;padding:1px 6px;border-radius:4px;margin-left:4px}
+.rep.pos{background:rgba(34,197,94,.1);color:var(--grn)}
+.rep.neg{background:rgba(239,68,68,.1);color:var(--red)}
+.rep.zero{background:rgba(144,144,168,.08);color:var(--t3)}
+
+/* ── DM list ── */
+.dm-item{display:flex;align-items:center;gap:12px;padding:12px;background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);margin-bottom:6px;cursor:pointer;transition:.12s}
+.dm-item:active{background:var(--bg3)}
+.dm-item-av{width:40px;height:40px;border-radius:50%;background:var(--bg2);border:1px solid var(--brd);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.dm-item-av img{width:100%;height:100%;object-fit:cover}
+.dm-item-info{flex:1;min-width:0}
+.dm-item-name{font-size:13px;font-weight:700}
+.dm-item-last{font-size:11px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dm-item-time{font-size:9px;color:var(--t3);flex-shrink:0}
+
+/* ── Notification badge ── */
+.notif-badge{position:absolute;top:4px;right:50%;transform:translateX(14px);background:var(--red);color:#fff;font-size:8px;font-weight:900;min-width:14px;height:14px;line-height:14px;text-align:center;border-radius:7px;padding:0 3px}
+

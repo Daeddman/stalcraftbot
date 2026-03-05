@@ -3,8 +3,8 @@ const tg = window.Telegram && window.Telegram.WebApp;
 if (tg) {
   tg.ready();
   tg.expand();
-  tg.setHeaderColor('#0a0a12');
-  tg.setBackgroundColor('#0a0a12');
+  tg.setHeaderColor('#0e0e18');
+  tg.setBackgroundColor('#0e0e18');
 }
 
 function _authHeaders() {

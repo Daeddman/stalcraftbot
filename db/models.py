@@ -242,9 +242,63 @@ class User(Base):
     discord = Column(String(128), nullable=True)
     bio = Column(Text, nullable=True)
     avatar_url = Column(String(512), nullable=True)
+    chat_color = Column(String(7), nullable=True)  # hex цвет в чате, напр. #e57373
+    reputation = Column(Integer, default=0)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc),
                         onupdate=lambda: datetime.now(timezone.utc))
+
+
+# ══════════════════════════════════════════════════════════════
+#  Social: Подписки (фолловеры)
+# ══════════════════════════════════════════════════════════════
+
+class UserFollow(Base):
+    __tablename__ = "user_follows"
+    __table_args__ = (
+        UniqueConstraint("follower_id", "target_id", name="uq_follow"),
+    )
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    follower_id = Column(Integer, nullable=False, index=True)  # кто подписался
+    target_id = Column(Integer, nullable=False, index=True)    # на кого
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+# ══════════════════════════════════════════════════════════════
+#  Social: Уведомления (in-app)
+# ══════════════════════════════════════════════════════════════
+
+class UserNotification(Base):
+    __tablename__ = "user_notifications"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, nullable=False, index=True)  # кому
+    type = Column(String(32), default="message")  # message / listing_reply / follow / reputation
+    title = Column(String(256), default="")
+    body = Column(Text, default="")
+    link = Column(String(256), nullable=True)  # hash-ссылка, напр. #/chat/dm:1_2
+    is_read = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+# ══════════════════════════════════════════════════════════════
+#  Social: Отзывы о сделках (reputation)
+# ══════════════════════════════════════════════════════════════
+
+class ReputationReview(Base):
+    __tablename__ = "reputation_reviews"
+    __table_args__ = (
+        UniqueConstraint("listing_id", "reviewer_id", name="uq_review"),
+    )
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    listing_id = Column(Integer, nullable=False, index=True)
+    reviewer_id = Column(Integer, nullable=False)   # кто оставил
+    target_id = Column(Integer, nullable=False, index=True)  # кому (owner листинга)
+    score = Column(Integer, default=0)  # +1 или -1
+    comment = Column(String(256), nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
 # ══════════════════════════════════════════════════════════════

@@ -48,9 +48,9 @@ async def list_market(item_id: str = "", listing_type: str = "", status: str = "
                 "amount": l.amount, "quality": l.quality, "upgrade_level": l.upgrade_level,
                 "description": l.description, "status": l.status,
                 "sold_price": l.sold_price,
-                "created_at": l.created_at.isoformat() if l.created_at else None,
-                "expires_at": l.expires_at.isoformat() if l.expires_at else None,
-                "user": {"id": u.id, "display_name": u.display_name, "game_nickname": u.game_nickname, "telegram_username": u.telegram_username, "avatar_url": u.avatar_url} if u else None,
+                "created_at": l.created_at.isoformat() + "Z" if l.created_at else None,
+                "expires_at": l.expires_at.isoformat() + "Z" if l.expires_at else None,
+                "user": {"id": u.id, "display_name": u.display_name, "game_nickname": u.game_nickname, "avatar_url": u.avatar_url, "reputation": getattr(u, 'reputation', 0)} if u else None,
             })
         return {"items": items, "total": total, "pages": max(1, -(-total // per_page))}
 
@@ -99,8 +99,8 @@ async def my_listings(user: User = Depends(require_user)):
                 "icon": _icon(gi), "listing_type": l.listing_type, "price": l.price,
                 "amount": l.amount, "quality": l.quality, "upgrade_level": l.upgrade_level,
                 "description": l.description, "status": l.status, "sold_price": l.sold_price,
-                "created_at": l.created_at.isoformat() if l.created_at else None,
-                "expires_at": l.expires_at.isoformat() if l.expires_at else None,
+                "created_at": l.created_at.isoformat() + "Z" if l.created_at else None,
+                "expires_at": l.expires_at.isoformat() + "Z" if l.expires_at else None,
             })
         return result
 
