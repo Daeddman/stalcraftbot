@@ -4,6 +4,7 @@
    ═══════════════════════════════════════════ */
 const A=document.getElementById('app');
 function go(h){location.hash=h}
+function _goBack(){history.back()}
 
 /* ── State ── */
 let S={catPP:20,lotPP:20,salePP:20,catSort:'name',lotSort:'buyout_price',lotOrder:'asc',saleQlt:'all',mktTab:'all',chatCh:'general'};
@@ -57,7 +58,7 @@ async function route(){
     const r=t.dataset.route;
     t.classList.toggle('active',r===h||(r==='#/'&&(h==='#/'||!pg)));
   });
-  if(tg&&pg){tg.BackButton.show();tg.BackButton.onClick(()=>history.back())}
+  if(tg&&pg){tg.BackButton.show();tg.BackButton.offClick(_goBack);tg.BackButton.onClick(_goBack)}
   else if(tg){tg.BackButton.hide()}
   try{
     if(!pg||h==='#/')await P_home();

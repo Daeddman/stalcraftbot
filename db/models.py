@@ -259,7 +259,7 @@ class ChatMessage(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, nullable=False, index=True)
-    channel = Column(String(32), default="general", index=True)
+    channel = Column(String(64), default="general", index=True)
     text = Column(Text, nullable=False)
     reply_to_id = Column(Integer, nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))

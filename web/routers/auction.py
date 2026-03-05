@@ -1,4 +1,5 @@
 """API аукциона — текущие лоты и история."""
+import asyncio
 import time
 import logging
 from fastapi import APIRouter
@@ -72,7 +73,7 @@ async def _fetch_filtered_history(item_id: str, quality: int) -> list[dict]:
     Сканирует до 10000 записей (50 батчей по 200).
     """
     fetch_limit = 200
-    max_scan = 4000
+    max_scan = 10000
     collected = []
     api_offset = 0
     total_scanned = 0
@@ -97,6 +98,9 @@ async def _fetch_filtered_history(item_id: str, quality: int) -> list[dict]:
 
         if api_offset >= api_total:
             break
+
+        # Задержка для rate-limit
+        await asyncio.sleep(0.35)
 
     logger.info(
         "History filter: item=%s qlt=%d scanned=%d found=%d",

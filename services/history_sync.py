@@ -49,7 +49,7 @@ def _save_sales_dedup(session, item_id: str, prices: list[dict]) -> int:
         if not price:
             continue
         try:
-            session.execute(
+            result = session.execute(
                 text("""
                     INSERT OR IGNORE INTO sale_records
                     (item_id, price, amount, time_sold, quality, upgrade_level, recorded_at)
@@ -65,10 +65,14 @@ def _save_sales_dedup(session, item_id: str, prices: list[dict]) -> int:
                     "recorded_at": datetime.now(timezone.utc).isoformat(),
                 },
             )
-            if session.connection().connection.changes:
+            if result.rowcount > 0:
                 added += 1
         except IntegrityError:
-            pass
+            session.rollback()
+    try:
+        session.commit()
+    except Exception:
+        session.rollback()
     return added
 
 

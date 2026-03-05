@@ -40,7 +40,7 @@ async def list_market(item_id: str = "", listing_type: str = "", status: str = "
         for l, u in rows:
             gi = item_db.get(l.item_id)
             items.append({
-                "id": l.id, "item_id": l.item_id, "item_name": l.item_name or (gi.name if gi else l.item_id),
+                "id": l.id, "item_id": l.item_id, "item_name": l.item_name or (gi.name_ru if gi else l.item_id),
                 "icon": _icon(gi), "listing_type": l.listing_type, "price": l.price,
                 "amount": l.amount, "quality": l.quality, "upgrade_level": l.upgrade_level,
                 "description": l.description, "status": l.status,
@@ -54,7 +54,7 @@ async def list_market(item_id: str = "", listing_type: str = "", status: str = "
 @router.post("/market")
 async def create_listing(data: CreateListing, user: User = Depends(require_user)):
     gi = item_db.get(data.item_id)
-    name = gi.name if gi else data.item_id
+    name = gi.name_ru if gi else data.item_id
     with SessionLocal() as session:
         listing = MarketListing(
             user_id=user.id, item_id=data.item_id, item_name=name,
