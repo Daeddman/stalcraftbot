@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Query
 from services.item_loader import item_db
 from config import CATEGORY_NAMES, RANK_NAMES
-from db.models import SessionLocal, TrackedItem, MarketListing
+from db.models import SessionLocal, TrackedItem
 from sqlalchemy import func
 
 router = APIRouter(tags=["catalog"])
