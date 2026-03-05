@@ -66,20 +66,25 @@ def upgrade_str(level: int) -> str:
 
 
 def get_active_tracked_items(user_id: int = None) -> list[TrackedItem]:
-    """Все активные отслеживаемые предметы (для конкретного пользователя или все)."""
+    """Активные отслеживаемые предметы для конкретного пользователя."""
+    if user_id is None:
+        return []  # Без авторизации — пустой список
     with SessionLocal() as session:
-        stmt = select(TrackedItem).where(TrackedItem.is_active.is_(True))
-        if user_id is not None:
-            stmt = stmt.where(TrackedItem.user_id == user_id)
+        stmt = (
+            select(TrackedItem)
+            .where(TrackedItem.is_active.is_(True))
+            .where(TrackedItem.user_id == user_id)
+        )
         return list(session.scalars(stmt).all())
 
 
 def add_tracked_item(item_id: str, name: str, category: str = "", user_id: int = None) -> TrackedItem:
-    """Добавить предмет в отслеживание."""
+    """Добавить предмет в отслеживание для пользователя."""
     with SessionLocal() as session:
-        q = select(TrackedItem).where(TrackedItem.item_id == item_id)
-        if user_id is not None:
-            q = q.where(TrackedItem.user_id == user_id)
+        q = select(TrackedItem).where(
+            TrackedItem.item_id == item_id,
+            TrackedItem.user_id == user_id,
+        )
         existing = session.scalar(q)
         if existing:
             existing.is_active = True
@@ -96,11 +101,12 @@ def add_tracked_item(item_id: str, name: str, category: str = "", user_id: int =
 
 
 def remove_tracked_item(item_id: str, user_id: int = None) -> bool:
-    """Деактивировать отслеживание предмета."""
+    """Деактивировать отслеживание предмета для пользователя."""
     with SessionLocal() as session:
-        q = select(TrackedItem).where(TrackedItem.item_id == item_id)
-        if user_id is not None:
-            q = q.where(TrackedItem.user_id == user_id)
+        q = select(TrackedItem).where(
+            TrackedItem.item_id == item_id,
+            TrackedItem.user_id == user_id,
+        )
         item = session.scalar(q)
         if item:
             item.is_active = False

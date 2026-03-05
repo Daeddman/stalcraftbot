@@ -382,6 +382,8 @@ def init_db() -> None:
 
     # ── Auto-migrate: добавляем недостающие колонки ──
     _migrate_columns()
+    # ── Migrate tracked_items: убираем UNIQUE(item_id) для per-user избранного ──
+    _migrate_tracked_items_unique()
 
 
 def _migrate_columns():
@@ -437,3 +439,82 @@ def _migrate_columns():
                         log.warning("⚠️ Миграция %s.%s: %s", table_name, col.name, e)
 
         conn.commit()
+
+
+def _migrate_tracked_items_unique():
+    """
+    SQLite не может DROP CONSTRAINT. Если tracked_items имеет UNIQUE(item_id),
+    пересоздаём таблицу без этого ограничения (для per-user избранного).
+    Также назначаем старые записи (user_id=NULL) первому пользователю.
+    """
+    import logging
+    from sqlalchemy import text
+
+    log = logging.getLogger(__name__)
+
+    with engine.connect() as conn:
+        # Проверяем, есть ли UNIQUE constraint на item_id
+        row = conn.execute(text(
+            "SELECT sql FROM sqlite_master WHERE type='table' AND name='tracked_items'"
+        )).first()
+        if not row or not row[0]:
+            return
+
+        create_sql = row[0]
+        # Если в DDL нет UNIQUE на item_id — миграция не нужна
+        if "UNIQUE" not in create_sql.upper() or "item_id" not in create_sql.lower():
+            # Дополнительная проверка: есть ли уникальный индекс на item_id
+            indices = conn.execute(text(
+                "SELECT sql FROM sqlite_master WHERE type='index' AND tbl_name='tracked_items'"
+            )).fetchall()
+            has_unique_idx = any("UNIQUE" in (idx[0] or "").upper() and "item_id" in (idx[0] or "").lower()
+                                 for idx in indices if idx[0])
+            if not has_unique_idx:
+                return
+
+        log.info("🔄 Миграция tracked_items: убираем UNIQUE(item_id)...")
+
+        try:
+            # 1. Rename old table
+            conn.execute(text("ALTER TABLE tracked_items RENAME TO _tracked_items_old"))
+
+            # 2. Create new table without UNIQUE
+            conn.execute(text("""
+                CREATE TABLE tracked_items (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    item_id VARCHAR(128) NOT NULL,
+                    user_id INTEGER,
+                    name VARCHAR(256) NOT NULL,
+                    category VARCHAR(128) DEFAULT '',
+                    is_active BOOLEAN DEFAULT 1,
+                    created_at DATETIME
+                )
+            """))
+            conn.execute(text("CREATE INDEX ix_tracked_items_item_id ON tracked_items (item_id)"))
+            conn.execute(text("CREATE INDEX ix_tracked_items_user_id ON tracked_items (user_id)"))
+
+            # 3. Copy data (add user_id column if it didn't exist)
+            # Check if old table has user_id
+            old_cols = {c[1] for c in conn.execute(text("PRAGMA table_info(_tracked_items_old)")).fetchall()}
+            if "user_id" in old_cols:
+                conn.execute(text("""
+                    INSERT INTO tracked_items (id, item_id, user_id, name, category, is_active, created_at)
+                    SELECT id, item_id, user_id, name, category, is_active, created_at
+                    FROM _tracked_items_old
+                """))
+            else:
+                conn.execute(text("""
+                    INSERT INTO tracked_items (id, item_id, user_id, name, category, is_active, created_at)
+                    SELECT id, item_id, NULL, name, category, is_active, created_at
+                    FROM _tracked_items_old
+                """))
+
+            # 4. Drop old table
+            conn.execute(text("DROP TABLE _tracked_items_old"))
+
+            conn.commit()
+            log.info("✅ tracked_items пересоздана без UNIQUE(item_id)")
+        except Exception as e:
+            conn.rollback()
+            log.error("❌ Ошибка миграции tracked_items: %s", e)
+

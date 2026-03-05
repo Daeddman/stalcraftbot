@@ -35,8 +35,9 @@ class TrackRequest(BaseModel):
 
 @router.get("/tracked")
 async def get_tracked(user: User = Depends(get_current_user)):
-    uid = user.id if user else None
-    items = get_active_tracked_items(user_id=uid)
+    if not user:
+        return []  # Не авторизован — пустой список
+    items = get_active_tracked_items(user_id=user.id)
     result = []
     for t in items:
         gi = item_db.get(t.item_id)
