@@ -1,6 +1,6 @@
 """
-Telegram-бот PerekupHelper — минимальные хендлеры.
-/start с кнопкой Web App + /help + /scan + /emission.
+Telegram-бот PerekupHelper — хендлеры.
+/start, /help, /emission, /emission_on, /emission_off.
 """
 
 import logging
@@ -15,7 +15,6 @@ from aiogram.types import (
 from aiogram.filters import Command, CommandStart
 from aiogram.enums import ParseMode
 
-from db.repository import get_active_tracked_items
 from db.models import SessionLocal, EmissionNotifySetting
 
 logger = logging.getLogger(__name__)
@@ -52,19 +51,20 @@ async def cmd_start(message: Message) -> None:
 
     if url.startswith("https://"):
         text = (
-            "🏪 <b>PerekupHelper</b>\n\n"
-            "📊 Мониторинг аукциона • Поиск выгодных сделок\n"
-            "📈 История цен • 🔔 Алерты ниже рынка\n\n"
-            "Нажми кнопку ниже, чтобы открыть приложение 👇"
+            "🏪 <b>PerekupHelper</b> — торговая площадка Stalcraft\n\n"
+            "📊 Аукцион — лоты и история продаж\n"
+            "🏪 Маркет — объявления игроков\n"
+            "💬 Чат — общение и сделки\n"
+            "☢️ Выброс — уведомления в реальном времени\n\n"
+            "👇 Открой приложение кнопкой в меню бота"
         )
     else:
         text = (
-            "🏪 <b>PerekupHelper</b>\n\n"
-            "📊 Мониторинг аукциона • Поиск выгодных сделок\n"
-            "📈 История цен • 🔔 Алерты ниже рынка\n\n"
+            "🏪 <b>PerekupHelper</b> — торговая площадка Stalcraft\n\n"
+            "📊 Аукцион • 🏪 Маркет • 💬 Чат • ☢️ Выброс\n\n"
             f"🌐 Приложение: <code>{url or 'http://localhost:8080'}</code>\n\n"
-            "⚠️ Для Mini App нужен HTTPS-туннель.\n"
-            "Запусти <code>cloudflared</code> или задай <code>WEBAPP_URL</code> в .env"
+            "⚠️ Для Mini App нужен HTTPS.\n"
+            "Задай <code>WEBAPP_URL</code> в .env"
         )
 
     await message.answer(text, parse_mode=ParseMode.HTML, reply_markup=_webapp_kb())
@@ -74,8 +74,7 @@ async def cmd_start(message: Message) -> None:
 async def cmd_help(message: Message) -> None:
     await message.answer(
         "📖 <b>Команды</b>\n\n"
-        "/start — Открыть приложение\n"
-        "/scan — Запустить сканирование\n"
+        "/start — Главное меню\n"
         "/emission — Статус выброса\n"
         "/emission_on — Включить уведомления о выбросе\n"
         "/emission_off — Выключить уведомления о выбросе\n"
@@ -83,23 +82,6 @@ async def cmd_help(message: Message) -> None:
         parse_mode=ParseMode.HTML,
     )
 
-
-@router.message(Command("scan"))
-async def cmd_scan(message: Message) -> None:
-    tracked = get_active_tracked_items()
-    if not tracked:
-        await message.answer("📭 Нет отслеживаемых предметов. Добавь через Web App!")
-        return
-
-    msg = await message.answer(f"🔄 Сканирую {len(tracked)} предметов...")
-
-    from services.scanner import scan_auction
-    await scan_auction()
-
-    try:
-        await msg.edit_text("✅ Сканирование завершено!")
-    except Exception:
-        await message.answer("✅ Сканирование завершено!")
 
 
 @router.message(Command("emission"))

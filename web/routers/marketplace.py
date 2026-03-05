@@ -42,11 +42,14 @@ async def list_market(item_id: str = "", listing_type: str = "", status: str = "
         items = []
         for l, u in rows:
             gi = item_db.get(l.item_id)
+            is_art = gi and gi.category.startswith("artefact") if gi else False
             items.append({
                 "id": l.id, "item_id": l.item_id, "item_name": l.item_name or (gi.name_ru if gi else l.item_id),
                 "icon": _icon(gi), "listing_type": l.listing_type, "price": l.price,
                 "amount": l.amount, "quality": l.quality, "upgrade_level": l.upgrade_level,
                 "description": l.description, "status": l.status,
+                "color": gi.color if gi else "DEFAULT",
+                "is_artefact": is_art,
                 "sold_price": l.sold_price,
                 "created_at": l.created_at.isoformat() + "Z" if l.created_at else None,
                 "expires_at": l.expires_at.isoformat() + "Z" if l.expires_at else None,

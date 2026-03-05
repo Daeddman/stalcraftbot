@@ -2,6 +2,8 @@
 from fastapi import APIRouter, Query
 from services.item_loader import item_db
 from config import CATEGORY_NAMES, RANK_NAMES
+from db.models import SessionLocal, TrackedItem, MarketListing
+from sqlalchemy import func
 
 router = APIRouter(tags=["catalog"])
 
@@ -84,12 +86,7 @@ async def get_item(item_id: str):
     details = item_db.get_item_details(item_id)
     stats = _parse_stats(details) if details else []
 
-    from db.repository import (
-        get_avg_price, get_avg_sale_price, get_quality_breakdown,
-    )
-
     is_art = item.category.startswith("artefact")
-    breakdown = get_quality_breakdown(item_id, hours=168) if is_art else []
 
     return {
         "id": item.item_id,
@@ -103,11 +100,6 @@ async def get_item(item_id: str):
         "is_artefact": is_art,
         "api_supported": item.api_supported,
         "stats": stats,
-        "prices": {
-            "avg_24h": get_avg_price(item_id, hours=24),
-            "avg_7d": get_avg_sale_price(item_id, hours=168),
-        },
-        "quality_breakdown": breakdown,
     }
 
 
@@ -125,6 +117,41 @@ async def search_items(
         results.sort(key=lambda x: (rank_order.get(x.color, 9), x.name_ru))
     # sort == "relevance" — оставляем порядок поисковика
     return [_item_short(i) for i in results]
+
+
+@router.get("/popular")
+async def popular_items(limit: int = 8):
+    """Самые отслеживаемые (популярные) предметы."""
+    limit = max(1, min(limit, 20))
+    with SessionLocal() as session:
+        # Count how many times each item is tracked
+        rows = session.query(
+            TrackedItem.item_id, func.count(TrackedItem.id).label("cnt")
+        ).filter(TrackedItem.is_active == True).group_by(
+            TrackedItem.item_id
+        ).order_by(func.count(TrackedItem.id).desc()).limit(limit * 2).all()
+
+    result = []
+    for item_id, cnt in rows:
+        gi = item_db.get(item_id)
+        if gi:
+            d = _item_short(gi)
+            d["track_count"] = cnt
+            result.append(d)
+        if len(result) >= limit:
+            break
+
+    # If not enough tracked, fill with some artefacts
+    if len(result) < limit:
+        arts = item_db.get_all_in_category_tree("artefact")
+        arts.sort(key=lambda x: x.name_ru)
+        for a in arts[:limit - len(result)]:
+            if not any(r["id"] == a.item_id for r in result):
+                d = _item_short(a)
+                d["track_count"] = 0
+                result.append(d)
+
+    return result
 
 
 def _icon_url(item) -> str:

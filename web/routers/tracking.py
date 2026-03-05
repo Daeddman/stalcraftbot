@@ -6,8 +6,6 @@ from db.repository import (
     get_active_tracked_items,
     add_tracked_item,
     remove_tracked_item,
-    get_avg_price,
-    get_avg_sale_price,
 )
 from services.item_loader import item_db
 
@@ -48,8 +46,6 @@ async def get_tracked():
             "color": gi.color if gi else "DEFAULT",
             "rank_name": RANK_NAMES.get(gi.color, "") if gi else "",
             "api_supported": gi.api_supported if gi else True,
-            "avg_24h": get_avg_price(t.item_id, hours=24),
-            "avg_7d": get_avg_sale_price(t.item_id, hours=168),
         })
     return result
 

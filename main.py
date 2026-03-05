@@ -142,8 +142,7 @@ def ensure_ssl_certs() -> tuple[str, str]:
 
 async def on_startup(bot: Bot) -> None:
     await bot.set_my_commands([
-        BotCommand(command="start", description="🏪 Открыть приложение"),
-        BotCommand(command="scan", description="🔄 Сканировать аукцион"),
+        BotCommand(command="start", description="🏪 Главное меню"),
         BotCommand(command="emission", description="☢️ Статус выброса"),
         BotCommand(command="emission_on", description="🔔 Вкл. уведомления о выбросе"),
         BotCommand(command="emission_off", description="🔕 Выкл. уведомления о выбросе"),
