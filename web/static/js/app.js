@@ -504,7 +504,6 @@ function statusRu(s){return{active:'Активно',sold:'Продано',expire
 
 /* ═══════════ CHAT ═══════════ */
 let _chatPoll=null;
-// Generate deterministic color from user ID
 function userColor(u){
   if(u&&u.chat_color)return u.chat_color;
   const colors=['#e57373','#f06292','#ba68c8','#9575cd','#7986cb','#64b5f6','#4fc3f7','#4dd0e1','#4db6ac','#81c784','#aed581','#dce775','#fff176','#ffd54f','#ffb74d','#ff8a65'];
@@ -517,57 +516,111 @@ function repBadge(r){
   if(r<0)return'<span class="rep neg">'+r+'</span>';
   return'';
 }
+function _chatAvatar(u,size){
+  if(!u)return'<div class="ch-av'+(size?' ch-av-'+size:'')+'">👤</div>';
+  const cls='ch-av'+(size?' ch-av-'+size:'');
+  if(u.avatar_url)return'<div class="'+cls+'"><img src="'+u.avatar_url+'" alt=""></div>';
+  const initial=(u.display_name||'?').charAt(0).toUpperCase();
+  const bg=userColor(u);
+  return'<div class="'+cls+'" style="background:'+bg+';color:#fff;font-weight:800">'+initial+'</div>';
+}
+
 async function P_chat(channel){
   channel=channel||S.chatCh||'general';
   S.chatCh=channel;saveS();
   if(_chatPoll){clearTimeout(_chatPoll);_chatPoll=null}
   const isDM=channel.startsWith('dm:');
+
   render('<div class="ld">Загрузка</div>');
 
-  let h='<div class="hdr">💬 Чат</div>';
+  let h='';
 
-  // Tabs: Общий, Торговый, Личные
-  h+='<div class="chat-channels">';
-  h+='<div class="chat-ch'+(channel==='general'?' act':'')+'" onclick="go(\'#/chat/general\')">💬 Общий</div>';
-  h+='<div class="chat-ch'+(channel==='trading'?' act':'')+'" onclick="go(\'#/chat/trading\')">💰 Торговый</div>';
-  h+='<div class="chat-ch'+(channel==='dm-list'?' act':'')+'" onclick="go(\'#/chat/dm-list\')">✉️ Личные</div>';
-  h+='</div>';
+  // Header bar
+  if(isDM){
+    // DM conversation header with user info
+    const dmUser=await _getDMPartner(channel);
+    const av=_chatAvatar(dmUser,'sm');
+    const name=dmUser?dmUser.display_name:'Пользователь';
+    h+='<div class="ch-header">';
+    h+='<div class="ch-header-back" onclick="go(\'#/chat/dm-list\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><path d="M15 18l-6-6 6-6"/></svg></div>';
+    h+='<div class="ch-header-user" onclick="'+(dmUser?'go(\'#/user/'+dmUser.id+'\')':'')+'">';
+    h+=av;
+    h+='<div class="ch-header-name">'+name+'</div>';
+    h+='</div></div>';
+  } else {
+    // Channel tabs
+    h+='<div class="ch-tabs">';
+    h+='<div class="ch-tab'+(channel==='general'?' act':'')+'" onclick="go(\'#/chat/general\')"><span class="ch-tab-icon">💬</span>Общий</div>';
+    h+='<div class="ch-tab'+(channel==='trading'?' act':'')+'" onclick="go(\'#/chat/trading\')"><span class="ch-tab-icon">💰</span>Торговый</div>';
+    h+='<div class="ch-tab'+(channel==='dm-list'?' act':'')+'" onclick="go(\'#/chat/dm-list\')"><span class="ch-tab-icon">✉️</span>Личные</div>';
+    h+='</div>';
+  }
 
   if(channel==='dm-list'){
-    // DM list
     try{
       const dms=await API.get('/api/chat/dm-list');
-      if(!dms.length){h+=emptyMsg('Нет личных сообщений');} else {
+      if(!dms.length){
+        h+='<div class="ch-empty"><div class="ch-empty-icon">✉️</div><div class="ch-empty-text">Нет личных сообщений</div><div class="ch-empty-sub">Напишите кому-нибудь из профиля пользователя</div></div>';
+      } else {
+        h+='<div class="dm-list">';
         for(const d of dms){
-          const av=d.user&&d.user.avatar_url?'<img src="'+d.user.avatar_url+'" alt="">':'✉️';
-          const name=d.user?d.user.display_name:'Пользователь';
-          h+='<div class="dm-item" onclick="go(\'#/chat/'+d.channel+'\')"><div class="dm-item-av">'+av+'</div><div class="dm-item-info"><div class="dm-item-name">'+name+'</div><div class="dm-item-last">'+d.last_message+'</div></div><div class="dm-item-time">'+fmtSaleDate(d.last_at)+'</div></div>';
+          const u=d.user||{};
+          const av=_chatAvatar(u,'md');
+          const name=u.display_name||'Пользователь';
+          const last=(d.last_message||'').substring(0,50);
+          const time=fmtSaleDate(d.last_at);
+          h+='<div class="dm-row" onclick="go(\'#/chat/'+d.channel+'\')">';
+          h+=av;
+          h+='<div class="dm-row-body"><div class="dm-row-top"><span class="dm-row-name">'+name+'</span><span class="dm-row-time">'+time+'</span></div><div class="dm-row-preview">'+escHtml(last)+'</div></div>';
+          h+='</div>';
         }
+        h+='</div>';
       }
-    }catch(e){h+=emptyMsg('Авторизуйтесь через Telegram')}
+    }catch(e){
+      h+='<div class="ch-empty"><div class="ch-empty-icon">🔐</div><div class="ch-empty-text">Авторизуйтесь через Telegram</div></div>';
+    }
     render(h);
     return;
   }
 
+  // Messages area
   const msgs=await API.get('/api/chat/'+channel+'/messages?limit=50');
-  h+='<div class="chat-msgs" id="chat-msgs">';
-  if(!msgs.length)h+='<div class="empty"><div class="empty-t">Пока нет сообщений. Напишите первым! 💬</div></div>';
+  h+='<div class="ch-messages" id="chat-msgs">';
+  if(!msgs.length){
+    h+='<div class="ch-empty" style="margin:40px 0"><div class="ch-empty-icon">💬</div><div class="ch-empty-text">Пока пусто</div><div class="ch-empty-sub">Напишите первое сообщение!</div></div>';
+  }
   for(const m of msgs)h+=chatMsg(m);
   h+='</div>';
-  h+='<div class="chat-input"><input id="chat-in" placeholder="Сообщение..." onkeypress="if(event.key===\'Enter\')sendChat(\''+channel+'\')"><button onclick="sendChat(\''+channel+'\')">→</button></div>';
+
+  // Input
+  h+='<div class="ch-input-wrap"><div class="ch-input"><input id="chat-in" placeholder="Сообщение..." onkeypress="if(event.key===\'Enter\')sendChat(\''+channel+'\')"><button onclick="sendChat(\''+channel+'\')"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button></div></div>';
+
   render(h);
   const box=document.getElementById('chat-msgs');
   if(box)box.scrollTop=box.scrollHeight;
   _ctx.chatLastId=msgs.length?msgs[msgs.length-1].id:0;
   startChatPoll(channel);
 }
+
+async function _getDMPartner(channel){
+  try{
+    const me=await getMe();
+    if(!me)return null;
+    const parts=channel.replace('dm:','').split('_');
+    const otherId=parts.find(id=>parseInt(id)!==me.id);
+    if(!otherId)return null;
+    return await API.get('/api/users/'+otherId);
+  }catch(e){return null}
+}
+
 function chatMsg(m){
   const u=m.user||{id:0,display_name:'Аноним'};
-  const av=u.avatar_url?'<img src="'+u.avatar_url+'" alt="">':'👤';
+  const av=_chatAvatar(u);
   const color=userColor(u);
   const rep=repBadge(u.reputation);
-  return'<div class="chat-msg"><div class="chat-msg-av" onclick="go(\'#/user/'+u.id+'\')">'+av+'</div><div class="chat-msg-body"><div class="chat-msg-head"><span class="chat-msg-name" style="color:'+color+'" onclick="go(\'#/user/'+u.id+'\')">'+u.display_name+'</span>'+rep+'<span class="chat-msg-time">'+fmtChatTime(m.created_at)+'</span></div><div class="chat-msg-text">'+escHtml(m.text)+'</div></div></div>';
+  return'<div class="ch-msg"><div class="ch-msg-av" onclick="go(\'#/user/'+u.id+'\')">'+av+'</div><div class="ch-msg-body"><div class="ch-msg-head"><span class="ch-msg-name" style="color:'+color+'" onclick="go(\'#/user/'+u.id+'\')">'+u.display_name+'</span>'+rep+'<span class="ch-msg-time">'+fmtChatTime(m.created_at)+'</span></div><div class="ch-msg-text">'+escHtml(m.text)+'</div></div></div>';
 }
+
 function fmtChatTime(s){
   if(!s)return'';
   try{const d=new Date(s);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}catch(e){return''}
@@ -582,7 +635,7 @@ async function sendChat(ch){
     if(r.error){toast('❌ '+r.error);inp.value=text;return}
     const box=document.getElementById('chat-msgs');
     if(box){
-      const emp=box.querySelector('.empty');if(emp)emp.remove();
+      const emp=box.querySelector('.ch-empty');if(emp)emp.remove();
       box.insertAdjacentHTML('beforeend',chatMsg(r));
       box.scrollTop=box.scrollHeight;
       _ctx.chatLastId=r.id;
