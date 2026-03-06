@@ -67,7 +67,7 @@ async def create_listing(data: CreateListing, user: User = Depends(require_user)
             listing_type=data.listing_type, price=data.price, amount=data.amount,
             quality=data.quality, upgrade_level=data.upgrade_level,
             description=(data.description or "")[:500],
-            expires_at=datetime.now(timezone.utc) + timedelta(days=2),
+            expires_at=datetime.utcnow() + timedelta(days=2),
         )
         session.add(listing)
         session.commit()
@@ -86,7 +86,7 @@ async def update_listing_status(listing_id: int, data: UpdateStatus, user: User 
         l.status = data.status
         if data.status == "sold" and data.sold_price is not None:
             l.sold_price = data.sold_price
-        l.updated_at = datetime.now(timezone.utc)
+        l.updated_at = datetime.utcnow()
         session.commit()
         return {"id": l.id, "status": l.status}
 
@@ -120,7 +120,7 @@ def _icon(gi):
 def expire_old_listings():
     """Фоновая задача: экспирация старых листингов."""
     with SessionLocal() as session:
-        now = datetime.now(timezone.utc)
+        now = datetime.utcnow()
         expired = session.query(MarketListing).filter(
             MarketListing.status == "active",
             MarketListing.expires_at < now,
