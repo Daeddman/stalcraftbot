@@ -373,9 +373,28 @@ class MarketListing(Base):
     contact_method = Column(String(32), default="telegram")
     status = Column(String(16), default="active")  # active / sold / expired / cancelled
     sold_price = Column(BigInteger, nullable=True)  # фактическая цена продажи
+    category_group = Column(String(32), default="other")  # artefact / weapon / armor / other
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     expires_at = Column(DateTime, nullable=True)
+
+
+class PriceOffer(Base):
+    """Предложения цены на объявление."""
+    __tablename__ = "price_offers"
+    __table_args__ = (
+        Index("ix_offer_listing", "listing_id"),
+    )
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    listing_id = Column(Integer, nullable=False, index=True)
+    user_id = Column(Integer, nullable=False, index=True)       # кто предложил
+    seller_id = Column(Integer, nullable=False, index=True)     # владелец лота
+    price = Column(BigInteger, nullable=False)
+    message = Column(String(256), nullable=True)
+    status = Column(String(16), default="pending")  # pending / accepted / declined / withdrawn
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
 # ══════════════════════════════════════════════════════════════

@@ -8,7 +8,7 @@ function go(h){location.hash=h}
 function _goBack(){history.back()}
 
 /* ── State ── */
-let S={lotPP:20,salePP:20,lotSort:'buyout_price',lotOrder:'asc',saleQlt:'all',saleUpg:'all',saleSort:'time_desc',lotQlt:'all',chartQlt:'all',chatCh:'general',searchTab:'market',chartDays:30};
+let S={lotPP:20,salePP:20,lotSort:'buyout_price',lotOrder:'asc',saleQlt:'all',saleUpg:'all',saleSort:'time_desc',lotQlt:'all',chartQlt:'all',chatCh:'general',searchTab:'market',chartDays:30,mktCat:'all',mktType:'',mktSort:'newest',mktSearch:''};
 try{Object.assign(S,JSON.parse(localStorage.getItem('ph11')||'{}'))}catch(e){}
 function saveS(){localStorage.setItem('ph11',JSON.stringify(S))}
 
@@ -630,38 +630,81 @@ async function P_market(sub){
   if(sub==='create'){P_market_create();return}
   if(sub==='my'){await P_market_my();return}
   render(skelCards(4));
-  const d=await API.get('/api/market?status=active&per_page=30');
+  // Get market state from session
+  const mCat=S.mktCat||'all';
+  const mType=S.mktType||'';
+  const mSort=S.mktSort||'newest';
+  const mSearch=S.mktSearch||'';
+  let url='/api/market?status=active&per_page=30&sort='+mSort;
+  if(mCat&&mCat!=='all')url+='&category='+mCat;
+  if(mType)url+='&listing_type='+mType;
+  if(mSearch)url+='&search='+encodeURIComponent(mSearch);
+  const d=await API.get(url);
   let h='<div class="hdr">🏪 Торговая площадка</div>';
-  h+='<div class="tabs">';
-  h+='<button class="tab-btn act" onclick="go(\'#/market\')">Все</button>';
-  h+='<button class="tab-btn" onclick="go(\'#/market-create\')">+ Создать</button>';
-  h+='<button class="tab-btn" onclick="go(\'#/market-my\')">Мои</button>';
+  // Action buttons row
+  h+='<div class="mkt-actions"><button class="btn btn-g btn-sm" onclick="go(\'#/market-create\')">+ Создать</button><button class="btn btn-o btn-sm" onclick="go(\'#/market-my\')">Мои объявления</button></div>';
+  // Category pills
+  h+='<div class="mkt-cats">';
+  for(const[v,l]of[['all','Все'],['artefact','🔮 Артефакты'],['weapon','🔫 Оружие'],['armor','🛡 Броня'],['attachment','🔧 Обвес'],['other','📦 Другое']]){
+    h+='<button class="mkt-cat'+(mCat===v?' act':'')+'" onclick="setMktCat(\''+v+'\')">'+l+'</button>';
+  }
   h+='</div>';
+  // Search + filters
+  h+='<div class="mkt-filters">';
+  h+='<input class="mkt-search" placeholder="🔍 Поиск по объявлениям..." value="'+escHtml(mSearch)+'" onkeypress="if(event.key===\'Enter\'){S.mktSearch=this.value;saveS();go(\'#/market\')}">';
+  h+='<div class="mkt-filter-row">';
+  h+='<select onchange="setMktType(this.value)"><option value=""'+(mType===''?' selected':'')+'>Все типы</option><option value="sell"'+(mType==='sell'?' selected':'')+'>Продажа</option><option value="buy"'+(mType==='buy'?' selected':'')+'>Покупка</option></select>';
+  h+='<select onchange="setMktSort(this.value)"><option value="newest"'+(mSort==='newest'?' selected':'')+'>Новые</option><option value="price_asc"'+(mSort==='price_asc'?' selected':'')+'>Цена ↑</option><option value="price_desc"'+(mSort==='price_desc'?' selected':'')+'>Цена ↓</option></select>';
+  h+='</div></div>';
   if(!d.items||!d.items.length){
-    h+=emptyMsg('Пока нет объявлений. Будь первым! 🎯');
+    h+=emptyMsg('Нет объявлений по фильтру');
   } else {
     for(const l of d.items)h+=marketCard(l);
     if(d.pages>1)h+='<div class="sub" style="text-align:center">Всего: '+d.total+' объявлений</div>';
   }
   render(h);
 }
+function setMktCat(v){S.mktCat=v;saveS();go('#/market')}
+function setMktType(v){S.mktType=v;saveS();go('#/market')}
+function setMktSort(v){S.mktSort=v;saveS();go('#/market')}
 
 function marketCard(l){
   const av=l.user&&l.user.avatar_url?'<img src="'+l.user.avatar_url+'" alt="">':'👤';
   const uname=l.user?l.user.display_name:'Аноним';
-  const urep=l.user&&l.user.reputation?repBadge(l.user.reputation):'';
   const ico=l.icon?'<img src="'+l.icon+'" alt="" onerror="this.parentElement.innerHTML=\'📦\'">':'📦';
   const tp=l.listing_type==='buy'?'<span class="mcard-type buy">Покупка</span>':'<span class="mcard-type sell">Продажа</span>';
   let meta=tp;
   if(l.is_artefact && l.quality>=0)meta+=qb(l.quality);
   if(l.is_artefact && l.upgrade_level>0)meta+=upg(l.upgrade_level);
   const nameColor=l.color?'style="color:var(--rk-'+colorCssVar(l.color)+')"':'';
+  // Seller rating badge
+  let sellerBadge='';
+  if(l.user){
+    const rep=l.user.reputation||0;
+    const deals=l.user.deals_count||0;
+    if(deals>0||rep!==0){
+      const cls=rep>0?'rep-pos':(rep<0?'rep-neg':'rep-zero');
+      sellerBadge='<span class="seller-badge '+cls+'">'+(rep>0?'👍':'👎')+' '+rep+' · '+deals+' сделок</span>';
+    }
+  }
+  // Offers badge
+  let offersBadge='';
+  if(l.offers_count>0)offersBadge='<span class="offers-badge">💬 '+l.offers_count+' предл.</span>';
   return'<div class="mcard" onclick="go(\'#/user/'+((l.user&&l.user.id)||0)+'\')">'
-    +'<div class="mcard-head"><div class="mcard-icon">'+ico+'</div><div class="mcard-info"><div class="mcard-name" '+nameColor+'>'+l.item_name+'</div><div class="mcard-meta">'+meta+'</div></div></div>'
-    +'<div class="mcard-price">'+fmt(l.price)+' ₽'+(l.amount>1?' × '+l.amount:'')+'</div>'
-    +(l.description?'<div style="font-size:11px;color:var(--t2);margin-top:6px">'+l.description+'</div>':'')
-    +'<div class="mcard-bottom"><div class="mcard-user"><div class="mcard-avatar">'+av+'</div><span>'+uname+urep+'</span></div><div class="mcard-time">'+fmtSaleDate(l.created_at)+'</div></div>'
+    +'<div class="mcard-head"><div class="mcard-icon">'+ico+'</div><div class="mcard-info"><div class="mcard-name" '+nameColor+'>'+l.item_name+'</div><div class="mcard-meta">'+meta+offersBadge+'</div></div><div class="mcard-price-col"><div class="mcard-price">'+fmt(l.price)+' ₽</div>'+(l.amount>1?'<div class="mcard-amount">×'+l.amount+'</div>':'')+'</div></div>'
+    +(l.description?'<div class="mcard-desc">'+escHtml(l.description)+'</div>':'')
+    +'<div class="mcard-bottom"><div class="mcard-user"><div class="mcard-avatar">'+av+'</div><span>'+uname+'</span>'+sellerBadge+'</div><div class="mcard-time">'+fmtSaleDate(l.created_at)+'</div></div>'
+    +'<div class="mcard-footer"><button class="mcard-offer-btn" onclick="event.stopPropagation();openOffer('+l.id+','+l.price+')">💰 Предложить цену</button></div>'
     +'</div>';
+}
+
+function openOffer(listingId,askPrice){
+  const price=prompt('Ваша цена (₽):',''+Math.round(askPrice*0.9));
+  if(!price)return;
+  const msg=prompt('Сообщение продавцу (необязательно):','');
+  API.post('/api/market/'+listingId+'/offer',{price:parseInt(price),message:msg||''}).then(r=>{
+    if(r.error){toast('❌ '+r.error)}else{toast('✅ Предложение отправлено!')}
+  }).catch(()=>toast('❌ Ошибка'));
 }
 
 /* ═══════════ MARKET CREATE ═══════════ */

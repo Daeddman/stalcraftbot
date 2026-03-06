@@ -10,7 +10,7 @@ function _applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
   localStorage.setItem('ph_theme', theme);
   if (tg) {
-    const bg = theme === 'light' ? '#f2f2f7' : '#0f0f1a';
+    const bg = theme === 'light' ? '#f5f2ec' : '#111116';
     try { tg.setHeaderColor(bg); tg.setBackgroundColor(bg); } catch(e) {}
   }
 }
