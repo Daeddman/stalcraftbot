@@ -183,6 +183,19 @@ async function P_item(id){
     h+='<a class="item-act-pill act-auc" href="#/auction/'+id+'"><span class="pill-icon">📊</span>Аукцион</a>';
     h+='<button class="item-act-pill act-sell" onclick="event.stopPropagation();go(\'#/market-create\');setTimeout(()=>selectMcItem(\''+id+'\'),200)"><span class="pill-icon">🏪</span>Продать</button>';
   }
+  // Compare button — check category compatibility
+  const canCmp=_compareIds.length===0||_compareCatMatch(item.category);
+  if(canCmp){
+    const inCmp=_compareIds.includes(id);
+    if(inCmp){
+      h+='<button class="item-act-pill act-remove" onclick="event.stopPropagation();removeFromCompare(\''+id+'\');P_item(\''+id+'\')"><span class="pill-icon">✕</span>Убрать из сравнения</button>';
+    } else {
+      h+='<button class="item-act-pill act-cmp" onclick="event.stopPropagation();_addCompareWithCat(\''+id+'\',\''+item.category+'\');P_item(\''+id+'\')"><span class="pill-icon">⚖️</span>Сравнить</button>';
+    }
+  }
+  if(_compareIds.length>1){
+    h+='<a class="item-act-pill act-auc" href="#/compare"><span class="pill-icon">📊</span>К сравнению ('+_compareIds.length+')</a>';
+  }
   h+='</div>';
   h+='</div>';
 
@@ -408,6 +421,110 @@ function _renderPriceChart(points){
 
   chart.timeScale().fitContent();
   new ResizeObserver(()=>{chart.applyOptions({width:el.clientWidth})}).observe(el);
+}
+
+/* ═══════════ COMPARE ═══════════ */
+let _compareIds=[];
+let _compareCat='';  // stored category for compatibility check
+
+function _getCompareGroup(cat){
+  // Group categories for comparison: same subcategory must match
+  if(!cat)return'';
+  // For artefacts: artefact/electrophysical, artefact/gravitational, etc. → compare within subcat
+  // For armor: armor/combined, etc. → compare within subcat
+  // For weapons: weapon/pistol, etc. → compare within subcat
+  // For attachments: attachment/muzzle, etc. → compare within subcat
+  return cat;  // exact category match
+}
+
+function _compareCatMatch(cat){
+  if(!_compareIds.length||!_compareCat)return true;
+  return _getCompareGroup(cat)===_compareCat;
+}
+
+function _addCompareWithCat(id,cat){
+  if(_compareIds.length>=5){toast('Максимум 5 предметов');return}
+  if(_compareIds.includes(id))return;
+  if(_compareIds.length===0)_compareCat=_getCompareGroup(cat);
+  if(!_compareCatMatch(cat)){toast('⚠️ Можно сравнивать только предметы одной категории');return}
+  _compareIds.push(id);
+  localStorage.setItem('ph_compare',JSON.stringify(_compareIds));
+  localStorage.setItem('ph_compare_cat',_compareCat);
+  toast('⚖️ Добавлено к сравнению ('+_compareIds.length+')');
+}
+
+function addToCompare(id){_addCompareWithCat(id,'')}
+function removeFromCompare(id){
+  _compareIds=_compareIds.filter(x=>x!==id);
+  localStorage.setItem('ph_compare',JSON.stringify(_compareIds));
+  if(!_compareIds.length){_compareCat='';localStorage.removeItem('ph_compare_cat')}
+}
+(function(){try{_compareIds=JSON.parse(localStorage.getItem('ph_compare'))||[];_compareCat=localStorage.getItem('ph_compare_cat')||''}catch(e){_compareIds=[];_compareCat=''}})();
+
+async function P_compare(){
+  if(!_compareIds.length){
+    render('<a class="back" onclick="history.back()">← Назад</a><div class="empty"><div class="empty-i">📊</div><div class="empty-t">Нет предметов для сравнения</div><div class="empty-sub">Добавьте предметы через кнопку «📊 Сравнить» на странице предмета</div></div>');
+    return;
+  }
+  render(skelRows(4));
+  let data;
+  try{data=await API.get('/api/compare?ids='+_compareIds.join(','))}catch(e){render(emptyMsg('Ошибка загрузки'));return}
+  const items=data.items||[];
+  if(!items.length){render('<a class="back" onclick="history.back()">← Назад</a>'+emptyMsg('Предметы не найдены'));return}
+
+  let h='<a class="back" onclick="history.back()">← Назад</a>';
+  h+='<div class="hdr">📊 Сравнение</div>';
+
+  // Item cards row
+  h+='<div class="cmp-cards">';
+  for(const it of items){
+    const rkVar=colorCssVar(it.color);
+    let trendH='';
+    if(it.trend!=null){
+      if(it.trend>0)trendH='<div class="trend up">▲ +'+it.trend+'%</div>';
+      else if(it.trend<0)trendH='<div class="trend down">▼ '+it.trend+'%</div>';
+    }
+    h+='<div class="cmp-card rk-'+(it.color||'DEFAULT')+'">';
+    h+='<button class="cmp-remove" onclick="removeFromCompare(\''+it.id+'\');P_compare()">✕</button>';
+    h+='<div class="cmp-icon">'+ICO(it.icon)+'</div>';
+    h+='<div class="cmp-name" style="color:var(--rk-'+rkVar+')">'+it.name+'</div>';
+    if(it.rank_name)h+='<div class="rk-pill rk-pill-'+it.color+'">'+it.rank_name+'</div>';
+    h+=trendH;
+    h+='</div>';
+  }
+  h+='</div>';
+
+  // Stats comparison table
+  // Collect all stat keys
+  const allKeys=[];const keySet=new Set();
+  for(const it of items){
+    for(const s of(it.stats||[])){
+      if(!keySet.has(s.key)){keySet.add(s.key);allKeys.push(s.key)}
+    }
+  }
+  if(allKeys.length){
+    h+='<div class="item-section-title">📋 Характеристики</div>';
+    h+='<div class="cmp-table-wrap"><table class="cmp-table"><thead><tr><th></th>';
+    for(const it of items)h+='<th style="color:var(--rk-'+colorCssVar(it.color)+')">'+it.name.split(' ')[0]+'</th>';
+    h+='</tr></thead><tbody>';
+    for(const key of allKeys){
+      h+='<tr><td class="cmp-key">'+key+'</td>';
+      for(const it of items){
+        const st=(it.stats||[]).find(s=>s.key===key);
+        if(st){
+          let c='';if(st.color==='53C353')c='sg';else if(st.color==='C15252')c='sr';
+          h+='<td class="cmp-val '+c+'">'+st.value+'</td>';
+        }else{
+          h+='<td class="cmp-val" style="color:var(--t3)">—</td>';
+        }
+      }
+      h+='</tr>';
+    }
+    h+='</tbody></table></div>';
+  }
+
+  h+='<button class="btn btn-r btn-sm" style="margin-top:16px" onclick="_compareIds=[];localStorage.removeItem(\'ph_compare\');P_compare()">🗑 Очистить список</button>';
+  render(h);
 }
 
 /* ═══════════ SEARCH (2 tabs) ═══════════ */
