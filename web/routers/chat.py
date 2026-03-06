@@ -172,7 +172,7 @@ async def send_message(channel: str, data: SendMessage, user: User = Depends(req
 
         u = session.query(User).filter_by(id=user.id).first()
         if u:
-            u.last_active_at = datetime.now(timezone.utc)
+            u.last_active_at = datetime.utcnow()
 
         session.commit()
         session.refresh(msg)
@@ -309,7 +309,7 @@ async def toggle_reaction(message_id: int, data: ReactionData, user: User = Depe
 
         u = session.query(User).filter_by(id=user.id).first()
         if u:
-            u.last_active_at = datetime.now(timezone.utc)
+            u.last_active_at = datetime.utcnow()
             session.commit()
 
         return {"action": action, "reactions": reactions}
@@ -328,14 +328,14 @@ async def heartbeat(user: User = Depends(require_user)):
     with SessionLocal() as session:
         u = session.query(User).filter_by(id=user.id).first()
         if u:
-            u.last_active_at = datetime.now(timezone.utc)
+            u.last_active_at = datetime.utcnow()
             session.commit()
     return {"ok": True}
 
 
 @router.get("/online-users")
 async def online_users():
-    threshold = datetime.now(timezone.utc) - timedelta(minutes=5)
+    threshold = datetime.utcnow() - timedelta(minutes=5)
     with SessionLocal() as session:
         users = session.query(User).filter(
             User.last_active_at != None,
@@ -447,7 +447,6 @@ def _online_user_dict(u):
     is_online = False
     if u.last_active_at:
         try:
-            # SQLite хранит naive datetime, сравниваем как naive UTC
             threshold = datetime.utcnow() - timedelta(minutes=5)
             last = u.last_active_at.replace(tzinfo=None) if u.last_active_at.tzinfo else u.last_active_at
             is_online = last >= threshold

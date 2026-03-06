@@ -259,7 +259,7 @@ async function P_auc(id,lp,sp){
       const pr=l.buyoutPrice||l.currentPrice||l.startPrice||0;
       const isBuyout=l.buyoutPrice>0;
       let meta='<span class="lot-type '+(isBuyout?'buyout':'bid')+'">'+(isBuyout?'Выкуп':'Ставка')+'</span>';
-      if(isA){const{q,u}=parseQU(l.additional);meta+=qb(q)+(u>0?' '+upg(u):'');}
+      if(isA){const{q,u}=parseQU(l.additional);if(q>=0)meta+=qb(q);if(u>0)meta+=' '+upg(u);}
       h+='<div class="lot-card"><div class="lot-price">'+fmt(pr)+' ₽</div><div class="lot-meta">'+meta+'</div><div class="lot-expire">'+fmtRemain(l.endTime)+'</div></div>';
     }
     h+='</div>';
@@ -297,7 +297,7 @@ async function P_auc(id,lp,sp){
     h+='<div class="card">';
     for(const s of sales){
       let meta='';
-      if(isA){const{q,u}=parseQU(s.additional);meta=qb(q)+(u>0?' '+upg(u):'');}
+      if(isA){const{q,u}=parseQU(s.additional);if(q>=0)meta=qb(q);if(u>0)meta+=' '+upg(u);}
       if(s.amount>1)meta+='<span class="sale-amount">×'+s.amount+'</span>';
       h+='<div class="sale-row"><div class="sale-price">'+fmt(s.price)+' ₽</div><div class="sale-meta">'+meta+'</div><div class="sale-date">'+fmtSaleDate(s.time)+'</div></div>';
     }
