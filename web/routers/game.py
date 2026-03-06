@@ -13,6 +13,27 @@ async def emission():
     return await get_emission()
 
 
+@router.get("/emission/debug")
+async def emission_debug():
+    """Диагностика emission checker — текущее состояние, подписчики, raw API."""
+    from services.alerter import get_emission_debug
+    from api.emission import get_emission as _get_emi
+
+    checker = get_emission_debug()
+    raw = await _get_emi(force=True)
+
+    with SessionLocal() as session:
+        subs = session.query(EmissionNotifySetting).all()
+        sub_list = [{"telegram_id": s.telegram_id, "enabled": s.enabled} for s in subs]
+
+    return {
+        "checker_state": checker,
+        "api_raw": raw,
+        "subscribers": sub_list,
+        "subscriber_count_enabled": sum(1 for s in sub_list if s["enabled"]),
+    }
+
+
 @router.get("/emission/settings")
 async def emission_settings(user: User = Depends(get_current_user)):
     """Получить настройки уведомлений о выбросе."""

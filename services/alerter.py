@@ -119,6 +119,48 @@ async def send_status_message(text: str) -> bool:
 _last_emission_active: bool | None = None  # None = неизвестно, True = идёт, False = чисто
 
 
+def get_emission_debug() -> dict:
+    """Диагностика состояния emission checker."""
+    return {
+        "last_known_state": _last_emission_active,
+        "description": {
+            None: "Не инициализирован (ожидает первую проверку)",
+            True: "Выброс идёт",
+            False: "Зона чиста",
+        }.get(_last_emission_active, "???"),
+    }
+
+
+def _parse_emission_time(s: str):
+    """Парсит дату из Stalcraft API (несколько форматов)."""
+    from datetime import datetime, timezone
+    if not s:
+        return None
+    # Убираем Z и пробуем разные варианты
+    for fmt in (
+        "%Y-%m-%dT%H:%M:%S.%f%z",
+        "%Y-%m-%dT%H:%M:%S%z",
+        "%Y-%m-%dT%H:%M:%S.%f",
+        "%Y-%m-%dT%H:%M:%S",
+    ):
+        try:
+            val = s.replace("Z", "+00:00")
+            dt = datetime.strptime(val, fmt)
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            return dt
+        except ValueError:
+            continue
+    # Последний вариант — fromisoformat
+    try:
+        dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt
+    except Exception:
+        return None
+
+
 async def check_emission_and_notify():
     """
     Проверяет статус выброса и рассылает уведомления подписчикам
@@ -135,6 +177,10 @@ async def check_emission_and_notify():
         logger.warning("Emission check error: %s", exc)
         return
 
+    if not data:
+        logger.warning("Emission: пустой ответ API")
+        return
+
     # Определяем текущее состояние
     now = datetime.now(timezone.utc)
     cs = data.get("currentStart")
@@ -142,21 +188,25 @@ async def check_emission_and_notify():
     is_active = False
 
     if cs and ce:
-        try:
-            # Поддерживаем разные форматы даты
-            start_str = cs.replace("Z", "+00:00")
-            end_str = ce.replace("Z", "+00:00")
-            start = datetime.fromisoformat(start_str)
-            end = datetime.fromisoformat(end_str)
+        start = _parse_emission_time(cs)
+        end = _parse_emission_time(ce)
+        if start and end:
             is_active = start <= now <= end
             logger.debug("Emission: start=%s end=%s now=%s active=%s", start, end, now, is_active)
-        except Exception as exc:
-            logger.warning("Emission datetime parse error: %s (cs=%r, ce=%r)", exc, cs, ce)
+        else:
+            logger.warning("Emission: не удалось распарсить даты cs=%r ce=%r", cs, ce)
 
-    # Первый запуск — запоминаем без уведомлений
+    # Первый запуск
     if _last_emission_active is None:
         _last_emission_active = is_active
-        logger.info("☢️ Emission init: active=%s", is_active)
+        logger.info("☢️ Emission init: active=%s (raw: cs=%r, ce=%r)", is_active, cs, ce)
+        # Если выброс уже идёт при старте — сразу шлём уведомление
+        if is_active:
+            logger.info("☢️ Emission: выброс уже идёт при старте, шлём уведомление")
+            await _send_emission_notifications(
+                "☢️ <b>Выброс идёт!</b>\n\n🚨 Немедленно укройтесь в безопасном месте!",
+                is_active=True,
+            )
         return
 
     # Нет изменений
@@ -173,25 +223,33 @@ async def check_emission_and_notify():
     else:
         text = "✅ <b>Выброс завершён</b>\n\n🌤 Зона снова безопасна. Можно выходить."
 
-    # Рассылаем подписчикам
+    await _send_emission_notifications(text, is_active=is_active)
+
+
+async def _send_emission_notifications(text: str, is_active: bool):
+    """Рассылает уведомление о выбросе всем подписчикам."""
+    from db.models import SessionLocal, EmissionNotifySetting
+
     bot = _get_bot()
     if not bot:
-        logger.warning("☢️ Emission: бот не инициализирован")
+        logger.warning("☢️ Emission: бот не инициализирован (token=%s)", bool(TELEGRAM_BOT_TOKEN))
         return
 
     with SessionLocal() as session:
         subscribers = session.query(EmissionNotifySetting).filter_by(enabled=True).all()
         tg_ids = [s.telegram_id for s in subscribers]
 
-    logger.info("☢️ Emission: подписчиков=%d", len(tg_ids))
+    logger.info("☢️ Emission notify: подписчиков=%d, tg_ids=%s", len(tg_ids), tg_ids)
 
     if not tg_ids:
-        # Если нет подписчиков, отправляем в основной чат
         if TELEGRAM_CHAT_ID:
             try:
                 await bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=text, parse_mode=ParseMode.HTML)
+                logger.info("☢️ Emission: отправлено в основной чат %s", TELEGRAM_CHAT_ID)
             except Exception as exc:
                 logger.error("Emission send to main chat error: %s", exc)
+        else:
+            logger.warning("☢️ Emission: нет подписчиков и нет TELEGRAM_CHAT_ID")
         return
 
     sent = 0
@@ -199,6 +257,7 @@ async def check_emission_and_notify():
         try:
             await bot.send_message(chat_id=tg_id, text=text, parse_mode=ParseMode.HTML)
             sent += 1
+            logger.debug("☢️ Emission: отправлено %s", tg_id)
         except Exception as exc:
             logger.warning("Emission notify error for %s: %s", tg_id, exc)
 
