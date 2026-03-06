@@ -726,6 +726,7 @@ async function P_chat(channel){
   const box=document.getElementById('chat-msgs');
   if(box)box.scrollTop=box.scrollHeight;
   _ctx.chatLastId=msgs.length?msgs[msgs.length-1].id:0;
+  _initChatGestures();
   startChatPoll(channel);
   _startHeartbeat();
 }
@@ -765,7 +766,7 @@ function chatMsg(m){
     contentHtml='<div class="ch-msg-text">'+escHtml(m.text)+'</div>';
   }
 
-  // Reactions
+  // Reactions (compact — only show if they exist)
   let reactHtml='';
   if(m.reactions&&m.reactions.length){
     reactHtml='<div class="ch-reactions">';
@@ -775,21 +776,20 @@ function chatMsg(m){
       const safeEmoji=escHtml(r.emoji);
       reactHtml+='<button class="ch-react-btn'+(isMine?' mine':'')+'" data-mid="'+m.id+'" data-emoji="'+safeEmoji+'">'+safeEmoji+'<span class="rc">'+r.count+'</span></button>';
     }
-    reactHtml+='<button class="ch-react-add" onclick="showReactPicker(event,'+m.id+')">+</button>';
     reactHtml+='</div>';
   }
 
-  return'<div class="ch-msg" id="msg-'+m.id+'" data-id="'+m.id+'">'
+  // Store reply data as data-attributes for swipe
+  const replyName=esc(u.display_name);
+  const replyText=esc((m.sticker?'['+m.sticker.label+']':m.text||'').substring(0,60));
+
+  return'<div class="ch-msg" id="msg-'+m.id+'" data-id="'+m.id+'" data-reply-name="'+replyName+'" data-reply-text="'+replyText+'">'
     +'<div class="ch-msg-av" onclick="go(\'#/user/'+u.id+'\')">'+av+'</div>'
     +'<div class="ch-msg-body">'
     +'<div class="ch-msg-head"><span class="ch-msg-name" style="color:'+color+'" onclick="go(\'#/user/'+u.id+'\')">'+u.display_name+'</span>'+rep+'<span class="ch-msg-time">'+fmtChatTime(m.created_at)+'</span></div>'
     +replyHtml
     +contentHtml
     +reactHtml
-    +'<div class="ch-msg-actions" style="display:flex;gap:8px;margin-top:2px">'
-    +'<button class="ch-react-add" onclick="showReactPicker(event,'+m.id+')" title="Реакция">😀</button>'
-    +'<button class="ch-react-add" onclick="setReply('+m.id+',\''+esc(u.display_name)+'\',\''+esc((m.sticker?'['+m.sticker.label+']':m.text||'').substring(0,60))+'\')" title="Ответить">↩️</button>'
-    +'</div>'
     +'</div></div>';
 }
 
@@ -821,14 +821,16 @@ async function toggleReact(msgId,emoji){
   try{
     const r=await API.post('/api/chat/messages/'+msgId+'/reactions',{emoji:emoji});
     if(r.error){toast('❌ '+r.error);return}
-    // Re-render reactions on this message
     const el=document.getElementById('msg-'+msgId);
     if(el){
-      const reactWrap=el.querySelector('.ch-reactions');
-      if(reactWrap)reactWrap.outerHTML=_buildReactionsHtml(msgId,r.reactions);
-      else {
-        const body=el.querySelector('.ch-msg-body .ch-msg-actions');
-        if(body)body.insertAdjacentHTML('beforebegin',_buildReactionsHtml(msgId,r.reactions));
+      const existing=el.querySelector('.ch-reactions');
+      const newHtml=_buildReactionsHtml(msgId,r.reactions);
+      if(existing){
+        if(newHtml)existing.outerHTML=newHtml;
+        else existing.remove();
+      } else if(newHtml){
+        const body=el.querySelector('.ch-msg-body');
+        if(body)body.insertAdjacentHTML('beforeend',newHtml);
       }
     }
   }catch(e){toast('❌ Авторизуйтесь')}
@@ -842,26 +844,8 @@ function _buildReactionsHtml(msgId,reactions){
     const safeEmoji=escHtml(r.emoji);
     h+='<button class="ch-react-btn'+(isMine?' mine':'')+'" data-mid="'+msgId+'" data-emoji="'+safeEmoji+'">'+safeEmoji+'<span class="rc">'+r.count+'</span></button>';
   }
-  h+='<button class="ch-react-add" onclick="showReactPicker(event,'+msgId+')">+</button>';
   h+='</div>';
   return h;
-}
-function showReactPicker(ev,msgId){
-  ev.stopPropagation();
-  // Remove existing picker
-  document.querySelectorAll('.react-picker').forEach(p=>p.remove());
-  const el=ev.currentTarget;
-  const picker=document.createElement('div');
-  picker.className='react-picker';
-  for(const emoji of REACTIONS_LIST){
-    const btn=document.createElement('button');
-    btn.textContent=emoji;
-    btn.onclick=(evt)=>{evt.stopPropagation();toggleReact(msgId,emoji);picker.remove()};
-    picker.appendChild(btn);
-  }
-  el.style.position='relative';
-  el.appendChild(picker);
-  setTimeout(()=>{document.addEventListener('click',function _cl(){picker.remove();document.removeEventListener('click',_cl)},{once:true})},50);
 }
 
 function scrollToMsg(id){
@@ -869,7 +853,144 @@ function scrollToMsg(id){
   if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.style.background='var(--acc-bg)';setTimeout(()=>el.style.background='',1500)}
 }
 
-// ── Stickers ──
+// ── Long-press → reaction picker (overlay) ──
+let _lpTimer=null,_lpMsgId=null;
+function _initChatGestures(){
+  const box=document.getElementById('chat-msgs');
+  if(!box)return;
+
+  // Long-press for reactions
+  box.addEventListener('touchstart',function(e){
+    const msg=e.target.closest('.ch-msg[data-id]');
+    if(!msg)return;
+    _lpMsgId=parseInt(msg.dataset.id);
+    _lpTimer=setTimeout(()=>{
+      _lpTimer=null;
+      haptic('medium');
+      _showReactOverlay(_lpMsgId,msg);
+    },500);
+  },{passive:true});
+
+  box.addEventListener('touchmove',function(){
+    if(_lpTimer){clearTimeout(_lpTimer);_lpTimer=null}
+  },{passive:true});
+
+  box.addEventListener('touchend',function(){
+    if(_lpTimer){clearTimeout(_lpTimer);_lpTimer=null}
+  },{passive:true});
+
+  // Desktop: right-click for reactions
+  box.addEventListener('contextmenu',function(e){
+    const msg=e.target.closest('.ch-msg[data-id]');
+    if(!msg)return;
+    e.preventDefault();
+    const msgId=parseInt(msg.dataset.id);
+    haptic('light');
+    _showReactOverlay(msgId,msg);
+  });
+
+  // Swipe left → reply
+  let _swStartX=0,_swStartY=0,_swMsg=null,_swActive=false;
+  box.addEventListener('touchstart',function(e){
+    const msg=e.target.closest('.ch-msg[data-id]');
+    if(!msg)return;
+    _swMsg=msg;_swStartX=e.touches[0].clientX;_swStartY=e.touches[0].clientY;_swActive=false;
+    msg.style.transition='none';
+  },{passive:true});
+
+  box.addEventListener('touchmove',function(e){
+    if(!_swMsg)return;
+    const dx=e.touches[0].clientX-_swStartX;
+    const dy=e.touches[0].clientY-_swStartY;
+    // Only horizontal swipe left
+    if(!_swActive && Math.abs(dx)>10 && Math.abs(dx)>Math.abs(dy) && dx<0){
+      _swActive=true;
+    }
+    if(_swActive){
+      const shift=Math.max(-80,Math.min(0,dx));
+      _swMsg.style.transform='translateX('+shift+'px)';
+      // Show reply hint when pulled enough
+      if(shift<=-50){
+        if(!_swMsg.querySelector('.swipe-hint')){
+          _swMsg.insertAdjacentHTML('beforeend','<div class="swipe-hint">↩️</div>');
+        }
+      } else {
+        const hint=_swMsg.querySelector('.swipe-hint');
+        if(hint)hint.remove();
+      }
+    }
+  },{passive:true});
+
+  box.addEventListener('touchend',function(e){
+    if(!_swMsg)return;
+    const msg=_swMsg;_swMsg=null;
+    msg.style.transition='transform .2s ease';
+    msg.style.transform='';
+    const hint=msg.querySelector('.swipe-hint');
+    if(hint)hint.remove();
+    if(_swActive){
+      const dx=e.changedTouches[0].clientX-_swStartX;
+      if(dx<=-50){
+        // Trigger reply
+        const msgId=parseInt(msg.dataset.id);
+        const name=msg.dataset.replyName||'';
+        const text=msg.dataset.replyText||'';
+        haptic('light');
+        setReply(msgId,name,text);
+      }
+    }
+    _swActive=false;
+  },{passive:true});
+}
+
+function _showReactOverlay(msgId,msgEl){
+  // Remove existing overlay
+  _closeReactOverlay();
+  // Create fullscreen overlay
+  const overlay=document.createElement('div');
+  overlay.className='react-overlay';
+  overlay.id='react-overlay';
+
+  // Picker bubble positioned near message
+  const rect=msgEl.getBoundingClientRect();
+  const picker=document.createElement('div');
+  picker.className='react-picker-float';
+
+  const REACT=['👍','❤️','🔥','😂','😢','💀','🎉','💎','☢️','👎'];
+  for(const emoji of REACT){
+    const btn=document.createElement('button');
+    btn.textContent=emoji;
+    btn.onclick=(ev)=>{ev.stopPropagation();toggleReact(msgId,emoji);_closeReactOverlay()};
+    picker.appendChild(btn);
+  }
+
+  overlay.appendChild(picker);
+  overlay.onclick=()=>_closeReactOverlay();
+  document.body.appendChild(overlay);
+
+  // Position picker near the message (above or below)
+  requestAnimationFrame(()=>{
+    const ph=picker.offsetHeight;
+    let top=rect.top-ph-8;
+    if(top<10)top=rect.bottom+8;
+    picker.style.top=top+'px';
+    picker.style.left=Math.max(10,Math.min(rect.left,window.innerWidth-picker.offsetWidth-10))+'px';
+  });
+}
+
+function _closeReactOverlay(){
+  const o=document.getElementById('react-overlay');
+  if(o)o.remove();
+}
+
+// Event delegation for existing reaction badges (click to toggle)
+document.addEventListener('click',function(ev){
+  const btn=ev.target.closest('.ch-react-btn[data-mid][data-emoji]');
+  if(!btn)return;
+  const mid=parseInt(btn.dataset.mid);
+  const emoji=btn.dataset.emoji;
+  if(mid&&emoji)toggleReact(mid,emoji);
+});
 function toggleStickerPanel(ch){
   _stickerPanelOpen=!_stickerPanelOpen;
   const anchor=document.getElementById('sticker-anchor');
@@ -956,14 +1077,6 @@ function _startHeartbeat(){
   _hbInterval=setInterval(beat,60000);
 }
 
-// ── Event delegation for reaction buttons (data-mid, data-emoji) ──
-document.addEventListener('click',function(ev){
-  const btn=ev.target.closest('.ch-react-btn[data-mid][data-emoji]');
-  if(!btn)return;
-  const mid=parseInt(btn.dataset.mid);
-  const emoji=btn.dataset.emoji;
-  if(mid&&emoji)toggleReact(mid,emoji);
-});
 
 /* ═══════════ PROFILE ═══════════ */
 async function P_profile(sub){

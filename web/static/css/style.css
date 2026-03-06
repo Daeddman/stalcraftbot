@@ -367,7 +367,7 @@ table.lt{width:100%;border-collapse:collapse;font-size:11px}
 .ch-messages{display:flex;flex-direction:column;gap:2px;flex:1;min-height:0;overflow-y:auto;padding-bottom:72px}
 
 /* Single message */
-.ch-msg{display:flex;gap:10px;padding:8px 4px;border-radius:var(--r-sm);transition:.08s}
+.ch-msg{display:flex;gap:10px;padding:8px 4px;border-radius:var(--r-sm);transition:transform .2s ease,background .3s;position:relative;overflow:visible;-webkit-user-select:none;user-select:text}
 .ch-msg:hover{background:rgba(128,128,128,.04)}
 .ch-msg-av{flex-shrink:0;cursor:pointer;padding-top:2px}
 .ch-msg-body{flex:1;min-width:0}
@@ -461,16 +461,20 @@ table.lt{width:100%;border-collapse:collapse;font-size:11px}
 .ch-reactions{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
 .ch-react-btn{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:12px;background:var(--bg2);border:1px solid var(--brd);font-size:12px;cursor:pointer;transition:.12s;-webkit-user-select:none;user-select:none;line-height:1.3}
 .ch-react-btn:hover{border-color:var(--brd3)}
+.ch-react-btn:active{transform:scale(.93)}
 .ch-react-btn.mine{border-color:var(--acc);background:var(--acc-bg)}
 .ch-react-btn .rc{font-size:10px;font-weight:800;color:var(--t2)}
 .ch-react-btn.mine .rc{color:var(--acc)}
-.ch-react-add{display:inline-flex;align-items:center;justify-content:center;width:28px;height:24px;border-radius:12px;background:var(--bg2);border:1px solid var(--brd);font-size:11px;cursor:pointer;transition:.12s;color:var(--t3)}
-.ch-react-add:hover{border-color:var(--brd3);color:var(--t)}
 
-/* Reaction picker popup */
-.react-picker{position:absolute;bottom:100%;left:0;background:var(--surf);border:1px solid var(--brd2);border-radius:12px;padding:6px 8px;display:flex;gap:4px;box-shadow:var(--shadow);z-index:10;animation:fadeUp .15s ease}
-.react-picker button{background:none;border:none;font-size:18px;cursor:pointer;padding:4px;border-radius:6px;transition:.1s;line-height:1}
-.react-picker button:hover{background:var(--bg3);transform:scale(1.2)}
+/* Reaction overlay (long-press) */
+.react-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.45);animation:fadeIn .12s ease}
+.react-picker-float{position:fixed;background:var(--surf);border:1px solid var(--brd2);border-radius:16px;padding:8px 10px;display:flex;gap:2px;box-shadow:0 8px 30px rgba(0,0,0,.35);z-index:201;animation:fadeUp .15s ease}
+.react-picker-float button{background:none;border:none;font-size:22px;cursor:pointer;padding:6px;border-radius:8px;transition:.12s;line-height:1}
+.react-picker-float button:hover{background:var(--bg3);transform:scale(1.15)}
+.react-picker-float button:active{transform:scale(.9)}
+
+/* Swipe hint arrow */
+.swipe-hint{position:absolute;right:-36px;top:50%;transform:translateY(-50%);font-size:20px;opacity:.7;animation:fadeIn .1s ease;pointer-events:none}
 
 /* ════════════════════════════════════════════
    REPLY QUOTE
@@ -514,4 +518,5 @@ table.lt{width:100%;border-collapse:collapse;font-size:11px}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
