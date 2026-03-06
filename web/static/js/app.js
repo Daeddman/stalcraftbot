@@ -772,7 +772,8 @@ function chatMsg(m){
     for(const r of m.reactions){
       const myId=_me?_me.id:0;
       const isMine=r.user_ids.includes(myId);
-      reactHtml+='<button class="ch-react-btn'+(isMine?' mine':'')+'" onclick="toggleReact('+m.id+',\''+r.emoji+'\')">'+r.emoji+'<span class="rc">'+r.count+'</span></button>';
+      const safeEmoji=escHtml(r.emoji);
+      reactHtml+='<button class="ch-react-btn'+(isMine?' mine':'')+'" data-mid="'+m.id+'" data-emoji="'+safeEmoji+'">'+safeEmoji+'<span class="rc">'+r.count+'</span></button>';
     }
     reactHtml+='<button class="ch-react-add" onclick="showReactPicker(event,'+m.id+')">+</button>';
     reactHtml+='</div>';
@@ -838,7 +839,8 @@ function _buildReactionsHtml(msgId,reactions){
   for(const r of reactions){
     const myId=_me?_me.id:0;
     const isMine=r.user_ids.includes(myId);
-    h+='<button class="ch-react-btn'+(isMine?' mine':'')+'" onclick="toggleReact('+msgId+',\''+r.emoji+'\')">'+r.emoji+'<span class="rc">'+r.count+'</span></button>';
+    const safeEmoji=escHtml(r.emoji);
+    h+='<button class="ch-react-btn'+(isMine?' mine':'')+'" data-mid="'+msgId+'" data-emoji="'+safeEmoji+'">'+safeEmoji+'<span class="rc">'+r.count+'</span></button>';
   }
   h+='<button class="ch-react-add" onclick="showReactPicker(event,'+msgId+')">+</button>';
   h+='</div>';
@@ -851,9 +853,6 @@ function showReactPicker(ev,msgId){
   const el=ev.currentTarget;
   const picker=document.createElement('div');
   picker.className='react-picker';
-  picker.innerHTML=REACTIONS_LIST.map(e=>'<button onclick="event.stopPropagation();toggleReact('+msgId+\',\\\'\'+e+\'\\\');\'+\'this.closest(\\\'.react-picker\\\').remove()\'+\'">'+e+'</button>').join('');
-  // Simpler approach
-  picker.innerHTML='';
   for(const emoji of REACTIONS_LIST){
     const btn=document.createElement('button');
     btn.textContent=emoji;
@@ -956,6 +955,15 @@ function _startHeartbeat(){
   beat();
   _hbInterval=setInterval(beat,60000);
 }
+
+// ── Event delegation for reaction buttons (data-mid, data-emoji) ──
+document.addEventListener('click',function(ev){
+  const btn=ev.target.closest('.ch-react-btn[data-mid][data-emoji]');
+  if(!btn)return;
+  const mid=parseInt(btn.dataset.mid);
+  const emoji=btn.dataset.emoji;
+  if(mid&&emoji)toggleReact(mid,emoji);
+});
 
 /* ═══════════ PROFILE ═══════════ */
 async function P_profile(sub){
