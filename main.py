@@ -216,45 +216,63 @@ async def main() -> None:
     # Подавляем спам от ProactorEventLoop на Windows
     asyncio.get_event_loop().set_exception_handler(_suppress_proactor_errors)
 
+    import time as _time
+    t0 = _time.monotonic()
+
     logger.info("Инициализация...")
     init_db()
 
-    # Проверяем наличие базы — если нет, скачиваем
+    # Загрузка базы предметов (быстро — файлы уже на диске)
     from config import GAME_DB_DIR, STALCRAFT_REGION
     listing_path = GAME_DB_DIR / STALCRAFT_REGION / "listing.json"
     if not listing_path.exists():
         logger.info("📥 База предметов не найдена, скачиваю с GitHub...")
         await update_game_database(force=True)
-    else:
-        # Проверяем обновления в фоне (не блокируем старт)
-        logger.info("🔄 Проверяю обновления базы предметов...")
-        await update_game_database(force=False)
 
+    t1 = _time.monotonic()
     logger.info("Загрузка базы предметов...")
     item_db.load()
     if not item_db.loaded:
         logger.error("❌ Не удалось загрузить базу!")
         return
-    logger.info("✅ Загружено %d предметов", item_db.total_items)
-
-    # Синхронизируем official DB → ItemRegistry
-    try:
-        added = sync_official_db_to_registry()
-        logger.info("📋 Registry sync: +%d предметов", added)
-    except Exception as exc:
-        logger.error("❌ Registry sync ошибка: %s", exc)
-
-    # Инициализация HistorySyncState для всех предметов
-    try:
-        init_sync_states()
-    except Exception as exc:
-        logger.error("❌ init_sync_states ошибка: %s", exc)
+    logger.info("✅ Загружено %d предметов за %.1f сек", item_db.total_items, _time.monotonic() - t1)
 
     # SSL
     cert_path, key_path = ensure_ssl_certs()
 
     # Планировщик
     scheduler = AsyncIOScheduler()
+
+    # ── Фоновая инициализация (не блокирует запуск) ──
+    async def _post_startup():
+        """Тяжёлые операции после старта сервера."""
+        await asyncio.sleep(2)  # даём серверу подняться
+
+        # Проверяем обновления базы (GitHub)
+        try:
+            updated = await update_game_database(force=False)
+            if updated:
+                logger.info("🔄 База обновлена при старте")
+                # Перезагрузить item_db если обновилось
+                item_db.load()
+        except Exception as exc:
+            logger.error("❌ Проверка обновлений: %s", exc)
+
+        # Registry sync
+        try:
+            added = sync_official_db_to_registry()
+            logger.info("📋 Registry sync: +%d предметов", added)
+        except Exception as exc:
+            logger.error("❌ Registry sync ошибка: %s", exc)
+
+        # Init history sync states
+        try:
+            init_sync_states()
+        except Exception as exc:
+            logger.error("❌ init_sync_states ошибка: %s", exc)
+
+        logger.info("✅ Фоновая инициализация завершена за %.1f сек", _time.monotonic() - t0)
+
     scheduler.add_job(
         scheduled_db_update, "interval",
         hours=DB_UPDATE_INTERVAL_HOURS,
@@ -383,9 +401,14 @@ async def main() -> None:
 
     logger.info("🌐 HTTPS: https://localhost:%d", WEBAPP_PORT)
     logger.info("🌐 Сеть:  https://%s:%d", local_ip, WEBAPP_PORT)
+    logger.info("🚀 Запуск за %.1f сек", _time.monotonic() - t0)
 
     try:
-        await asyncio.gather(run_webapp(cert_path, key_path), run_bot())
+        await asyncio.gather(
+            run_webapp(cert_path, key_path),
+            run_bot(),
+            _post_startup(),
+        )
     finally:
         scheduler.shutdown()
         logger.info("⏹️  Остановлен")
