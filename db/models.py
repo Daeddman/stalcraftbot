@@ -390,6 +390,21 @@ class EmissionNotifySetting(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
+class AuditLog(Base):
+    """Аудит-лог действий пользователей."""
+
+    __tablename__ = "audit_log"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, nullable=True, index=True)
+    action = Column(String(64), nullable=False, index=True)
+    entity_type = Column(String(64), default="")
+    entity_id = Column(String(128), default="")
+    details_json = Column(Text, nullable=True)
+    ip = Column(String(45), nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+
+
 # ── Создание движка и сессии ──
 
 engine = create_engine(f"sqlite:///{DB_PATH}", echo=False)

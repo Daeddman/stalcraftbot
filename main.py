@@ -28,6 +28,7 @@ from services.wiki_sync import sync_from_wiki
 from services.discovery import run_discovery_scan, sync_official_db_to_registry
 from services.history_sync import run_incremental_job, run_full_download_job, init_sync_states
 from services.alerter import check_emission_and_notify
+from services.backup import backup_database
 from web.routers.marketplace import expire_old_listings
 from bot.handlers import router
 from web.app import app as fastapi_app
@@ -243,6 +244,10 @@ async def main() -> None:
     # Планировщик
     scheduler = AsyncIOScheduler()
 
+    # Attach scheduler to FastAPI app.state for health endpoint
+    fastapi_app.state.scheduler = scheduler
+    fastapi_app.state.start_time = _time.monotonic()
+
     # ── Фоновая инициализация (не блокирует запуск) ──
     async def _post_startup():
         """Тяжёлые операции после старта сервера."""
@@ -253,7 +258,6 @@ async def main() -> None:
             updated = await update_game_database(force=False)
             if updated:
                 logger.info("🔄 База обновлена при старте")
-                # Перезагрузить item_db если обновилось
                 item_db.load()
         except Exception as exc:
             logger.error("❌ Проверка обновлений: %s", exc)
@@ -270,6 +274,24 @@ async def main() -> None:
             init_sync_states()
         except Exception as exc:
             logger.error("❌ init_sync_states ошибка: %s", exc)
+
+        # Generate icon thumbnails
+        try:
+            from services.thumbnails import generate_thumbnails
+            count = await asyncio.to_thread(generate_thumbnails)
+            if count:
+                logger.info("🖼 Миниатюры: %d новых", count)
+                # Mount thumbs dir if it was just created
+                from services.thumbnails import THUMBS_DIR
+                if THUMBS_DIR.exists():
+                    try:
+                        fastapi_app.mount("/icon-thumbs",
+                            __import__('fastapi.staticfiles', fromlist=['StaticFiles']).StaticFiles(
+                                directory=str(THUMBS_DIR)), name="icon_thumbs_late")
+                    except Exception:
+                        pass
+        except Exception as exc:
+            logger.debug("Thumbnails: %s", exc)
 
         logger.info("✅ Фоновая инициализация завершена за %.1f сек", _time.monotonic() - t0)
 
@@ -376,6 +398,15 @@ async def main() -> None:
         name="Проверка выброса",
         misfire_grace_time=30,
         max_instances=1,
+    )
+
+    # Ежедневный бекап БД (в 4:00 UTC)
+    scheduler.add_job(
+        backup_database, "cron",
+        hour=4, minute=0,
+        id="db_backup",
+        name="Бекап БД",
+        misfire_grace_time=3600,
     )
 
     scheduler.start()

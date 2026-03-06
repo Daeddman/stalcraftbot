@@ -71,6 +71,13 @@ async def create_listing(data: CreateListing, user: User = Depends(require_user)
         )
         session.add(listing)
         session.commit()
+        # Audit
+        try:
+            from services.audit import log_action, ACTION_LISTING_CREATE
+            log_action(user.id, ACTION_LISTING_CREATE, "listing", str(listing.id),
+                       {"item_id": data.item_id, "price": data.price})
+        except Exception:
+            pass
         return {"id": listing.id, "status": "created"}
 
 @router.put("/market/{listing_id}/status")
@@ -88,6 +95,13 @@ async def update_listing_status(listing_id: int, data: UpdateStatus, user: User 
             l.sold_price = data.sold_price
         l.updated_at = datetime.utcnow()
         session.commit()
+        # Audit
+        try:
+            from services.audit import log_action, ACTION_LISTING_UPDATE
+            log_action(user.id, ACTION_LISTING_UPDATE, "listing", str(l.id),
+                       {"status": data.status, "sold_price": data.sold_price})
+        except Exception:
+            pass
         return {"id": l.id, "status": l.status}
 
 @router.get("/market/my")

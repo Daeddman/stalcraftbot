@@ -23,11 +23,14 @@ import web.routers.users as users
 import web.routers.chat as chat
 import web.routers.marketplace as marketplace
 import web.routers.sync as sync
+import web.routers.health as health
+import web.routers.ws_chat as ws_chat
 
 logger = logging.getLogger(__name__)
 
 STATIC_DIR = Path(__file__).parent / "static"
 ICONS_DIR = GAME_DB_DIR / STALCRAFT_REGION / "icons"
+THUMBS_DIR = GAME_DB_DIR / STALCRAFT_REGION / "icon-thumbs"
 CUSTOM_ICONS_DIR = BASE_DIR / "custom_icons"
 UPLOADS_DIR = BASE_DIR / "uploads"
 
@@ -68,9 +71,15 @@ app.include_router(users.router, prefix="/api")
 app.include_router(chat.router, prefix="/api")
 app.include_router(marketplace.router, prefix="/api")
 app.include_router(sync.router, prefix="/api")
+app.include_router(health.router, prefix="/api")
+# WebSocket — без /api prefix
+app.include_router(ws_chat.router)
 
 # ── Статика ──
 app.mount("/icons", StaticFiles(directory=str(ICONS_DIR)), name="icons")
+# Миниатюры иконок (64x64)
+if THUMBS_DIR.exists():
+    app.mount("/icon-thumbs", StaticFiles(directory=str(THUMBS_DIR)), name="icon_thumbs")
 # Кастомные иконки (wiki-предметы, загруженные вручную)
 if CUSTOM_ICONS_DIR.exists():
     app.mount("/custom-icons", StaticFiles(directory=str(CUSTOM_ICONS_DIR)), name="custom_icons")

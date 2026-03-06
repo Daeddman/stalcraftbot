@@ -191,6 +191,24 @@ async def send_message(channel: str, data: SendMessage, user: User = Depends(req
     if data.listing_id:
         _notify_listing_reply(user, data.listing_id, text)
 
+    # WebSocket broadcast
+    try:
+        from web.routers.ws_chat import manager as ws_manager
+        import asyncio
+        asyncio.ensure_future(ws_manager.broadcast(channel, {
+            "type": "new_message", "message": result
+        }))
+    except Exception:
+        pass
+
+    # Audit
+    try:
+        from services.audit import log_action, ACTION_CHAT_MESSAGE
+        log_action(user.id, ACTION_CHAT_MESSAGE, "chat", channel,
+                   {"text": (text or "")[:100], "sticker": sticker})
+    except Exception:
+        pass
+
     return result
 
 

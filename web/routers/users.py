@@ -61,6 +61,12 @@ async def update_me(data: ProfileUpdate, user: User = Depends(require_user)):
                 u.chat_color = data.chat_color
         session.commit()
         session.refresh(u)
+        # Audit
+        try:
+            from services.audit import log_action, ACTION_PROFILE_EDIT
+            log_action(user.id, ACTION_PROFILE_EDIT, "user", str(user.id))
+        except Exception:
+            pass
         return _full_user_dict(u)
 
 
