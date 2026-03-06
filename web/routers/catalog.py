@@ -130,12 +130,12 @@ async def popular_items(limit: int = 8):
 
     # 1) Items with most sales in last 7 days
     with SessionLocal() as session:
-        cutoff = datetime.now(timezone.utc) - timedelta(days=7)
+        cutoff = datetime.utcnow() - timedelta(days=7)
         try:
             from db.models import SaleRecord
             sale_rows = session.query(
                 SaleRecord.item_id, func.count(SaleRecord.id).label("cnt")
-            ).filter(SaleRecord.sold_at >= cutoff).group_by(
+            ).filter(SaleRecord.recorded_at >= cutoff).group_by(
                 SaleRecord.item_id
             ).order_by(func.count(SaleRecord.id).desc()).limit(limit * 3).all()
 
