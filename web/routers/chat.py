@@ -88,6 +88,16 @@ async def trading_cooldown(user: User = Depends(get_current_user)):
     return {"remaining": int(remaining)}
 
 
+@router.get("/chat/general/cooldown")
+async def general_cooldown(user: User = Depends(get_current_user)):
+    """Оставшееся время кулдауна в общем чате."""
+    if not user:
+        return {"remaining": 0}
+    last = _spam_tracker.get(user.id, 0)
+    remaining = max(0, SPAM_COOLDOWN - (time.time() - last))
+    return {"remaining": int(remaining) + (1 if remaining > 0 else 0)}
+
+
 @router.get("/chat/stickers")
 async def get_stickers():
     return STICKERS
@@ -166,8 +176,9 @@ async def send_message(channel: str, data: SendMessage, user: User = Depends(req
         text = text[:MAX_GENERAL_LEN]
         now = time.time()
         last = _spam_tracker.get(user.id, 0)
-        if now - last < SPAM_COOLDOWN:
-            return {"error": f"Подождите {int(SPAM_COOLDOWN - (now - last))+1} сек"}
+        remaining = SPAM_COOLDOWN - (now - last)
+        if remaining > 0:
+            return {"error": f"Подождите {int(remaining)+1} сек", "cooldown": int(remaining) + 1}
         _spam_tracker[user.id] = now
 
     if channel == "trading":

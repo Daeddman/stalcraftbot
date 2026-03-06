@@ -1051,7 +1051,7 @@ async function P_chat(channel){
 
   // Input area (with sticker toggle and reply bar placeholder)
   h+='<div class="ch-input-wrap" id="chat-input-wrap">';
-  if(channel==='trading')h+='<div id="trade-cooldown" class="trade-cooldown" style="display:none"></div>';
+  if(channel==='trading'||channel==='general')h+='<div id="chat-cooldown" class="trade-cooldown" style="display:none"></div>';
   h+='<div id="reply-bar"></div>';
   h+='<div style="position:relative" id="sticker-anchor"></div>';
   h+='<div class="ch-input">';
@@ -1061,8 +1061,8 @@ async function P_chat(channel){
   h+='</div></div>';
 
   render(h);
-  // Init trading cooldown timer
-  if(channel==='trading')_initTradeCooldown();
+  // Init cooldown timer for general and trading
+  if(channel==='trading'||channel==='general')_initChatCooldown(channel);
   const box=document.getElementById('chat-msgs');
   if(box){
     // Scroll the #app container (the actual scrolling parent) to bottom
@@ -1430,8 +1430,7 @@ async function sendChat(ch){
     const r=await API.post('/api/chat/'+ch+'/messages',body);
     if(r.error){
       toast('❌ '+r.error);inp.value=text;
-      // Start cooldown timer if trading
-      if(r.cooldown&&r.cooldown>0)_startTradeCooldownTimer(r.cooldown);
+      if(r.cooldown&&r.cooldown>0)_startChatCooldownTimer(r.cooldown);
       return;
     }
     clearReply();
@@ -1442,22 +1441,23 @@ async function sendChat(ch){
       A.scrollTop=A.scrollHeight;
       _ctx.chatLastId=r.id;
     }
-    // After successful send in trading, start cooldown
-    if(ch==='trading')_startTradeCooldownTimer(300);
+    // After successful send, start cooldown
+    if(ch==='trading')_startChatCooldownTimer(300);
+    else if(ch==='general')_startChatCooldownTimer(3);
   }catch(e){toast('❌ Авторизуйтесь через Telegram');inp.value=text}
 }
 
-// ── Trading cooldown timer ──
-let _tradeCdInterval=null;
-async function _initTradeCooldown(){
+// ── Chat cooldown timer (universal) ──
+let _chatCdInterval=null;
+async function _initChatCooldown(ch){
   try{
-    const d=await API.get('/api/chat/trading/cooldown');
-    if(d.remaining>0)_startTradeCooldownTimer(d.remaining);
+    const d=await API.get('/api/chat/'+ch+'/cooldown');
+    if(d.remaining>0)_startChatCooldownTimer(d.remaining);
   }catch(e){}
 }
-function _startTradeCooldownTimer(secs){
-  if(_tradeCdInterval){clearInterval(_tradeCdInterval);_tradeCdInterval=null}
-  const el=document.getElementById('trade-cooldown');
+function _startChatCooldownTimer(secs){
+  if(_chatCdInterval){clearInterval(_chatCdInterval);_chatCdInterval=null}
+  const el=document.getElementById('chat-cooldown');
   if(!el)return;
   let left=secs;
   const inp=document.getElementById('chat-in');
@@ -1465,17 +1465,21 @@ function _startTradeCooldownTimer(secs){
     if(left<=0){
       el.style.display='none';
       if(inp)inp.disabled=false;
-      clearInterval(_tradeCdInterval);_tradeCdInterval=null;
+      clearInterval(_chatCdInterval);_chatCdInterval=null;
       return;
     }
     const m=Math.floor(left/60),s=left%60;
-    el.innerHTML='⏳ Следующее сообщение через <b>'+m+':'+String(s).padStart(2,'0')+'</b>';
+    if(m>0){
+      el.innerHTML='⏳ Следующее сообщение через <b>'+m+':'+String(s).padStart(2,'0')+'</b>';
+    } else {
+      el.innerHTML='⏳ Подождите <b>'+s+' сек</b>';
+    }
     el.style.display='block';
     if(inp)inp.disabled=true;
     left--;
   }
   tick();
-  _tradeCdInterval=setInterval(tick,1000);
+  _chatCdInterval=setInterval(tick,1000);
 }
 // ── WebSocket Chat + Polling fallback ──
 let _chatWs=null,_wsOk=false;
