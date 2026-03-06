@@ -68,7 +68,9 @@ function fmtMs(ms){if(ms<=0)return'0:00';const m=Math.floor(ms/60000),s=Math.flo
 function fmtAgo(ms){if(ms<60000)return'<1 мин';if(ms<3600000)return Math.floor(ms/60000)+' мин';if(ms<86400000)return Math.floor(ms/3600000)+' ч';return Math.floor(ms/86400000)+' д'}
 
 /* ── Router ── */
+let _routeId=0;
 async function route(){
+  const rid=++_routeId;
   const h=location.hash||'#/',p=h.replace('#','').split('/').filter(Boolean),pg=p[0]||'';
   document.querySelectorAll('#tab-bar .tab').forEach(t=>{
     const r=t.dataset.route;
@@ -78,7 +80,7 @@ async function route(){
   else if(tg){tg.BackButton.hide()}
   _updateUnreadBadge();
   try{
-    if(!pg||h==='#/')await P_home();
+    if(!pg||h==='#/')await P_home(rid);
     else if(pg==='item')await P_item(p[1]);
     else if(pg==='auction')await P_auc(p[1]);
     else if(pg==='search')await P_search();
@@ -92,7 +94,8 @@ async function route(){
     else if(pg==='profile')await P_profile(p[1]);
     else if(pg==='user')await P_user(p[1]);
     else if(pg==='blocked')await P_blocked();
-    else await P_home();
+    else if(pg==='compare')await P_compare();
+    else await P_home(rid);
   }catch(e){render('<div class="empty"><div class="empty-i">⚠️</div><div class="empty-t">'+e.message+'</div></div>')}
   if(tg)tg.expand();
 }
@@ -100,13 +103,15 @@ window.addEventListener('hashchange',route);
 window.addEventListener('load',()=>{showOnboarding();route()});
 
 /* ═══════════ HOME ═══════════ */
-async function P_home(){
+async function P_home(rid){
   render(skelBlock()+skelCards(3));
   const [emi,mkt,pop]=await Promise.all([
     getEmi(),
     API.get('/api/market?status=active&per_page=6').catch(()=>({items:[]})),
     API.get('/api/popular?limit=8').catch(()=>[]),
   ]);
+  // Guard: if user navigated away, don't render stale content
+  if(rid!==undefined && rid!==_routeId)return;
   let h='';
   h+=emiHTML(emi);
   h+='<div class="quick-row">';
@@ -116,7 +121,15 @@ async function P_home(){
   h+='</div>';
   if(pop&&pop.length){
     h+='<div class="sec">🔥 Популярные предметы</div><div class="hscroll">';
-    for(const i of pop)h+='<div class="hcard rk-'+(i.color||'DEFAULT')+'" onclick="haptic();go(\'#/item/'+i.id+'\')"><div class="hcard-img">'+ICO(i.icon)+'</div><div class="hcard-name" style="color:var(--rk-'+colorCssVar(i.color)+')">'+i.name+'</div></div>';
+    for(const i of pop){
+      let trendH='';
+      if(i.trend!=null){
+        if(i.trend>0)trendH='<div class="trend up">▲ +'+i.trend+'%</div>';
+        else if(i.trend<0)trendH='<div class="trend down">▼ '+i.trend+'%</div>';
+        else trendH='<div class="trend flat">— 0%</div>';
+      }
+      h+='<div class="hcard rk-'+(i.color||'DEFAULT')+'" onclick="haptic();go(\'#/item/'+i.id+'\')"><div class="hcard-img">'+ICO(i.icon)+'</div><div class="hcard-name" style="color:var(--rk-'+colorCssVar(i.color)+')">'+i.name+'</div>'+trendH+'</div>';
+    }
     h+='</div>';
   }
   if(mkt.items&&mkt.items.length){
@@ -253,7 +266,7 @@ async function P_auc(id,lp,sp){
   }
 
   // ── Price Chart ──
-  h+='<div class="chart-wrap"><div class="chart-header"><div class="chart-title">📈 График цен</div><div class="chart-controls">';
+  h+='<div class="chart-wrap"><div class="chart-header"><div class="chart-title">📈 График цен'+(chartD.expanded?' <span style="font-size:10px;color:var(--t3);font-weight:400">(за всё время)</span>':'')+'</div><div class="chart-controls">';
   // Quality filter for chart (only for artefacts)
   if(isA){
     h+='<select class="chart-qlt-sel" onchange="setChartQlt(this.value)">';
@@ -264,7 +277,7 @@ async function P_auc(id,lp,sp){
     h+='</select>';
   }
   h+='<div class="chart-period">';
-  for(const[d,l] of[[7,'7д'],[30,'30д'],[90,'90д']]){
+  for(const[d,l] of[[7,'7д'],[30,'30д'],[90,'90д'],[0,'Всё']]){
     h+='<button class="'+(S.chartDays===d?'act':'')+'" onclick="setChartDays('+d+')">'+l+'</button>';
   }
   h+='</div></div></div><div id="price-chart"></div></div>';

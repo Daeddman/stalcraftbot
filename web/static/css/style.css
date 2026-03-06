@@ -517,8 +517,9 @@ table.lt{width:100%;border-collapse:collapse;font-size:11px}
 
 /* Reaction overlay (long-press) */
 .react-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.45);animation:fadeIn .12s ease}
-.react-picker-float{position:fixed;background:var(--surf);border:1px solid var(--brd2);border-radius:16px;padding:8px 10px;display:flex;gap:2px;box-shadow:0 8px 30px rgba(0,0,0,.35);z-index:201;animation:fadeUp .15s ease}
-.react-picker-float button{background:none;border:none;font-size:22px;cursor:pointer;padding:6px;border-radius:8px;transition:.12s;line-height:1}
+.react-picker-float{position:fixed;background:var(--surf);border:1px solid var(--brd2);border-radius:16px;padding:8px 10px;display:flex;gap:2px;box-shadow:0 8px 30px rgba(0,0,0,.35);z-index:201;animation:fadeUp .15s ease;max-width:calc(100vw - 32px);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.react-picker-float::-webkit-scrollbar{display:none}
+.react-picker-float button{background:none;border:none;font-size:22px;cursor:pointer;padding:6px;border-radius:8px;transition:.12s;line-height:1;flex-shrink:0}
 .react-picker-float button:hover{background:var(--bg3);transform:scale(1.15)}
 .react-picker-float button:active{transform:scale(.9)}
 

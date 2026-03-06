@@ -189,7 +189,43 @@ async def popular_items(limit: int = 8):
             if len(result) >= limit:
                 break
 
+    # Add trend data
+    _attach_trends(result)
+
     return result
+
+
+def _attach_trends(items: list[dict]):
+    """Добавляет тренд (изменение цены за 7д) к каждому предмету."""
+    from datetime import datetime, timedelta
+    from db.models import SaleRecord
+    if not items:
+        return
+    cutoff_7d = (datetime.utcnow() - timedelta(days=7)).isoformat()
+    cutoff_14d = (datetime.utcnow() - timedelta(days=14)).isoformat()
+    ids = [i["id"] for i in items]
+    try:
+        with SessionLocal() as session:
+            for item_dict in items:
+                iid = item_dict["id"]
+                # Avg price last 7d
+                avg7 = session.query(func.avg(SaleRecord.price)).filter(
+                    SaleRecord.item_id == iid,
+                    SaleRecord.time_sold >= cutoff_7d,
+                ).scalar()
+                # Avg price 7-14d ago
+                avg14 = session.query(func.avg(SaleRecord.price)).filter(
+                    SaleRecord.item_id == iid,
+                    SaleRecord.time_sold >= cutoff_14d,
+                    SaleRecord.time_sold < cutoff_7d,
+                ).scalar()
+                if avg7 and avg14 and avg14 > 0:
+                    pct = round((avg7 - avg14) / avg14 * 100, 1)
+                    item_dict["trend"] = pct
+                else:
+                    item_dict["trend"] = None
+    except Exception:
+        pass
 
 
 def _icon_url(item) -> str:

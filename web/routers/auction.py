@@ -248,27 +248,39 @@ async def chart_data(
 ):
     """Агрегированные данные для графика цен (по дням).
     Приоритет: БД → API fallback.
+    Если за указанный период нет данных — отдаём за всё время.
     """
     from datetime import datetime, timedelta
     from collections import defaultdict
 
-    cutoff = (datetime.utcnow() - timedelta(days=days)).isoformat()
+    use_all_time = (days <= 0)
+    cutoff = "" if use_all_time else (datetime.utcnow() - timedelta(days=days)).isoformat()
 
-    # 1) Пробуем из БД (SaleRecord)
+    # 1) Пробуем из БД (SaleRecord) за указанный период
     with SessionLocal() as session:
         q = session.query(SaleRecord).filter(SaleRecord.item_id == item_id)
         if quality != -99:
             q = q.filter(SaleRecord.quality == quality)
-        q = q.filter(SaleRecord.time_sold >= cutoff)
-        q = q.order_by(asc(SaleRecord.time_sold))
-        records = q.all()
+        if not use_all_time:
+            q_period = q.filter(SaleRecord.time_sold >= cutoff).order_by(asc(SaleRecord.time_sold))
+            records = q_period.all()
+        else:
+            records = None  # force all
+
+        # Если за период ничего нет — берём ВСЕ записи
+        expanded = False
+        if not records:
+            records = q.order_by(asc(SaleRecord.time_sold)).all()
+            expanded = not use_all_time  # only mark as expanded if wasn't already all-time
 
     if records:
-        return _build_chart_points(records)
+        result = _build_chart_points(records)
+        result["expanded"] = expanded
+        return result
 
     # 2) Fallback: API history (без фильтра quality — API не поддерживает)
     if quality != -99:
-        return {"points": [], "total_sales": 0}
+        return {"points": [], "total_sales": 0, "expanded": False}
 
     try:
         all_prices = []
@@ -288,9 +300,9 @@ async def chart_data(
             await asyncio.sleep(0.2)
 
         if not all_prices:
-            return {"points": [], "total_sales": 0}
+            return {"points": [], "total_sales": 0, "expanded": False}
 
-        # Фильтруем по дате
+        # Сначала пробуем с фильтром по дате
         daily: dict[str, list[int]] = defaultdict(list)
         for p in all_prices:
             t = p.get("time", "")
@@ -299,6 +311,18 @@ async def chart_data(
                 price = p.get("price", 0)
                 if price > 0:
                     daily[day].append(price)
+
+        # Если за период пусто — берём всё
+        expanded = False
+        if not daily:
+            expanded = True
+            for p in all_prices:
+                t = p.get("time", "")
+                day = t[:10] if t else ""
+                if day:
+                    price = p.get("price", 0)
+                    if price > 0:
+                        daily[day].append(price)
 
         points = []
         total = 0
@@ -315,11 +339,11 @@ async def chart_data(
                 "count": n,
             })
 
-        return {"points": points, "total_sales": total}
+        return {"points": points, "total_sales": total, "expanded": expanded}
 
     except Exception as exc:
         logger.warning("Chart fallback error for %s: %s", item_id, exc)
-        return {"points": [], "total_sales": 0}
+        return {"points": [], "total_sales": 0, "expanded": False}
 
 
 def _build_chart_points(records) -> dict:
