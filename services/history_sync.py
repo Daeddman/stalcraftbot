@@ -141,10 +141,10 @@ async def incremental_sync(item_id: str) -> int:
 #  Полная выгрузка (продолжает с последнего offset)
 # ══════════════════════════════════════════════════════════════
 
-async def full_download_chunk(item_id: str, max_requests: int = 20) -> int:
+async def full_download_chunk(item_id: str, max_requests: int = 50) -> int:
     """
     Продолжает полную выгрузку с того offset, где остановились.
-    Делает max_requests запросов за один вызов (не блокирует надолго).
+    Делает max_requests запросов за один вызов.
     Возвращает кол-во новых записей.
     """
     with SessionLocal() as session:
@@ -288,7 +288,7 @@ async def run_full_download_job():
         item_id = st.item_id
 
     try:
-        added = await full_download_chunk(item_id, max_requests=20)
+        added = await full_download_chunk(item_id, max_requests=50)
         if added:
             logger.info("📥 Full download %s: +%d записей", item_id, added)
     except Exception as exc:

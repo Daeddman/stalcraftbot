@@ -1,15 +1,16 @@
 /* ═══════════════════════════════════════════
-   PerekupHelper SPA — v9
+   PerekupHelper SPA — v11
    Stalcraft Trading Hub
+   Skeleton · Charts · Filters · Theme
    ═══════════════════════════════════════════ */
 const A=document.getElementById('app');
 function go(h){location.hash=h}
 function _goBack(){history.back()}
 
 /* ── State ── */
-let S={lotPP:20,salePP:20,lotSort:'buyout_price',lotOrder:'asc',saleQlt:'all',chatCh:'general',searchTab:'market'};
-try{Object.assign(S,JSON.parse(localStorage.getItem('ph9')||'{}'))}catch(e){}
-function saveS(){localStorage.setItem('ph9',JSON.stringify(S))}
+let S={lotPP:20,salePP:20,lotSort:'buyout_price',lotOrder:'asc',saleQlt:'all',saleUpg:'all',saleSort:'time_desc',lotQlt:'all',chatCh:'general',searchTab:'market',chartDays:30};
+try{Object.assign(S,JSON.parse(localStorage.getItem('ph11')||'{}'))}catch(e){}
+function saveS(){localStorage.setItem('ph11',JSON.stringify(S))}
 
 /* ── Cache ── */
 const _c=new Map();
@@ -20,11 +21,10 @@ function cS(k,v){_c.set(k,{v,t:Date.now()})}
 let _te;
 function toast(m){if(!_te){_te=document.createElement('div');_te.className='toast';document.body.appendChild(_te)}_te.textContent=m;_te.classList.add('show');setTimeout(()=>_te.classList.remove('show'),2200)}
 
-/* ── Unread badge on chat tab ── */
+/* ── Unread badge ── */
 async function _updateUnreadBadge(){
   try{
-    const me=await getMe();
-    if(!me)return;
+    const me=await getMe();if(!me)return;
     const cnt=me.unread_count||0;
     const chatTab=document.querySelector('#tab-bar .tab[data-route="#/chat"]');
     if(!chatTab)return;
@@ -39,7 +39,7 @@ async function _updateUnreadBadge(){
 /* ── Render ── */
 function render(h){A.innerHTML='<div class="page">'+h+'</div>';A.scrollTop=0}
 
-/* ── Parse quality + potency from API additional ── */
+/* ── Parse quality + potency ── */
 function parseQU(add){
   if(!add)return{q:-1,u:0};
   return{q:(add.qlt!=null)?Number(add.qlt):-1, u:Math.max(0,Math.min(15,Math.round(add.ptn||0)))};
@@ -76,7 +76,6 @@ async function route(){
   });
   if(tg&&pg){tg.BackButton.show();tg.BackButton.offClick(_goBack);tg.BackButton.onClick(_goBack)}
   else if(tg){tg.BackButton.hide()}
-  // Update unread badge
   _updateUnreadBadge();
   try{
     if(!pg||h==='#/')await P_home();
@@ -97,11 +96,11 @@ async function route(){
   if(tg)tg.expand();
 }
 window.addEventListener('hashchange',route);
-window.addEventListener('load',route);
+window.addEventListener('load',()=>{showOnboarding();route()});
 
 /* ═══════════ HOME ═══════════ */
 async function P_home(){
-  render('<div class="ld">Загрузка</div>');
+  render(skelBlock()+skelCards(3));
   const [emi,mkt,pop]=await Promise.all([
     getEmi(),
     API.get('/api/market?status=active&per_page=6').catch(()=>({items:[]})),
@@ -116,7 +115,7 @@ async function P_home(){
   h+='</div>';
   if(pop&&pop.length){
     h+='<div class="sec">🔥 Популярные предметы</div><div class="hscroll">';
-    for(const i of pop){h+='<div class="hcard rk-'+(i.color||'DEFAULT')+'" onclick="haptic();go(\'#/item/'+i.id+'\')"><div class="hcard-img">'+ICO(i.icon)+'</div><div class="hcard-name" style="color:var(--rk-'+colorCssVar(i.color)+')">'+i.name+'</div></div>'}
+    for(const i of pop)h+='<div class="hcard rk-'+(i.color||'DEFAULT')+'" onclick="haptic();go(\'#/item/'+i.id+'\')"><div class="hcard-img">'+ICO(i.icon)+'</div><div class="hcard-name" style="color:var(--rk-'+colorCssVar(i.color)+')">'+i.name+'</div></div>';
     h+='</div>';
   }
   if(mkt.items&&mkt.items.length){
@@ -125,11 +124,10 @@ async function P_home(){
     h+='<button class="btn btn-o btn-sm" style="margin-top:8px" onclick="go(\'#/market\')">Все объявления →</button>';
   } else {
     h+='<div class="sec">🏪 Маркет</div>';
-    h+='<div class="empty"><div class="empty-t" style="padding:18px 0">Пока нет объявлений.<br>Будьте первым!</div><button class="btn btn-g btn-sm" style="margin:10px auto 0" onclick="go(\'#/market-create\')">+ Создать объявление</button></div>';
+    h+='<div class="empty"><div class="empty-t" style="padding:18px 0">Пока нет объявлений.<br>Будьте первым!</div><button class="btn btn-g btn-sm" style="margin:10px auto 0" onclick="go(\'#/market-create\')">+ Создать</button></div>';
   }
   render(h);
 }
-/* Map rank color to CSS var name */
 function colorCssVar(c){
   const m={'DEFAULT':'def','RANK_NEWBIE':'new','RANK_STALKER':'stk','RANK_VETERAN':'vet','RANK_MASTER':'mas','RANK_LEGEND':'leg'};
   return m[c]||'def';
@@ -137,7 +135,7 @@ function colorCssVar(c){
 
 /* ═══════════ ITEM ═══════════ */
 async function P_item(id){
-  render('<div class="ld">Загрузка</div>');
+  render(skelRows(4));
   const [item,tr,mkt]=await Promise.all([
     API.get('/api/items/'+id),
     API.get('/api/tracked'),
@@ -156,7 +154,7 @@ async function P_item(id){
   }
   h+='<div class="bgrp">';
   if(ok){
-    h+=(isTr?'<button class="btn btn-r" onclick="haptic(\'medium\');UT(\''+id+'\')">✕ Убрать</button>':'<button class="btn btn-g" onclick="haptic(\'medium\');TK(\''+id+'\')">⭐ В избранное</button>');
+    h+=(isTr?'<button class="btn btn-r" onclick="haptic(\'medium\');UT(\''+id+'\')">✕ Убрать</button>':'<button class="btn btn-g" onclick="haptic(\'medium\');TK(\''+id+'\',event)">⭐ В избранное</button>');
     h+='<a class="btn btn-o" href="#/auction/'+id+'">📊 Аукцион</a>';
   } else {
     h+=warnBox('Аукцион недоступен','Предмет не поддерживается API.');
@@ -170,72 +168,195 @@ async function P_item(id){
   }
   render(h);
 }
-async function TK(id){await API.post('/api/tracked',{item_id:id});toast('⭐ Добавлено');P_item(id)}
+async function TK(id,ev){
+  if(ev){favAnim(ev.clientX||ev.pageX,ev.clientY||ev.pageY)}else{favAnim()}
+  await API.post('/api/tracked',{item_id:id});toast('⭐ Добавлено');P_item(id);
+}
 async function UT(id){await API.del('/api/tracked/'+id);toast('✕ Убрано');P_item(id)}
 
-/* ═══════════ AUCTION ═══════════ */
+/* ═══════════ AUCTION (completely reworked) ═══════════ */
+let _aucState = {};
+
 async function P_auc(id,lp,sp){
   lp=lp||1;sp=sp||1;
-  render('<div class="ld">'+(S.saleQlt!=='all'?'Фильтрация по качеству...':'Загрузка')+'</div>');
+  // Show skeleton
+  render(skelBlock()+'<div class="sec">Загрузка...</div>'+skelRows(5));
+
   const item=await API.get('/api/items/'+id);
   if(item.api_supported===false){render('<a class="back" href="#/item/'+id+'">← Назад</a>'+warnBox('Недоступно','API не поддерживает.'));return}
-  const isA=!!item.is_artefact,nm=item.name||id;
-  const lOff=(lp-1)*S.lotPP,sOff=(sp-1)*S.salePP;
-  let histUrl='/api/auction/'+id+'/history?limit='+S.salePP+'&offset='+sOff;
+  const isA=!!item.is_artefact, nm=item.name||id;
+
+  // Build lots URL with quality filter
+  const lOff=(lp-1)*S.lotPP;
+  let lotsUrl='/api/auction/'+id+'/lots?limit='+S.lotPP+'&offset='+lOff+'&sort='+S.lotSort+'&order='+S.lotOrder;
+  if(isA&&S.lotQlt!=='all')lotsUrl+='&quality='+S.lotQlt;
+
+  // Build history URL with quality + upgrade + sort
+  const sOff=(sp-1)*S.salePP;
+  let histUrl='/api/auction/'+id+'/history?limit='+S.salePP+'&offset='+sOff+'&sort='+S.saleSort;
   if(isA&&S.saleQlt!=='all')histUrl+='&quality='+S.saleQlt;
-  const [ld,hd]=await Promise.all([
-    API.get('/api/auction/'+id+'/lots?limit='+S.lotPP+'&offset='+lOff+'&sort='+S.lotSort+'&order='+S.lotOrder),
-    API.get(histUrl)]);
-  let lots=(ld.lots||[]).slice(0,S.lotPP);
-  // Client-side sort fallback (API may not always honor sort)
-  if(S.lotSort==='buyout_price'){
-    lots.sort((a,b)=>{const pa=a.buyoutPrice||a.currentPrice||a.startPrice||0,pb=b.buyoutPrice||b.currentPrice||b.startPrice||0;return S.lotOrder==='asc'?pa-pb:pb-pa});
-  } else if(S.lotSort==='time_created'){
-    lots.sort((a,b)=>{const ta=new Date(a.startTime||0).getTime(),tb=new Date(b.startTime||0).getTime();return S.lotOrder==='desc'?tb-ta:ta-tb});
-  }
-  const sales=(hd.prices||[]).slice(0,S.salePP);
-  const lTotal=ld.total||lots.length,sTotal=hd.total||sales.length;
+  if(isA&&S.saleUpg!=='all')histUrl+='&upgrade='+S.saleUpg;
+
+  const [ld,hd,syncSt,chartD]=await Promise.all([
+    API.get(lotsUrl),
+    API.get(histUrl),
+    API.get('/api/auction/'+id+'/sync-status').catch(()=>({})),
+    API.get('/api/auction/'+id+'/chart-data?days='+S.chartDays+(isA&&S.saleQlt!=='all'?'&quality='+S.saleQlt:'')).catch(()=>({points:[]})),
+  ]);
+
+  const lots=ld.lots||[];
+  const sales=hd.prices||[];
+  const lTotal=ld.total||0, sTotal=hd.total||0;
   const lPages=Math.max(1,Math.ceil(lTotal/S.lotPP));
   const sPages=Math.max(1,Math.ceil(sTotal/S.salePP));
-  _ctx.aucId=id;_ctx.lp=lp;_ctx.sp=sp;
+  _aucState={id,lp,sp};
+
   let h='<a class="back" href="#/item/'+id+'">← '+nm+'</a>';
-  h+='<div class="hdr">📊 Аукцион</div>';
+
+  // Header with icon
+  h+='<div class="auc-header"><div class="auc-header-icon">'+ICO(item.icon)+'</div><div class="auc-header-info"><div class="auc-header-name" style="color:var(--rk-'+colorCssVar(item.color)+')">'+nm+'</div><div class="auc-header-sub">📊 Аукцион</div></div></div>';
+
+  // Sync status
+  if(syncSt.total_api>0){
+    const pct=syncSt.total_stored && syncSt.total_api ? Math.min(100,Math.round(syncSt.total_stored/syncSt.total_api*100)) : 0;
+    if(!syncSt.synced){
+      h+='<div class="sync-bar">📥 История: '+fmtK(syncSt.total_stored)+' / '+fmtK(syncSt.total_api)+' продаж загружено ('+pct+'%)<div class="sync-progress"><div class="sync-progress-fill" style="width:'+pct+'%"></div></div></div>';
+    }
+  }
+
+  // ── Price Chart ──
+  h+='<div class="chart-wrap"><div class="chart-header"><div class="chart-title">📈 График цен</div><div class="chart-period">';
+  for(const[d,l] of[[7,'7д'],[30,'30д'],[90,'90д']]){
+    h+='<button class="'+(S.chartDays===d?'act':'')+'" onclick="setChartDays('+d+')">'+l+'</button>';
+  }
+  h+='</div></div><div id="price-chart"></div></div>';
+
+  // ── Active Lots ──
   h+='<div class="sec">Активные лоты · '+fmtK(lTotal)+'</div>';
-  h+=sortBar([['buyout_price|asc','Цена ↑'],['buyout_price|desc','Цена ↓'],['time_created|desc','Новые']],S.lotSort+'|'+S.lotOrder,'setLS');
+
+  // Filters row
+  h+='<div class="filter-row">';
+  h+='<select onchange="setLotSort(this.value)">';
+  for(const[v,l] of[['buyout_price|asc','Цена ↑'],['buyout_price|desc','Цена ↓'],['time_created|desc','Новые']]){
+    h+='<option value="'+v+'"'+(S.lotSort+'|'+S.lotOrder===v?' selected':'')+'>'+l+'</option>';
+  }
+  h+='</select>';
+  if(isA){
+    h+='<select onchange="setLotQlt(this.value)">';
+    h+='<option value="all"'+(S.lotQlt==='all'?' selected':'')+'>Все качества</option>';
+    for(const[v,l] of[['0','Обычный'],['1','Необычный'],['2','Особый'],['3','Редкий'],['4','Исключ.'],['5','Легенд.']]){
+      h+='<option value="'+v+'"'+(S.lotQlt===v?' selected':'')+'>'+l+'</option>';
+    }
+    h+='</select>';
+  }
   h+=ppSel(S.lotPP,[10,20,50],'lot');
+  h+='</div>';
+
   if(lots.length){
-    h+='<div class="card"><div class="tw"><table class="lt"><thead><tr><th>Цена</th>'+(isA?'<th>Качество</th>':'')+'<th>Тип</th><th>Истекает</th></tr></thead><tbody>';
+    h+='<div class="card">';
     for(const l of lots){
       const pr=l.buyoutPrice||l.currentPrice||l.startPrice||0;
-      const tp=l.buyoutPrice>0?'Выкуп':'Ставка';
-      let qc='';if(isA){const{q,u}=parseQU(l.additional);qc='<td>'+qb(q)+(u>0?' '+upg(u):'')+'</td>'}
-      h+='<tr><td class="lp">'+fmt(pr)+' ₽</td>'+(isA?qc:'')+'<td>'+tp+'</td><td class="td-date">'+fmtRemain(l.endTime)+'</td></tr>';
-    }
-    h+='</tbody></table></div></div>';
-    if(lPages>1)h+=pgBar(lp,lPages,"P_auc('"+id+"',{p},"+sp+")");
-  } else h+=emptyMsg('Нет активных лотов');
-  h+='<div class="sec">История продаж · '+fmtK(sTotal)+'</div>';
-  if(isA){
-    h+='<div class="sort-bar">';
-    for(const[v,l]of[['all','Все'],['0','Обычный'],['1','Необычн.'],['2','Особый'],['3','Редкий'],['4','Исключ.'],['5','Легенд.']]){
-      h+='<button class="'+(S.saleQlt===v?'act':'')+'" onclick="setSaleQlt(\''+v+'\')">'+l+'</button>';
+      const isBuyout=l.buyoutPrice>0;
+      let meta='<span class="lot-type '+(isBuyout?'buyout':'bid')+'">'+(isBuyout?'Выкуп':'Ставка')+'</span>';
+      if(isA){const{q,u}=parseQU(l.additional);meta+=qb(q)+(u>0?' '+upg(u):'');}
+      h+='<div class="lot-card"><div class="lot-price">'+fmt(pr)+' ₽</div><div class="lot-meta">'+meta+'</div><div class="lot-expire">'+fmtRemain(l.endTime)+'</div></div>';
     }
     h+='</div>';
+    if(lPages>1)h+=pgBar(lp,lPages,"P_auc('"+id+"',{p},"+sp+")");
+  } else h+=emptyMsg('Нет активных лотов');
+
+  // ── Sales History ──
+  h+='<div class="sec">История продаж · '+fmtK(sTotal)+'</div>';
+
+  // History filters
+  h+='<div class="filter-row">';
+  h+='<select onchange="setSaleSort(this.value)">';
+  for(const[v,l] of[['time_desc','Новые ↓'],['time_asc','Старые ↑'],['price_desc','Дорогие ↓'],['price_asc','Дешёвые ↑']]){
+    h+='<option value="'+v+'"'+(S.saleSort===v?' selected':'')+'>'+l+'</option>';
+  }
+  h+='</select>';
+  if(isA){
+    h+='<select onchange="setSaleQlt(this.value)">';
+    h+='<option value="all"'+(S.saleQlt==='all'?' selected':'')+'>Все качества</option>';
+    for(const[v,l] of[['0','Обычный'],['1','Необычный'],['2','Особый'],['3','Редкий'],['4','Исключ.'],['5','Легенд.']]){
+      h+='<option value="'+v+'"'+(S.saleQlt===v?' selected':'')+'>'+l+'</option>';
+    }
+    h+='</select>';
+    h+='<select onchange="setSaleUpg(this.value)">';
+    h+='<option value="all"'+(S.saleUpg==='all'?' selected':'')+'>Любая заточка</option>';
+    for(let i=0;i<=15;i++){
+      h+='<option value="'+i+'"'+(S.saleUpg===String(i)?' selected':'')+'>+'+i+'</option>';
+    }
+    h+='</select>';
   }
   h+=ppSel(S.salePP,[10,20,50],'sale');
+  h+='</div>';
+
   if(sales.length){
-    h+='<div class="card"><div class="tw"><table class="lt"><thead><tr><th>Цена</th>'+(isA?'<th>Качество</th>':'')+'<th>Кол</th><th>Дата</th></tr></thead><tbody>';
+    h+='<div class="card">';
     for(const s of sales){
-      let qc='';if(isA){const{q,u}=parseQU(s.additional);qc='<td>'+qb(q)+(u>0?' '+upg(u):'')+'</td>'}
-      h+='<tr><td class="lp">'+fmt(s.price)+' ₽</td>'+(isA?qc:'')+'<td>'+(s.amount||1)+'</td><td class="td-date">'+fmtSaleDate(s.time)+'</td></tr>';
+      let meta='';
+      if(isA){const{q,u}=parseQU(s.additional);meta=qb(q)+(u>0?' '+upg(u):'');}
+      if(s.amount>1)meta+='<span class="sale-amount">×'+s.amount+'</span>';
+      h+='<div class="sale-row"><div class="sale-price">'+fmt(s.price)+' ₽</div><div class="sale-meta">'+meta+'</div><div class="sale-date">'+fmtSaleDate(s.time)+'</div></div>';
     }
-    h+='</tbody></table></div></div>';
+    h+='</div>';
     if(sPages>1)h+=pgBar(sp,sPages,"P_auc('"+id+"',"+lp+",{p})");
   } else h+=emptyMsg('Нет данных о продажах');
+
   render(h);
+
+  // Render chart after DOM is ready
+  _renderPriceChart(chartD.points || []);
 }
-function setLS(v){const[s,o]=v.split('|');S.lotSort=s;S.lotOrder=o;saveS();if(_ctx.aucId)P_auc(_ctx.aucId,1,_ctx.sp||1)}
-function setSaleQlt(v){S.saleQlt=v;saveS();if(_ctx.aucId)P_auc(_ctx.aucId,_ctx.lp||1,1)}
+
+/* ── Auction filter setters ── */
+function setLotSort(v){const[s,o]=v.split('|');S.lotSort=s;S.lotOrder=o;saveS();if(_aucState.id)P_auc(_aucState.id,1,_aucState.sp||1)}
+function setLotQlt(v){S.lotQlt=v;saveS();if(_aucState.id)P_auc(_aucState.id,1,_aucState.sp||1)}
+function setSaleQlt(v){S.saleQlt=v;saveS();if(_aucState.id)P_auc(_aucState.id,_aucState.lp||1,1)}
+function setSaleUpg(v){S.saleUpg=v;saveS();if(_aucState.id)P_auc(_aucState.id,_aucState.lp||1,1)}
+function setSaleSort(v){S.saleSort=v;saveS();if(_aucState.id)P_auc(_aucState.id,_aucState.lp||1,_aucState.sp||1)}
+function setChartDays(d){S.chartDays=d;saveS();if(_aucState.id)P_auc(_aucState.id,_aucState.lp||1,_aucState.sp||1)}
+
+/* ── Price Chart (lightweight-charts) ── */
+function _renderPriceChart(points){
+  const el=document.getElementById('price-chart');
+  if(!el)return;
+  if(!points||!points.length){
+    el.innerHTML='<div class="chart-empty">📊 Нет данных для графика</div>';
+    return;
+  }
+  if(typeof LightweightCharts==='undefined'){
+    el.innerHTML='<div class="chart-empty">Загрузка графика...</div>';
+    return;
+  }
+  const dark=isDark();
+  const chart=LightweightCharts.createChart(el,{
+    width:el.clientWidth,
+    height:200,
+    layout:{background:{type:'solid',color:'transparent'},textColor:dark?'#9090a8':'#555570',fontSize:10},
+    grid:{vertLines:{color:dark?'rgba(255,255,255,.04)':'rgba(0,0,0,.06)'},horzLines:{color:dark?'rgba(255,255,255,.04)':'rgba(0,0,0,.06)'}},
+    rightPriceScale:{borderColor:'transparent'},
+    timeScale:{borderColor:'transparent',timeVisible:false},
+    crosshair:{mode:0},
+  });
+  const areaSeries=chart.addAreaSeries({
+    topColor:dark?'rgba(212,164,58,.3)':'rgba(184,134,30,.25)',
+    bottomColor:dark?'rgba(212,164,58,.02)':'rgba(184,134,30,.02)',
+    lineColor:dark?'#d4a43a':'#b8861e',
+    lineWidth:2,
+    priceFormat:{type:'custom',formatter:v=>fmt(v)+' ₽'},
+  });
+  const data=points.map(p=>({time:p.date,value:p.avg}));
+  areaSeries.setData(data);
+
+  // Min line
+  const minSeries=chart.addLineSeries({color:dark?'#22c55e':'#16a34a',lineWidth:1,lineStyle:2,priceLineVisible:false,lastValueVisible:false});
+  minSeries.setData(points.map(p=>({time:p.date,value:p.min})));
+
+  chart.timeScale().fitContent();
+  new ResizeObserver(()=>{chart.applyOptions({width:el.clientWidth})}).observe(el);
+}
 
 /* ═══════════ SEARCH (2 tabs) ═══════════ */
 let _st,_sSort='relevance',_lastQ='';
@@ -265,7 +386,7 @@ function setSS(v){_sSort=v;if(_lastQ)doSearch(_lastQ);else P_search()}
 async function doSearch(q){
   const b=document.getElementById('sr');if(!b)return;
   if(q.trim().length<2){b.innerHTML='';return}
-  b.innerHTML='<div class="ld">Поиск...</div>';
+  b.innerHTML=skelRows(3);
   try{
     if(S.searchTab==='market'){
       const d=await API.get('/api/market?status=active&search='+encodeURIComponent(q)+'&per_page=20');
@@ -283,7 +404,7 @@ async function doSearch(q){
 
 /* ═══════════ TRACKED ═══════════ */
 async function P_tracked(){
-  render('<div class="ld">Загрузка</div>');
+  render(skelRows(4));
   const tr=await API.get('/api/tracked');
   let h='<div class="hdr">⭐ Избранное</div><div class="sub">'+tr.length+' предметов</div>';
   if(!tr.length){
@@ -297,7 +418,7 @@ async function P_tracked(){
 /* ═══════════ CLAN ═══════════ */
 async function P_clan(id){
   if(!id){render(emptyMsg('Укажите ID клана'));return}
-  render('<div class="ld">Загрузка</div>');
+  render(skelRows(5));
   const [info,members]=await Promise.all([API.get('/api/clan/'+id),API.get('/api/clan/'+id+'/members')]);
   if(info.error){render('<a class="back" onclick="history.back()">← Назад</a>'+emptyMsg('Клан не найден'));return}
   let h='<a class="back" onclick="history.back()">← Назад</a>';
@@ -319,7 +440,7 @@ async function P_clan(id){
 /* ═══════════ PLAYER ═══════════ */
 async function P_player(name){
   if(!name){render(emptyMsg('Укажите имя'));return}
-  render('<div class="ld">Загрузка</div>');
+  render(skelRows(3));
   const d=await API.get('/api/character/'+encodeURIComponent(name)+'/profile');
   if(d.error){render('<a class="back" onclick="history.back()">← Назад</a>'+emptyMsg('Профиль не найден'));return}
   let h='<a class="back" onclick="history.back()">← Назад</a>';
@@ -339,7 +460,7 @@ async function P_player(name){
 async function P_market(sub){
   if(sub==='create'){P_market_create();return}
   if(sub==='my'){await P_market_my();return}
-  render('<div class="ld">Загрузка</div>');
+  render(skelCards(4));
   const d=await API.get('/api/market?status=active&per_page=30');
   let h='<div class="hdr">🏪 Торговая площадка</div>';
   h+='<div class="tabs">';
@@ -363,7 +484,6 @@ function marketCard(l){
   const ico=l.icon?'<img src="'+l.icon+'" alt="" onerror="this.parentElement.innerHTML=\'📦\'">':'📦';
   const tp=l.listing_type==='buy'?'<span class="mcard-type buy">Покупка</span>':'<span class="mcard-type sell">Продажа</span>';
   let meta=tp;
-  // Quality only for artefacts
   if(l.is_artefact && l.quality>=0)meta+=qb(l.quality);
   if(l.is_artefact && l.upgrade_level>0)meta+=upg(l.upgrade_level);
   const nameColor=l.color?'style="color:var(--rk-'+colorCssVar(l.color)+')"':'';
@@ -421,16 +541,12 @@ async function selectMcItem(id){
     _mcItemData=d;
     const nameColor=d.color?'style="color:var(--rk-'+colorCssVar(d.color)+')"':'';
     document.getElementById('mc-selected').innerHTML='<div class="card" style="padding:10px 12px;margin:8px 0"><div style="font-weight:800" '+nameColor+'>✅ '+d.name+'</div><div style="font-size:10px;color:var(--t3)">'+d.category_name+'</div></div>';
-    // Show quality block only for artefacts and weapon modules
     const needQuality=d.is_artefact||(d.category&&(d.category.startsWith('weapon/')||d.category.includes('module')));
     _showQualityBlock(!!needQuality);
   }catch(e){
     document.getElementById('mc-selected').innerHTML='<div class="card" style="padding:10px 12px;margin:8px 0"><div style="font-weight:800">✅ '+id+'</div></div>';
     _showQualityBlock(false);
   }
-}
-async function loadPreItem(id){
-  try{await selectMcItem(id)}catch(e){}
 }
 async function submitListing(){
   const id=document.getElementById('mc-item-id').value;
@@ -457,7 +573,7 @@ async function submitListing(){
 
 /* ═══════════ MY LISTINGS ═══════════ */
 async function P_market_my(){
-  render('<div class="ld">Загрузка</div>');
+  render(skelCards(3));
   let items;
   try{items=await API.get('/api/market/my')}catch(e){render(emptyMsg('Войдите через Telegram'));return}
   let h='<a class="back" href="#/market">← Маркет</a>';
@@ -531,13 +647,11 @@ async function P_chat(channel){
   if(_chatPoll){clearTimeout(_chatPoll);_chatPoll=null}
   const isDM=channel.startsWith('dm:');
 
-  render('<div class="ld">Загрузка</div>');
+  render(skelRows(5));
 
   let h='';
 
-  // Header bar
   if(isDM){
-    // DM conversation header with user info
     const dmUser=await _getDMPartner(channel);
     const av=_chatAvatar(dmUser,'sm');
     const name=dmUser?dmUser.display_name:'Пользователь';
@@ -548,7 +662,6 @@ async function P_chat(channel){
     h+='<div class="ch-header-name">'+name+'</div>';
     h+='</div></div>';
   } else {
-    // Channel tabs
     h+='<div class="ch-tabs">';
     h+='<div class="ch-tab'+(channel==='general'?' act':'')+'" onclick="go(\'#/chat/general\')"><span class="ch-tab-icon">💬</span>Общий</div>';
     h+='<div class="ch-tab'+(channel==='trading'?' act':'')+'" onclick="go(\'#/chat/trading\')"><span class="ch-tab-icon">💰</span>Торговый</div>';
@@ -560,7 +673,7 @@ async function P_chat(channel){
     try{
       const dms=await API.get('/api/chat/dm-list');
       if(!dms.length){
-        h+='<div class="ch-empty"><div class="ch-empty-icon">✉️</div><div class="ch-empty-text">Нет личных сообщений</div><div class="ch-empty-sub">Напишите кому-нибудь из профиля пользователя</div></div>';
+        h+='<div class="ch-empty"><div class="ch-empty-icon">✉️</div><div class="ch-empty-text">Нет личных сообщений</div><div class="ch-empty-sub">Напишите кому-нибудь из профиля</div></div>';
       } else {
         h+='<div class="dm-list">';
         for(const d of dms){
@@ -583,7 +696,6 @@ async function P_chat(channel){
     return;
   }
 
-  // Messages area
   const msgs=await API.get('/api/chat/'+channel+'/messages?limit=50');
   h+='<div class="ch-messages" id="chat-msgs">';
   if(!msgs.length){
@@ -592,7 +704,6 @@ async function P_chat(channel){
   for(const m of msgs)h+=chatMsg(m);
   h+='</div>';
 
-  // Input
   h+='<div class="ch-input-wrap"><div class="ch-input"><input id="chat-in" placeholder="Сообщение..." onkeypress="if(event.key===\'Enter\')sendChat(\''+channel+'\')"><button onclick="sendChat(\''+channel+'\')"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button></div></div>';
 
   render(h);
@@ -667,7 +778,7 @@ function startChatPoll(ch){
 /* ═══════════ PROFILE ═══════════ */
 async function P_profile(sub){
   if(sub==='edit'){await P_profile_edit();return}
-  render('<div class="ld">Загрузка</div>');
+  render(skelRows(3));
   let me,emiS;
   try{[me,emiS]=await Promise.all([API.get('/api/me'),API.get('/api/emission/settings').catch(()=>({enabled:false}))])}catch(e){}
   if(!me||!me.id){
@@ -688,11 +799,18 @@ async function P_profile(sub){
   h+='<button class="btn btn-o" onclick="go(\'#/profile/edit\')">✏️ Редактировать</button>';
   h+='<div style="margin-top:14px"><button class="btn btn-o" onclick="go(\'#/tracked\')">⭐ Избранное</button></div>';
   h+='<div style="margin-top:8px"><button class="btn btn-o" onclick="go(\'#/market-my\')">📋 Мои объявления</button></div>';
-  // Emission notifications settings
+
+  // Settings
   h+='<div class="sec" style="margin-top:18px">⚙️ Настройки</div>';
+
+  // Theme toggle
+  const isLight=(document.documentElement.dataset.theme||'dark')==='light';
+  h+='<div class="theme-toggle" onclick="toggleTheme();P_profile()"><div><div class="theme-toggle-label">'+(isLight?'☀️ Светлая тема':'🌙 Тёмная тема')+'</div><div class="theme-toggle-sub">Переключить оформление</div></div><div class="theme-switch'+(isLight?' on':'')+'"></div></div>';
+
+  // Emission
   const emiOn=emiS&&emiS.enabled;
   h+='<div class="card" style="padding:12px;display:flex;align-items:center;justify-content:space-between">';
-  h+='<div><div style="font-weight:700;font-size:13px">☢️ Уведомления о выбросе</div><div style="font-size:11px;color:var(--t3)">Уведомление при начале и конце выброса</div></div>';
+  h+='<div><div style="font-weight:700;font-size:13px">☢️ Уведомления о выбросе</div><div style="font-size:11px;color:var(--t3)">При начале и конце выброса</div></div>';
   h+='<button class="btn btn-sm '+(emiOn?'btn-r':'btn-g')+'" onclick="toggleEmission()" style="flex-shrink:0">'+(emiOn?'🔕 Выкл':'🔔 Вкл')+'</button>';
   h+='</div>';
   render(h);
@@ -705,7 +823,7 @@ async function toggleEmission(){
   }catch(e){toast('❌ Ошибка')}
 }
 async function P_profile_edit(){
-  render('<div class="ld">Загрузка</div>');
+  render(skelRows(4));
   let me;
   try{me=await API.get('/api/me')}catch(e){}
   if(!me||!me.id){render(emptyMsg('Авторизуйтесь через Telegram'));return}
@@ -745,7 +863,7 @@ async function uploadAvatar(input){
 /* ═══════════ USER (public profile) ═══════════ */
 async function P_user(uid){
   if(!uid||uid==='0'){render(emptyMsg('Пользователь не найден'));return}
-  render('<div class="ld">Загрузка</div>');
+  render(skelRows(3));
   const u=await API.get('/api/users/'+uid);
   if(u.error){render('<a class="back" onclick="history.back()">← Назад</a>'+emptyMsg('Не найден'));return}
   const av=u.avatar_url?'<img src="'+u.avatar_url+'" alt="">':'👤';
@@ -770,7 +888,6 @@ async function P_user(uid){
     }
   }
   h+='</div>';
-  // User's marketplace listings
   const mkt=await API.get('/api/market?status=active&per_page=10');
   const userListings=(mkt.items||[]).filter(l=>l.user&&l.user.id===parseInt(uid));
   if(userListings.length){
@@ -810,9 +927,9 @@ function sortBar(opts,cur,fn){
   return h+'</div>';
 }
 function ppSel(cur,opts,key){
-  let h='<div class="pps"><span>Показать:</span>';
-  for(const v of opts)h+='<button class="'+(v===cur?'act':'')+'" onclick="setPP(\''+key+'\','+v+')">'+v+'</button>';
-  return h+'</div>';
+  let h='<span style="font-size:10px;color:var(--t3);margin-left:auto">На стр:</span>';
+  for(const v of opts)h+='<button class="'+(v===cur?'act':'')+'" style="background:var(--surf);border:1px solid var(--brd);color:'+(v===cur?'var(--acc)':'var(--t2)')+';border-radius:var(--r-xs);padding:3px 8px;font-size:9px;cursor:pointer;font-family:var(--font)"'+(v===cur?' style="border-color:var(--acc)"':'')+ ' onclick="setPP(\''+key+'\','+v+')">'+v+'</button>';
+  return h;
 }
 function pgBar(cur,tot,tpl){
   return'<div class="pgr"><button '+(cur<=1?'disabled':'')+' onclick="'+tpl.replace('{p}',cur-1)+'">‹</button><span class="pi">'+cur+' / '+tot+'</span><button '+(cur>=tot?'disabled':'')+' onclick="'+tpl.replace('{p}',cur+1)+'">›</button></div>';
@@ -821,8 +938,8 @@ function emptyMsg(t){return'<div class="empty"><div class="empty-t" style="paddi
 function warnBox(t,d){return'<div class="warn-box"><span class="warn-icon">⚠️</span><div class="warn-text"><b>'+t+'</b><br>'+d+'</div></div>'}
 let _ctx={};
 function setPP(key,val){
-  if(key==='lot'){S.lotPP=val;saveS();if(_ctx.aucId)P_auc(_ctx.aucId,1,_ctx.sp||1)}
-  else if(key==='sale'){S.salePP=val;saveS();if(_ctx.aucId)P_auc(_ctx.aucId,_ctx.lp||1,1)}
+  if(key==='lot'){S.lotPP=val;saveS();if(_aucState.id)P_auc(_aucState.id,1,_aucState.sp||1)}
+  else if(key==='sale'){S.salePP=val;saveS();if(_aucState.id)P_auc(_aucState.id,_aucState.lp||1,1)}
 }
 function fmtRemain(s){
   if(!s)return'—';
