@@ -619,7 +619,9 @@ async function cancelListing(id){
 function statusRu(s){return{active:'Активно',sold:'Продано',expired:'Истекло',cancelled:'Отменено'}[s]||s}
 
 /* ═══════════ CHAT ═══════════ */
-let _chatPoll=null;
+let _chatPoll=null,_stickers=null,_replyTo=null,_stickerPanelOpen=false;
+const REACTIONS_LIST=['👍','❤️','🔥','😂','😢','💀','🎉','💎','☢️','👎'];
+
 function userColor(u){
   if(u&&u.chat_color)return u.chat_color;
   const colors=['#e57373','#f06292','#ba68c8','#9575cd','#7986cb','#64b5f6','#4fc3f7','#4dd0e1','#4db6ac','#81c784','#aed581','#dce775','#fff176','#ffd54f','#ffb74d','#ff8a65'];
@@ -635,17 +637,22 @@ function repBadge(r){
 function _chatAvatar(u,size){
   if(!u)return'<div class="ch-av'+(size?' ch-av-'+size:'')+'">👤</div>';
   const cls='ch-av'+(size?' ch-av-'+size:'');
-  if(u.avatar_url)return'<div class="'+cls+'"><img src="'+u.avatar_url+'" alt=""></div>';
+  const onlineDot=(u.is_online)?'<div class="online-dot'+(size==='sm'?' online-dot-sm':'')+(size==='lg'?' online-dot-lg':'')+'"></div>':'';
+  if(u.avatar_url)return'<div class="'+cls+'"><img src="'+u.avatar_url+'" alt="">'+onlineDot+'</div>';
   const initial=(u.display_name||'?').charAt(0).toUpperCase();
   const bg=userColor(u);
-  return'<div class="'+cls+'" style="background:'+bg+';color:#fff;font-weight:800">'+initial+'</div>';
+  return'<div class="'+cls+'" style="background:'+bg+';color:#fff;font-weight:800">'+initial+onlineDot+'</div>';
 }
 
 async function P_chat(channel){
   channel=channel||S.chatCh||'general';
   S.chatCh=channel;saveS();
   if(_chatPoll){clearTimeout(_chatPoll);_chatPoll=null}
+  _replyTo=null;_stickerPanelOpen=false;
   const isDM=channel.startsWith('dm:');
+
+  // Load stickers once
+  if(!_stickers){try{_stickers=await API.get('/api/chat/stickers')}catch(e){_stickers=[]}}
 
   render(skelRows(5));
 
@@ -655,11 +662,12 @@ async function P_chat(channel){
     const dmUser=await _getDMPartner(channel);
     const av=_chatAvatar(dmUser,'sm');
     const name=dmUser?dmUser.display_name:'Пользователь';
+    const onlineText=dmUser&&dmUser.is_online?'<span style="font-size:10px;color:var(--grn);margin-left:6px">● онлайн</span>':'';
     h+='<div class="ch-header">';
     h+='<div class="ch-header-back" onclick="go(\'#/chat/dm-list\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><path d="M15 18l-6-6 6-6"/></svg></div>';
     h+='<div class="ch-header-user" onclick="'+(dmUser?'go(\'#/user/'+dmUser.id+'\')':'')+'">';
     h+=av;
-    h+='<div class="ch-header-name">'+name+'</div>';
+    h+='<div class="ch-header-name">'+name+onlineText+'</div>';
     h+='</div></div>';
   } else {
     h+='<div class="ch-tabs">';
@@ -704,13 +712,22 @@ async function P_chat(channel){
   for(const m of msgs)h+=chatMsg(m);
   h+='</div>';
 
-  h+='<div class="ch-input-wrap"><div class="ch-input"><input id="chat-in" placeholder="Сообщение..." onkeypress="if(event.key===\'Enter\')sendChat(\''+channel+'\')"><button onclick="sendChat(\''+channel+'\')"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button></div></div>';
+  // Input area (with sticker toggle and reply bar placeholder)
+  h+='<div class="ch-input-wrap" id="chat-input-wrap">';
+  h+='<div id="reply-bar"></div>';
+  h+='<div style="position:relative" id="sticker-anchor"></div>';
+  h+='<div class="ch-input">';
+  h+='<button class="sticker-toggle" onclick="toggleStickerPanel(\''+channel+'\')" title="Стикеры">😀</button>';
+  h+='<input id="chat-in" placeholder="Сообщение..." onkeypress="if(event.key===\'Enter\')sendChat(\''+channel+'\')">';
+  h+='<button onclick="sendChat(\''+channel+'\')"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>';
+  h+='</div></div>';
 
   render(h);
   const box=document.getElementById('chat-msgs');
   if(box)box.scrollTop=box.scrollHeight;
   _ctx.chatLastId=msgs.length?msgs[msgs.length-1].id:0;
   startChatPoll(channel);
+  _startHeartbeat();
 }
 
 async function _getDMPartner(channel){
@@ -729,21 +746,177 @@ function chatMsg(m){
   const av=_chatAvatar(u);
   const color=userColor(u);
   const rep=repBadge(u.reputation);
-  return'<div class="ch-msg"><div class="ch-msg-av" onclick="go(\'#/user/'+u.id+'\')">'+av+'</div><div class="ch-msg-body"><div class="ch-msg-head"><span class="ch-msg-name" style="color:'+color+'" onclick="go(\'#/user/'+u.id+'\')">'+u.display_name+'</span>'+rep+'<span class="ch-msg-time">'+fmtChatTime(m.created_at)+'</span></div><div class="ch-msg-text">'+escHtml(m.text)+'</div></div></div>';
+
+  // Reply quote
+  let replyHtml='';
+  if(m.reply_to){
+    const r=m.reply_to;
+    const rColor=r.user_color||'var(--acc)';
+    const rText=r.sticker?'['+r.sticker.label+']':escHtml(r.text||'');
+    replyHtml='<div class="ch-reply" onclick="scrollToMsg('+r.id+')"><span class="ch-reply-name" style="color:'+rColor+'">'+r.user_name+'</span><span class="ch-reply-text">'+rText+'</span></div>';
+  }
+
+  // Sticker content
+  let contentHtml='';
+  if(m.sticker){
+    contentHtml='<div class="ch-sticker">'+m.sticker.emoji+'</div><div class="ch-sticker-label">'+m.sticker.label+'</div>';
+    if(m.text)contentHtml+='<div class="ch-msg-text">'+escHtml(m.text)+'</div>';
+  } else {
+    contentHtml='<div class="ch-msg-text">'+escHtml(m.text)+'</div>';
+  }
+
+  // Reactions
+  let reactHtml='';
+  if(m.reactions&&m.reactions.length){
+    reactHtml='<div class="ch-reactions">';
+    for(const r of m.reactions){
+      const myId=_me?_me.id:0;
+      const isMine=r.user_ids.includes(myId);
+      reactHtml+='<button class="ch-react-btn'+(isMine?' mine':'')+'" onclick="toggleReact('+m.id+',\''+r.emoji+'\')">'+r.emoji+'<span class="rc">'+r.count+'</span></button>';
+    }
+    reactHtml+='<button class="ch-react-add" onclick="showReactPicker(event,'+m.id+')">+</button>';
+    reactHtml+='</div>';
+  }
+
+  return'<div class="ch-msg" id="msg-'+m.id+'" data-id="'+m.id+'">'
+    +'<div class="ch-msg-av" onclick="go(\'#/user/'+u.id+'\')">'+av+'</div>'
+    +'<div class="ch-msg-body">'
+    +'<div class="ch-msg-head"><span class="ch-msg-name" style="color:'+color+'" onclick="go(\'#/user/'+u.id+'\')">'+u.display_name+'</span>'+rep+'<span class="ch-msg-time">'+fmtChatTime(m.created_at)+'</span></div>'
+    +replyHtml
+    +contentHtml
+    +reactHtml
+    +'<div class="ch-msg-actions" style="display:flex;gap:8px;margin-top:2px">'
+    +'<button class="ch-react-add" onclick="showReactPicker(event,'+m.id+')" title="Реакция">😀</button>'
+    +'<button class="ch-react-add" onclick="setReply('+m.id+',\''+esc(u.display_name)+'\',\''+esc((m.sticker?'['+m.sticker.label+']':m.text||'').substring(0,60))+'\')" title="Ответить">↩️</button>'
+    +'</div>'
+    +'</div></div>';
 }
 
 function fmtChatTime(s){
   if(!s)return'';
   try{const d=new Date(s);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}catch(e){return''}
 }
+
+// ── Reply ──
+function setReply(msgId,userName,text){
+  _replyTo={id:msgId,name:userName,text:text};
+  const bar=document.getElementById('reply-bar');
+  if(bar){
+    bar.innerHTML='<div class="ch-reply-bar"><span class="ch-reply-bar-name">↩️ '+userName+'</span><span class="ch-reply-bar-text">'+escHtml(text)+'</span><span class="ch-reply-bar-close" onclick="clearReply()">✕</span></div>';
+  }
+  const inp=document.getElementById('chat-in');
+  if(inp)inp.focus();
+  haptic('light');
+}
+function clearReply(){
+  _replyTo=null;
+  const bar=document.getElementById('reply-bar');
+  if(bar)bar.innerHTML='';
+}
+
+// ── Reactions ──
+async function toggleReact(msgId,emoji){
+  haptic('light');
+  try{
+    const r=await API.post('/api/chat/messages/'+msgId+'/reactions',{emoji:emoji});
+    if(r.error){toast('❌ '+r.error);return}
+    // Re-render reactions on this message
+    const el=document.getElementById('msg-'+msgId);
+    if(el){
+      const reactWrap=el.querySelector('.ch-reactions');
+      if(reactWrap)reactWrap.outerHTML=_buildReactionsHtml(msgId,r.reactions);
+      else {
+        const body=el.querySelector('.ch-msg-body .ch-msg-actions');
+        if(body)body.insertAdjacentHTML('beforebegin',_buildReactionsHtml(msgId,r.reactions));
+      }
+    }
+  }catch(e){toast('❌ Авторизуйтесь')}
+}
+function _buildReactionsHtml(msgId,reactions){
+  if(!reactions||!reactions.length)return'';
+  let h='<div class="ch-reactions">';
+  for(const r of reactions){
+    const myId=_me?_me.id:0;
+    const isMine=r.user_ids.includes(myId);
+    h+='<button class="ch-react-btn'+(isMine?' mine':'')+'" onclick="toggleReact('+msgId+',\''+r.emoji+'\')">'+r.emoji+'<span class="rc">'+r.count+'</span></button>';
+  }
+  h+='<button class="ch-react-add" onclick="showReactPicker(event,'+msgId+')">+</button>';
+  h+='</div>';
+  return h;
+}
+function showReactPicker(ev,msgId){
+  ev.stopPropagation();
+  // Remove existing picker
+  document.querySelectorAll('.react-picker').forEach(p=>p.remove());
+  const el=ev.currentTarget;
+  const picker=document.createElement('div');
+  picker.className='react-picker';
+  picker.innerHTML=REACTIONS_LIST.map(e=>'<button onclick="event.stopPropagation();toggleReact('+msgId+\',\\\'\'+e+\'\\\');\'+\'this.closest(\\\'.react-picker\\\').remove()\'+\'">'+e+'</button>').join('');
+  // Simpler approach
+  picker.innerHTML='';
+  for(const emoji of REACTIONS_LIST){
+    const btn=document.createElement('button');
+    btn.textContent=emoji;
+    btn.onclick=(evt)=>{evt.stopPropagation();toggleReact(msgId,emoji);picker.remove()};
+    picker.appendChild(btn);
+  }
+  el.style.position='relative';
+  el.appendChild(picker);
+  setTimeout(()=>{document.addEventListener('click',function _cl(){picker.remove();document.removeEventListener('click',_cl)},{once:true})},50);
+}
+
+function scrollToMsg(id){
+  const el=document.getElementById('msg-'+id);
+  if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.style.background='var(--acc-bg)';setTimeout(()=>el.style.background='',1500)}
+}
+
+// ── Stickers ──
+function toggleStickerPanel(ch){
+  _stickerPanelOpen=!_stickerPanelOpen;
+  const anchor=document.getElementById('sticker-anchor');
+  if(!anchor)return;
+  if(!_stickerPanelOpen){anchor.innerHTML='';return}
+  const stickers=_stickers||[];
+  let h='<div class="sticker-panel">';
+  for(const s of stickers){
+    h+='<div class="sticker-item" onclick="sendSticker(\''+ch+'\',\''+s.code+'\')"><div class="sticker-emoji">'+s.emoji+'</div><div class="sticker-label">'+s.label+'</div></div>';
+  }
+  h+='</div>';
+  anchor.innerHTML=h;
+}
+async function sendSticker(ch,code){
+  _stickerPanelOpen=false;
+  const anchor=document.getElementById('sticker-anchor');
+  if(anchor)anchor.innerHTML='';
+  haptic('medium');
+  try{
+    const body={text:'',sticker:code,reply_to_id:_replyTo?_replyTo.id:0};
+    const r=await API.post('/api/chat/'+ch+'/messages',body);
+    if(r.error){toast('❌ '+r.error);return}
+    clearReply();
+    const box=document.getElementById('chat-msgs');
+    if(box){
+      const emp=box.querySelector('.ch-empty');if(emp)emp.remove();
+      box.insertAdjacentHTML('beforeend',chatMsg(r));
+      box.scrollTop=box.scrollHeight;
+      _ctx.chatLastId=r.id;
+    }
+  }catch(e){toast('❌ Авторизуйтесь')}
+}
+
 async function sendChat(ch){
   const inp=document.getElementById('chat-in');
   if(!inp||!inp.value.trim())return;
   const text=inp.value.trim();
   inp.value='';
+  _stickerPanelOpen=false;
+  const anchor=document.getElementById('sticker-anchor');
+  if(anchor)anchor.innerHTML='';
   try{
-    const r=await API.post('/api/chat/'+ch+'/messages',{text:text});
+    const body={text:text,reply_to_id:_replyTo?_replyTo.id:0};
+    const r=await API.post('/api/chat/'+ch+'/messages',body);
     if(r.error){toast('❌ '+r.error);inp.value=text;return}
+    clearReply();
     const box=document.getElementById('chat-msgs');
     if(box){
       const emp=box.querySelector('.ch-empty');if(emp)emp.remove();
@@ -773,6 +946,15 @@ function startChatPoll(ch){
     if(location.hash.startsWith('#/chat'))_chatPoll=setTimeout(poll,3000);
   }
   _chatPoll=setTimeout(poll,3000);
+}
+
+// ── Heartbeat for online status ──
+let _hbInterval=null;
+function _startHeartbeat(){
+  if(_hbInterval)return;
+  async function beat(){try{await API.post('/api/heartbeat',{})}catch(e){}}
+  beat();
+  _hbInterval=setInterval(beat,60000);
 }
 
 /* ═══════════ PROFILE ═══════════ */
@@ -867,11 +1049,12 @@ async function P_user(uid){
   const u=await API.get('/api/users/'+uid);
   if(u.error){render('<a class="back" onclick="history.back()">← Назад</a>'+emptyMsg('Не найден'));return}
   const av=u.avatar_url?'<img src="'+u.avatar_url+'" alt="">':'👤';
+  const onlineHtml=u.is_online?'<span style="font-size:11px;color:var(--grn);margin-left:6px">● онлайн</span>':'';
   const rep=u.reputation>0?'<span class="rep pos">+'+u.reputation+'</span>':(u.reputation<0?'<span class="rep neg">'+u.reputation+'</span>':'');
   let h='<a class="back" onclick="history.back()">← Назад</a>';
   h+='<div class="profile-header">';
-  h+='<div class="profile-avatar" style="cursor:default;border-color:var(--brd)">'+av+'</div>';
-  h+='<div class="profile-info"><div class="profile-name">'+u.display_name+' '+rep+'</div>';
+  h+='<div class="profile-avatar" style="cursor:default;border-color:var(--brd)">'+av+(u.is_online?'<div class="online-dot online-dot-lg"></div>':'')+'</div>';
+  h+='<div class="profile-info"><div class="profile-name">'+u.display_name+' '+rep+onlineHtml+'</div>';
   h+='<div class="profile-sub">';
   if(u.game_nickname)h+='🎮 '+u.game_nickname+'<br>';
   if(u.discord)h+='💬 '+u.discord;

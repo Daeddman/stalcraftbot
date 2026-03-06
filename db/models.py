@@ -245,6 +245,7 @@ class User(Base):
     avatar_url = Column(String(512), nullable=True)
     chat_color = Column(String(7), nullable=True)  # hex цвет в чате, напр. #e57373
     reputation = Column(Integer, default=0)
+    last_active_at = Column(DateTime, nullable=True)  # онлайн-статус
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc),
                         onupdate=lambda: datetime.now(timezone.utc))
@@ -317,6 +318,22 @@ class ChatMessage(Base):
     channel = Column(String(64), default="general", index=True)
     text = Column(Text, nullable=False)
     reply_to_id = Column(Integer, nullable=True)
+    sticker = Column(String(64), nullable=True)  # sticker code, e.g. "zone_clear", "loot"
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+class ChatReaction(Base):
+    """Реакции на сообщения в чате (emoji)."""
+    __tablename__ = "chat_reactions"
+    __table_args__ = (
+        UniqueConstraint("message_id", "user_id", "emoji", name="uq_reaction"),
+        Index("ix_reaction_message", "message_id"),
+    )
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    message_id = Column(Integer, nullable=False, index=True)
+    user_id = Column(Integer, nullable=False)
+    emoji = Column(String(8), nullable=False)  # 👍 ❤️ 🔥 😂 😢 💀
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 

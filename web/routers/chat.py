@@ -1,13 +1,15 @@
-"""API: чат внутри приложения — общий, торговый, личные сообщения."""
+"""API: чат внутри приложения — общий, торговый, личные сообщения, реакции, стикеры."""
 import time
 import logging
+from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from typing import Optional
 from db.models import (
-    SessionLocal, ChatMessage, User, MarketListing,
+    SessionLocal, ChatMessage, ChatReaction, User, MarketListing,
     UserNotification,
 )
+from sqlalchemy import func
 from web.auth import require_user, get_current_user
 
 logger = logging.getLogger(__name__)
@@ -21,16 +23,52 @@ _spam_tracker: dict[int, float] = {}
 SPAM_COOLDOWN = 3.0
 MAX_GENERAL_LEN = 500
 
+# ── Доступные реакции ──
+ALLOWED_REACTIONS = {"👍", "❤️", "🔥", "😂", "😢", "💀", "🎉", "💎", "☢️", "👎"}
+
+# ── Кастомные STALCRAFT стикеры ──
+STICKERS = [
+    {"code": "zone_clear", "emoji": "✅", "label": "Зона чиста"},
+    {"code": "emission", "emoji": "☢️", "label": "Выброс!"},
+    {"code": "loot", "emoji": "💰", "label": "Лут!"},
+    {"code": "artifact", "emoji": "💎", "label": "Артефакт"},
+    {"code": "death", "emoji": "💀", "label": "Смерть"},
+    {"code": "run", "emoji": "🏃", "label": "Бежим!"},
+    {"code": "anomaly", "emoji": "⚡", "label": "Аномалия"},
+    {"code": "deal", "emoji": "🤝", "label": "Сделка"},
+    {"code": "scam", "emoji": "🚫", "label": "Скам"},
+    {"code": "gg", "emoji": "🎮", "label": "GG"},
+    {"code": "camp", "emoji": "🏕️", "label": "Лагерь"},
+    {"code": "sniper", "emoji": "🔫", "label": "Снайпер"},
+    {"code": "heal", "emoji": "💊", "label": "Хилка"},
+    {"code": "trade", "emoji": "📦", "label": "Трейд"},
+    {"code": "money", "emoji": "💵", "label": "Деньги"},
+    {"code": "fire", "emoji": "🔥", "label": "Огонь"},
+]
+
+STICKER_MAP = {s["code"]: s for s in STICKERS}
+
 
 class SendMessage(BaseModel):
-    text: str
+    text: str = ""
     reply_to_id: int = 0
     listing_id: Optional[int] = None
+    sticker: Optional[str] = None  # sticker code
+
+
+class ReactionData(BaseModel):
+    emoji: str
 
 
 @router.get("/chat/channels")
 async def list_channels():
     return [{"id": k, "name": v} for k, v in CHANNELS.items()]
+
+
+@router.get("/chat/stickers")
+async def get_stickers():
+    """Список доступных стикеров."""
+    return STICKERS
 
 
 @router.get("/chat/{channel}/messages")
@@ -43,14 +81,33 @@ async def get_messages(channel: str, since_id: int = 0, limit: int = 50):
         if since_id > 0:
             q = q.filter(ChatMessage.id > since_id)
         rows = q.order_by(ChatMessage.id.desc()).limit(limit).all()
-        return [_msg_dict(m, u) for m, u in reversed(rows)]
+
+        messages = []
+        for m, u in reversed(rows):
+            d = _msg_dict(m, u)
+            # Загружаем реакции для этого сообщения
+            d["reactions"] = _get_reactions(session, m.id)
+            # Если есть reply — загружаем цитируемое сообщение
+            if m.reply_to_id:
+                d["reply_to"] = _get_reply_preview(session, m.reply_to_id)
+            messages.append(d)
+
+        return messages
 
 
 @router.post("/chat/{channel}/messages")
 async def send_message(channel: str, data: SendMessage, user: User = Depends(require_user)):
-    text = data.text.strip()
-    if not text:
-        return {"error": "Пустое сообщение"}
+    text = (data.text or "").strip()
+    sticker = data.sticker
+
+    # Стикер вместо текста
+    if sticker:
+        if sticker not in STICKER_MAP:
+            return {"error": "Неизвестный стикер"}
+        text = text or ""
+    else:
+        if not text:
+            return {"error": "Пустое сообщение"}
 
     is_dm = channel.startswith("dm:")
 
@@ -80,8 +137,15 @@ async def send_message(channel: str, data: SendMessage, user: User = Depends(req
             user_id=user.id, channel=channel,
             text=text[:2000],
             reply_to_id=data.reply_to_id or None,
+            sticker=sticker,
         )
         session.add(msg)
+
+        # Update online status
+        u = session.query(User).filter_by(id=user.id).first()
+        if u:
+            u.last_active_at = datetime.now(timezone.utc)
+
         session.commit()
         session.refresh(msg)
 
@@ -89,14 +153,93 @@ async def send_message(channel: str, data: SendMessage, user: User = Depends(req
             _trim_channel(session, channel, MAX_PUBLIC_MESSAGES)
 
         result = _msg_dict(msg, user)
+        result["reactions"] = []
+        if msg.reply_to_id:
+            result["reply_to"] = _get_reply_preview(session, msg.reply_to_id)
 
     if is_dm:
-        _notify_dm(user, channel, text)
+        _notify_dm(user, channel, text or f"[стикер: {STICKER_MAP.get(sticker, {}).get('label', sticker)}]")
     if data.listing_id:
         _notify_listing_reply(user, data.listing_id, text)
 
     return result
 
+
+# ── Реакции ──
+
+@router.post("/chat/messages/{message_id}/reactions")
+async def toggle_reaction(message_id: int, data: ReactionData, user: User = Depends(require_user)):
+    """Toggle реакции: если уже есть — удаляем, если нет — добавляем."""
+    emoji = data.emoji.strip()
+    if emoji not in ALLOWED_REACTIONS:
+        return {"error": "Недопустимая реакция"}
+
+    with SessionLocal() as session:
+        # Проверяем что сообщение существует
+        msg = session.query(ChatMessage).filter_by(id=message_id).first()
+        if not msg:
+            return {"error": "Сообщение не найдено"}
+
+        existing = session.query(ChatReaction).filter_by(
+            message_id=message_id, user_id=user.id, emoji=emoji
+        ).first()
+
+        if existing:
+            session.delete(existing)
+            action = "removed"
+        else:
+            session.add(ChatReaction(
+                message_id=message_id, user_id=user.id, emoji=emoji,
+            ))
+            action = "added"
+
+        session.commit()
+
+        # Возвращаем обновлённые реакции
+        reactions = _get_reactions(session, message_id)
+
+        # Update online status
+        u = session.query(User).filter_by(id=user.id).first()
+        if u:
+            u.last_active_at = datetime.now(timezone.utc)
+            session.commit()
+
+        return {"action": action, "reactions": reactions}
+
+
+@router.get("/chat/messages/{message_id}/reactions")
+async def get_message_reactions(message_id: int):
+    """Получить реакции для сообщения."""
+    with SessionLocal() as session:
+        return _get_reactions(session, message_id)
+
+
+# ── Онлайн-статус (heartbeat) ──
+
+@router.post("/heartbeat")
+async def heartbeat(user: User = Depends(require_user)):
+    """Обновить last_active_at для онлайн-статуса."""
+    with SessionLocal() as session:
+        u = session.query(User).filter_by(id=user.id).first()
+        if u:
+            u.last_active_at = datetime.now(timezone.utc)
+            session.commit()
+    return {"ok": True}
+
+
+@router.get("/online-users")
+async def online_users():
+    """Список онлайн пользователей (активны < 5 мин)."""
+    threshold = datetime.now(timezone.utc) - timedelta(minutes=5)
+    with SessionLocal() as session:
+        users = session.query(User).filter(
+            User.last_active_at != None,
+            User.last_active_at >= threshold,
+        ).all()
+        return [{"id": u.id, "display_name": u.display_name} for u in users]
+
+
+# ── DM ──
 
 @router.get("/chat/dm/{target_user_id}")
 async def init_dm(target_user_id: int, user: User = Depends(require_user)):
@@ -130,15 +273,15 @@ async def dm_list(user: User = Depends(require_user)):
             ).first()
             result.append({
                 "channel": ch,
-                "user": {"id": other.id, "display_name": other.display_name,
-                         "avatar_url": other.avatar_url,
-                         "chat_color": other.chat_color} if other else None,
+                "user": _online_user_dict(other) if other else None,
                 "last_message": last_msg.text[:50] if last_msg else "",
                 "last_at": last_msg.created_at.isoformat() + "Z" if last_msg and last_msg.created_at else None,
             })
         result.sort(key=lambda x: x["last_at"] or "", reverse=True)
         return result
 
+
+# ── Notifications ──
 
 @router.get("/notifications")
 async def get_notifications(user: User = Depends(require_user), limit: int = 20):
@@ -163,18 +306,69 @@ async def mark_notifications_read(user: User = Depends(require_user)):
         return {"ok": True}
 
 
+# ── Helpers ──
+
 def _msg_dict(m, u):
+    sticker_data = None
+    if m.sticker and m.sticker in STICKER_MAP:
+        sticker_data = STICKER_MAP[m.sticker]
+
     return {
         "id": m.id, "text": m.text, "channel": m.channel,
         "reply_to_id": m.reply_to_id,
+        "sticker": sticker_data,
         "created_at": m.created_at.isoformat() + "Z" if m.created_at else None,
-        "user": {
-            "id": u.id, "display_name": u.display_name,
-            "game_nickname": u.game_nickname,
-            "avatar_url": u.avatar_url,
-            "chat_color": getattr(u, "chat_color", None),
-            "reputation": getattr(u, "reputation", 0),
-        } if u else {"id": 0, "display_name": "Аноним"},
+        "user": _online_user_dict(u) if u else {"id": 0, "display_name": "Аноним"},
+    }
+
+
+def _online_user_dict(u):
+    """User dict with online status."""
+    if not u:
+        return {"id": 0, "display_name": "Аноним"}
+    is_online = False
+    if u.last_active_at:
+        threshold = datetime.now(timezone.utc) - timedelta(minutes=5)
+        is_online = u.last_active_at >= threshold
+    return {
+        "id": u.id, "display_name": u.display_name,
+        "game_nickname": getattr(u, "game_nickname", None),
+        "avatar_url": u.avatar_url,
+        "chat_color": getattr(u, "chat_color", None),
+        "reputation": getattr(u, "reputation", 0),
+        "is_online": is_online,
+    }
+
+
+def _get_reactions(session, message_id: int) -> list[dict]:
+    """Агрегированные реакции для сообщения: [{emoji, count, user_ids}]."""
+    rows = session.query(
+        ChatReaction.emoji,
+        func.count(ChatReaction.id).label("cnt"),
+        func.group_concat(ChatReaction.user_id).label("uids"),
+    ).filter_by(message_id=message_id).group_by(ChatReaction.emoji).all()
+
+    result = []
+    for emoji, cnt, uids in rows:
+        uid_list = [int(x) for x in (uids or "").split(",") if x]
+        result.append({"emoji": emoji, "count": cnt, "user_ids": uid_list})
+    return result
+
+
+def _get_reply_preview(session, reply_to_id: int) -> Optional[dict]:
+    """Короткое превью цитируемого сообщения."""
+    msg = session.query(ChatMessage, User).outerjoin(
+        User, ChatMessage.user_id == User.id
+    ).filter(ChatMessage.id == reply_to_id).first()
+    if not msg:
+        return None
+    m, u = msg
+    return {
+        "id": m.id,
+        "text": (m.text or "")[:100],
+        "sticker": STICKER_MAP.get(m.sticker) if m.sticker else None,
+        "user_name": u.display_name if u else "Аноним",
+        "user_color": getattr(u, "chat_color", None) if u else None,
     }
 
 
@@ -188,6 +382,10 @@ def _trim_channel(session, channel: str, max_count: int):
             session.query(ChatMessage).filter(
                 ChatMessage.channel == channel,
                 ChatMessage.id < cutoff,
+            ).delete()
+            # Also clean up reactions for deleted messages
+            session.query(ChatReaction).filter(
+                ChatReaction.message_id < cutoff,
             ).delete()
             session.commit()
 

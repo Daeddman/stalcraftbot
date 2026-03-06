@@ -225,6 +225,11 @@ def _full_user_dict(u: User) -> dict:
 
 def _public_user_dict(u: User) -> dict:
     """Public user dict — NO telegram_username for safety."""
+    from datetime import datetime, timezone, timedelta
+    is_online = False
+    if hasattr(u, 'last_active_at') and u.last_active_at:
+        threshold = datetime.now(timezone.utc) - timedelta(minutes=5)
+        is_online = u.last_active_at >= threshold
     return {
         "id": u.id,
         "display_name": u.display_name,
@@ -234,5 +239,6 @@ def _public_user_dict(u: User) -> dict:
         "avatar_url": u.avatar_url,
         "chat_color": u.chat_color,
         "reputation": u.reputation or 0,
+        "is_online": is_online,
         "created_at": u.created_at.isoformat() + "Z" if u.created_at else None,
     }
