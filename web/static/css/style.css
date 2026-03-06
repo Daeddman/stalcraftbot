@@ -386,6 +386,10 @@ table.lt{width:100%;border-collapse:collapse;font-size:11px}
 
 /* Input bar */
 .ch-input-wrap{position:fixed;bottom:calc(var(--tab) + var(--safe));left:0;right:0;z-index:50;background:var(--bg);border-top:1px solid var(--brd2);padding:8px 14px 8px}
+
+/* Scroll-to-bottom button */
+.ch-scroll-btn{position:fixed;bottom:calc(var(--tab) + var(--safe) + 70px);right:16px;z-index:51;width:40px;height:40px;border-radius:50%;background:var(--acc);color:#fff;border:none;font-size:18px;font-weight:900;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;transition:transform .15s ease,opacity .15s ease;animation:fadeUp .2s ease}
+.ch-scroll-btn:active{transform:scale(.9)}
 .ch-input{display:flex;gap:8px;background:var(--surf2);border:1px solid var(--brd2);border-radius:24px;padding:6px 6px 6px 16px;align-items:center;max-width:520px;margin:0 auto}
 .ch-input input{flex:1;background:transparent;border:none;color:var(--t);font-size:13px;outline:none;font-family:var(--font);padding:6px 0}
 .ch-input input::placeholder{color:var(--t3)}

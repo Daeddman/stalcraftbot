@@ -734,6 +734,9 @@ async function P_chat(channel){
   for(const m of msgs)h+=chatMsg(m);
   h+='</div>';
 
+  // Scroll-to-bottom floating button
+  h+='<button class="ch-scroll-btn" id="chat-scroll-btn" onclick="chatScrollBottom()" style="display:none">↓</button>';
+
   // Input area (with sticker toggle and reply bar placeholder)
   h+='<div class="ch-input-wrap" id="chat-input-wrap">';
   h+='<div id="reply-bar"></div>';
@@ -746,7 +749,10 @@ async function P_chat(channel){
 
   render(h);
   const box=document.getElementById('chat-msgs');
-  if(box)box.scrollTop=box.scrollHeight;
+  if(box){
+    box.scrollTop=box.scrollHeight;
+    box.addEventListener('scroll',_chatScrollHandler);
+  }
   _ctx.chatLastId=msgs.length?msgs[msgs.length-1].id:0;
   _initChatGestures();
   startChatPoll(channel);
@@ -1119,19 +1125,41 @@ function startChatPoll(ch){
       if(msgs.length){
         const box=document.getElementById('chat-msgs');
         if(box){
+          const wasAtBottom=_isChatAtBottom(box);
           for(const m of msgs){
             if(m.id>(_ctx.chatLastId||0)){
               box.insertAdjacentHTML('beforeend',chatMsg(m));
               _ctx.chatLastId=m.id;
             }
           }
-          box.scrollTop=box.scrollHeight;
+          if(wasAtBottom){
+            box.scrollTop=box.scrollHeight;
+          } else {
+            _showScrollBtn(true);
+          }
         }
       }
     }catch(e){}
     if(location.hash.startsWith('#/chat'))_chatPoll=setTimeout(poll,3000);
   }
   _chatPoll=setTimeout(poll,3000);
+}
+
+function _isChatAtBottom(box){
+  if(!box)return true;
+  return box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+}
+function _chatScrollHandler(){
+  const box=document.getElementById('chat-msgs');
+  _showScrollBtn(!_isChatAtBottom(box));
+}
+function _showScrollBtn(show){
+  const btn=document.getElementById('chat-scroll-btn');
+  if(btn)btn.style.display=show?'flex':'none';
+}
+function chatScrollBottom(){
+  const box=document.getElementById('chat-msgs');
+  if(box){box.scrollTop=box.scrollHeight;_showScrollBtn(false)}
 }
 
 // ── Heartbeat for online status ──
