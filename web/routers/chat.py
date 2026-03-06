@@ -446,8 +446,13 @@ def _online_user_dict(u):
         return {"id": 0, "display_name": "Аноним"}
     is_online = False
     if u.last_active_at:
-        threshold = datetime.now(timezone.utc) - timedelta(minutes=5)
-        is_online = u.last_active_at >= threshold
+        try:
+            # SQLite хранит naive datetime, сравниваем как naive UTC
+            threshold = datetime.utcnow() - timedelta(minutes=5)
+            last = u.last_active_at.replace(tzinfo=None) if u.last_active_at.tzinfo else u.last_active_at
+            is_online = last >= threshold
+        except Exception:
+            pass
     return {
         "id": u.id, "display_name": u.display_name,
         "game_nickname": getattr(u, "game_nickname", None),
