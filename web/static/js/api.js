@@ -102,15 +102,19 @@ async function getMe() {
 
 /* ── Swipe between tabs ── */
 (function initSwipe() {
-  let startX = 0, startY = 0;
+  let startX = 0, startY = 0, _swipeBlocked = false;
   const tabs = ['#/', '#/search', '#/market', '#/chat', '#/profile'];
   const app = document.getElementById('app');
   if (!app) return;
   app.addEventListener('touchstart', e => {
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
+    // Block swipe if started inside a horizontal scroller
+    const t = e.target;
+    _swipeBlocked = !!(t.closest('.hscroll, .mkt-cats, .react-picker-float, .cmp-cards, .ch-messages, [style*="overflow-x"], .lot-grid'));
   }, { passive: true });
   app.addEventListener('touchend', e => {
+    if (_swipeBlocked) return;
     const dx = e.changedTouches[0].clientX - startX;
     const dy = e.changedTouches[0].clientY - startY;
     if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx)) return;

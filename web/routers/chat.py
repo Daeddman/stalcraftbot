@@ -21,6 +21,7 @@ MAX_PUBLIC_MESSAGES = 2000
 
 _spam_tracker: dict[int, float] = {}
 SPAM_COOLDOWN = 3.0
+TRADING_COOLDOWN = 300.0  # 5 minutes
 MAX_GENERAL_LEN = 500
 
 ALLOWED_REACTIONS = {"👍", "❤️", "🔥", "😂", "😢", "💀", "🎉", "💎", "☢️", "👎"}
@@ -74,6 +75,17 @@ def _get_blocked_by_ids(session, user_id: int) -> set[int]:
 @router.get("/chat/channels")
 async def list_channels():
     return [{"id": k, "name": v} for k, v in CHANNELS.items()]
+
+
+@router.get("/chat/trading/cooldown")
+async def trading_cooldown(user: User = Depends(get_current_user)):
+    """Возвращает оставшееся время кулдауна в торговом чате."""
+    if not user:
+        return {"remaining": 0}
+    key = f"trading_{user.id}"
+    last = _spam_tracker.get(key, 0)
+    remaining = max(0, TRADING_COOLDOWN - (time.time() - last))
+    return {"remaining": int(remaining)}
 
 
 @router.get("/chat/stickers")
@@ -158,8 +170,17 @@ async def send_message(channel: str, data: SendMessage, user: User = Depends(req
             return {"error": f"Подождите {int(SPAM_COOLDOWN - (now - last))+1} сек"}
         _spam_tracker[user.id] = now
 
-    if channel == "trading" and not data.listing_id:
+    if channel == "trading":
         text = text[:1000]
+        now = time.time()
+        key = f"trading_{user.id}"
+        last = _spam_tracker.get(key, 0)
+        remaining = TRADING_COOLDOWN - (now - last)
+        if remaining > 0:
+            mins = int(remaining // 60)
+            secs = int(remaining % 60)
+            return {"error": f"Подождите {mins}:{secs:02d}", "cooldown": int(remaining)}
+        _spam_tracker[key] = now
 
     with SessionLocal() as session:
         msg = ChatMessage(

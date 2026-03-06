@@ -717,9 +717,9 @@ async function P_market(sub){
     });
   }
 }
-function setMktCat(v){S.mktCat=v;saveS();go('#/market')}
-function setMktType(v){S.mktType=v;saveS();go('#/market')}
-function setMktSort(v){S.mktSort=v;saveS();go('#/market')}
+function setMktCat(v){S.mktCat=v;saveS();P_market()}
+function setMktType(v){S.mktType=v;saveS();P_market()}
+function setMktSort(v){S.mktSort=v;saveS();P_market()}
 
 function marketCard(l){
   const av=l.user&&l.user.avatar_url?'<img src="'+l.user.avatar_url+'" alt="">':'👤';
@@ -992,6 +992,7 @@ async function P_chat(channel){
 
   // Input area (with sticker toggle and reply bar placeholder)
   h+='<div class="ch-input-wrap" id="chat-input-wrap">';
+  if(channel==='trading')h+='<div id="trade-cooldown" class="trade-cooldown" style="display:none"></div>';
   h+='<div id="reply-bar"></div>';
   h+='<div style="position:relative" id="sticker-anchor"></div>';
   h+='<div class="ch-input">';
@@ -1001,15 +1002,18 @@ async function P_chat(channel){
   h+='</div></div>';
 
   render(h);
+  // Init trading cooldown timer
+  if(channel==='trading')_initTradeCooldown();
   const box=document.getElementById('chat-msgs');
   if(box){
-    // Ensure scroll-to-bottom after full DOM render + image load
+    // Scroll the #app container (the actual scrolling parent) to bottom
     requestAnimationFrame(()=>{
-      box.scrollTop=box.scrollHeight;
-      setTimeout(()=>{box.scrollTop=box.scrollHeight},100);
-      setTimeout(()=>{box.scrollTop=box.scrollHeight},300);
+      A.scrollTop=A.scrollHeight;
+      setTimeout(()=>{A.scrollTop=A.scrollHeight},50);
+      setTimeout(()=>{A.scrollTop=A.scrollHeight},200);
+      setTimeout(()=>{A.scrollTop=A.scrollHeight},500);
     });
-    box.addEventListener('scroll',_chatScrollHandler);
+    A.addEventListener('scroll',_chatScrollHandler);
   }
   _ctx.chatLastId=msgs.length?msgs[msgs.length-1].id:0;
   _initChatGestures();
@@ -1365,16 +1369,54 @@ async function sendChat(ch){
   try{
     const body={text:text,reply_to_id:_replyTo?_replyTo.id:0};
     const r=await API.post('/api/chat/'+ch+'/messages',body);
-    if(r.error){toast('❌ '+r.error);inp.value=text;return}
+    if(r.error){
+      toast('❌ '+r.error);inp.value=text;
+      // Start cooldown timer if trading
+      if(r.cooldown&&r.cooldown>0)_startTradeCooldownTimer(r.cooldown);
+      return;
+    }
     clearReply();
     const box=document.getElementById('chat-msgs');
     if(box){
       const emp=box.querySelector('.ch-empty');if(emp)emp.remove();
       box.insertAdjacentHTML('beforeend',chatMsg(r));
-      box.scrollTop=box.scrollHeight;
+      A.scrollTop=A.scrollHeight;
       _ctx.chatLastId=r.id;
     }
+    // After successful send in trading, start cooldown
+    if(ch==='trading')_startTradeCooldownTimer(300);
   }catch(e){toast('❌ Авторизуйтесь через Telegram');inp.value=text}
+}
+
+// ── Trading cooldown timer ──
+let _tradeCdInterval=null;
+async function _initTradeCooldown(){
+  try{
+    const d=await API.get('/api/chat/trading/cooldown');
+    if(d.remaining>0)_startTradeCooldownTimer(d.remaining);
+  }catch(e){}
+}
+function _startTradeCooldownTimer(secs){
+  if(_tradeCdInterval){clearInterval(_tradeCdInterval);_tradeCdInterval=null}
+  const el=document.getElementById('trade-cooldown');
+  if(!el)return;
+  let left=secs;
+  const inp=document.getElementById('chat-in');
+  function tick(){
+    if(left<=0){
+      el.style.display='none';
+      if(inp)inp.disabled=false;
+      clearInterval(_tradeCdInterval);_tradeCdInterval=null;
+      return;
+    }
+    const m=Math.floor(left/60),s=left%60;
+    el.innerHTML='⏳ Следующее сообщение через <b>'+m+':'+String(s).padStart(2,'0')+'</b>';
+    el.style.display='block';
+    if(inp)inp.disabled=true;
+    left--;
+  }
+  tick();
+  _tradeCdInterval=setInterval(tick,1000);
 }
 // ── WebSocket Chat + Polling fallback ──
 let _chatWs=null,_wsOk=false;
@@ -1398,10 +1440,10 @@ function _connectChatWs(ch){
         if(ev.type==='new_message'&&ev.message){
           const box=document.getElementById('chat-msgs');
           if(box&&ev.message.id>(_ctx.chatLastId||0)){
-            const wasBottom=_isChatAtBottom(box);
+            const wasBottom=_isChatAtBottom();
             box.insertAdjacentHTML('beforeend',chatMsg(ev.message));
             _ctx.chatLastId=ev.message.id;
-            if(wasBottom)box.scrollTop=box.scrollHeight;
+            if(wasBottom)A.scrollTop=A.scrollHeight;
             else _showScrollBtn(true);
           }
         }
@@ -1427,14 +1469,14 @@ function _startFallbackPoll(ch){
       if(msgs.length){
         const box=document.getElementById('chat-msgs');
         if(box){
-          const wasAtBottom=_isChatAtBottom(box);
+          const wasAtBottom=_isChatAtBottom();
           for(const m of msgs){
             if(m.id>(_ctx.chatLastId||0)){
               box.insertAdjacentHTML('beforeend',chatMsg(m));
               _ctx.chatLastId=m.id;
             }
           }
-          if(wasAtBottom)box.scrollTop=box.scrollHeight;
+          if(wasAtBottom)A.scrollTop=A.scrollHeight;
           else _showScrollBtn(true);
         }
       }
@@ -1444,21 +1486,18 @@ function _startFallbackPoll(ch){
   _chatPoll=setTimeout(poll,3000);
 }
 
-function _isChatAtBottom(box){
-  if(!box)return true;
-  return box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+function _isChatAtBottom(){
+  return A.scrollHeight - A.scrollTop - A.clientHeight < 80;
 }
 function _chatScrollHandler(){
-  const box=document.getElementById('chat-msgs');
-  _showScrollBtn(!_isChatAtBottom(box));
+  _showScrollBtn(!_isChatAtBottom());
 }
 function _showScrollBtn(show){
   const btn=document.getElementById('chat-scroll-btn');
   if(btn)btn.style.display=show?'flex':'none';
 }
 function chatScrollBottom(){
-  const box=document.getElementById('chat-msgs');
-  if(box){box.scrollTop=box.scrollHeight;_showScrollBtn(false)}
+  A.scrollTop=A.scrollHeight;_showScrollBtn(false);
 }
 
 // ── Heartbeat for online status ──
