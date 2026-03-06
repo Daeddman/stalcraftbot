@@ -255,6 +255,19 @@ class User(Base):
 #  Social: Подписки (фолловеры)
 # ══════════════════════════════════════════════════════════════
 
+class UserBlock(Base):
+    """Блокировка пользователей."""
+    __tablename__ = "user_blocks"
+    __table_args__ = (
+        UniqueConstraint("blocker_id", "blocked_id", name="uq_block"),
+    )
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    blocker_id = Column(Integer, nullable=False, index=True)  # кто заблокировал
+    blocked_id = Column(Integer, nullable=False, index=True)  # кого заблокировали
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
 class UserFollow(Base):
     __tablename__ = "user_follows"
     __table_args__ = (

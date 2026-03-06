@@ -1,4 +1,4 @@
-"""API: чат внутри приложения — общий, торговый, личные сообщения, реакции, стикеры."""
+"""API: чат — общий, торговый, ЛС, реакции, стикеры, удаление, блокировка."""
 import time
 import logging
 from datetime import datetime, timezone, timedelta
@@ -7,9 +7,9 @@ from pydantic import BaseModel
 from typing import Optional
 from db.models import (
     SessionLocal, ChatMessage, ChatReaction, User, MarketListing,
-    UserNotification,
+    UserNotification, UserBlock,
 )
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from web.auth import require_user, get_current_user
 
 logger = logging.getLogger(__name__)
@@ -23,10 +23,8 @@ _spam_tracker: dict[int, float] = {}
 SPAM_COOLDOWN = 3.0
 MAX_GENERAL_LEN = 500
 
-# ── Доступные реакции ──
 ALLOWED_REACTIONS = {"👍", "❤️", "🔥", "😂", "😢", "💀", "🎉", "💎", "☢️", "👎"}
 
-# ── Кастомные STALCRAFT стикеры ──
 STICKERS = [
     {"code": "zone_clear", "emoji": "✅", "label": "Зона чиста"},
     {"code": "emission", "emoji": "☢️", "label": "Выброс!"},
@@ -45,7 +43,6 @@ STICKERS = [
     {"code": "money", "emoji": "💵", "label": "Деньги"},
     {"code": "fire", "emoji": "🔥", "label": "Огонь"},
 ]
-
 STICKER_MAP = {s["code"]: s for s in STICKERS}
 
 
@@ -53,12 +50,26 @@ class SendMessage(BaseModel):
     text: str = ""
     reply_to_id: int = 0
     listing_id: Optional[int] = None
-    sticker: Optional[str] = None  # sticker code
+    sticker: Optional[str] = None
 
 
 class ReactionData(BaseModel):
     emoji: str
 
+
+# ── Helpers: blocked users ──
+
+def _get_blocked_ids(session, user_id: int) -> set[int]:
+    rows = session.query(UserBlock.blocked_id).filter_by(blocker_id=user_id).all()
+    return {r[0] for r in rows}
+
+
+def _get_blocked_by_ids(session, user_id: int) -> set[int]:
+    rows = session.query(UserBlock.blocker_id).filter_by(blocked_id=user_id).all()
+    return {r[0] for r in rows}
+
+
+# ── Channels & Stickers ──
 
 @router.get("/chat/channels")
 async def list_channels():
@@ -67,14 +78,20 @@ async def list_channels():
 
 @router.get("/chat/stickers")
 async def get_stickers():
-    """Список доступных стикеров."""
     return STICKERS
 
 
+# ── Messages ──
+
 @router.get("/chat/{channel}/messages")
-async def get_messages(channel: str, since_id: int = 0, limit: int = 50):
+async def get_messages(channel: str, since_id: int = 0, limit: int = 50,
+                       user: User = Depends(get_current_user)):
     limit = max(1, min(limit, 100))
     with SessionLocal() as session:
+        blocked_ids = set()
+        if user:
+            blocked_ids = _get_blocked_ids(session, user.id) | _get_blocked_by_ids(session, user.id)
+
         q = session.query(ChatMessage, User).outerjoin(
             User, ChatMessage.user_id == User.id
         ).filter(ChatMessage.channel == channel)
@@ -84,12 +101,13 @@ async def get_messages(channel: str, since_id: int = 0, limit: int = 50):
 
         messages = []
         for m, u in reversed(rows):
+            if not channel.startswith("dm:") and u and u.id in blocked_ids:
+                continue
             d = _msg_dict(m, u)
-            # Загружаем реакции для этого сообщения
             d["reactions"] = _get_reactions(session, m.id)
-            # Если есть reply — загружаем цитируемое сообщение
             if m.reply_to_id:
                 d["reply_to"] = _get_reply_preview(session, m.reply_to_id)
+            d["is_own"] = (user.id == m.user_id) if user else False
             messages.append(d)
 
         return messages
@@ -100,7 +118,6 @@ async def send_message(channel: str, data: SendMessage, user: User = Depends(req
     text = (data.text or "").strip()
     sticker = data.sticker
 
-    # Стикер вместо текста
     if sticker:
         if sticker not in STICKER_MAP:
             return {"error": "Неизвестный стикер"}
@@ -120,6 +137,18 @@ async def send_message(channel: str, data: SendMessage, user: User = Depends(req
             ids = [int(x) for x in parts]
             if user.id not in ids:
                 return {"error": "Нет доступа к этому чату"}
+            other_id = ids[0] if ids[1] == user.id else ids[1]
+            if other_id == user.id:
+                return {"error": "Нельзя написать самому себе"}
+            with SessionLocal() as session:
+                blocked = session.query(UserBlock).filter(
+                    or_(
+                        (UserBlock.blocker_id == user.id) & (UserBlock.blocked_id == other_id),
+                        (UserBlock.blocker_id == other_id) & (UserBlock.blocked_id == user.id),
+                    )
+                ).first()
+                if blocked:
+                    return {"error": "Невозможно отправить сообщение"}
 
     if channel == "general":
         text = text[:MAX_GENERAL_LEN]
@@ -141,7 +170,6 @@ async def send_message(channel: str, data: SendMessage, user: User = Depends(req
         )
         session.add(msg)
 
-        # Update online status
         u = session.query(User).filter_by(id=user.id).first()
         if u:
             u.last_active_at = datetime.now(timezone.utc)
@@ -154,6 +182,7 @@ async def send_message(channel: str, data: SendMessage, user: User = Depends(req
 
         result = _msg_dict(msg, user)
         result["reactions"] = []
+        result["is_own"] = True
         if msg.reply_to_id:
             result["reply_to"] = _get_reply_preview(session, msg.reply_to_id)
 
@@ -165,17 +194,99 @@ async def send_message(channel: str, data: SendMessage, user: User = Depends(req
     return result
 
 
-# ── Реакции ──
+# ── Delete own message ──
+
+@router.delete("/chat/messages/{message_id}")
+async def delete_message(message_id: int, user: User = Depends(require_user)):
+    with SessionLocal() as session:
+        msg = session.query(ChatMessage).filter_by(id=message_id).first()
+        if not msg:
+            return {"error": "Сообщение не найдено"}
+        if msg.user_id != user.id:
+            return {"error": "Можно удалять только свои сообщения"}
+        session.query(ChatReaction).filter_by(message_id=message_id).delete()
+        session.delete(msg)
+        session.commit()
+        return {"ok": True, "id": message_id}
+
+
+# ── Delete DM conversation ──
+
+@router.delete("/chat/dm-channel/{channel:path}")
+async def delete_dm_channel(channel: str, user: User = Depends(require_user)):
+    if not channel.startswith("dm:"):
+        channel = "dm:" + channel
+    parts = channel.replace("dm:", "").split("_")
+    if len(parts) != 2:
+        return {"error": "Неверный формат канала"}
+    ids = [int(x) for x in parts]
+    if user.id not in ids:
+        return {"error": "Нет доступа"}
+
+    with SessionLocal() as session:
+        msg_ids = [r[0] for r in session.query(ChatMessage.id).filter_by(channel=channel).all()]
+        if msg_ids:
+            session.query(ChatReaction).filter(ChatReaction.message_id.in_(msg_ids)).delete(synchronize_session=False)
+        session.query(ChatMessage).filter_by(channel=channel).delete()
+        session.commit()
+        return {"ok": True}
+
+
+# ── Block / Unblock users ──
+
+@router.post("/users/{user_id}/block")
+async def block_user(user_id: int, user: User = Depends(require_user)):
+    if user_id == user.id:
+        return {"error": "Нельзя заблокировать себя"}
+    with SessionLocal() as session:
+        existing = session.query(UserBlock).filter_by(
+            blocker_id=user.id, blocked_id=user_id
+        ).first()
+        if existing:
+            return {"ok": True, "blocked": True}
+        session.add(UserBlock(blocker_id=user.id, blocked_id=user_id))
+        session.commit()
+        return {"ok": True, "blocked": True}
+
+
+@router.delete("/users/{user_id}/block")
+async def unblock_user(user_id: int, user: User = Depends(require_user)):
+    with SessionLocal() as session:
+        b = session.query(UserBlock).filter_by(
+            blocker_id=user.id, blocked_id=user_id
+        ).first()
+        if b:
+            session.delete(b)
+            session.commit()
+        return {"ok": True, "blocked": False}
+
+
+@router.get("/blocked-users")
+async def get_blocked_users(user: User = Depends(require_user)):
+    with SessionLocal() as session:
+        blocks = session.query(UserBlock, User).outerjoin(
+            User, UserBlock.blocked_id == User.id
+        ).filter(UserBlock.blocker_id == user.id).all()
+        return [
+            {
+                "id": u.id if u else b.blocked_id,
+                "display_name": u.display_name if u else "Удалён",
+                "avatar_url": u.avatar_url if u else None,
+                "blocked_at": b.created_at.isoformat() + "Z" if b.created_at else None,
+            }
+            for b, u in blocks
+        ]
+
+
+# ── Reactions ──
 
 @router.post("/chat/messages/{message_id}/reactions")
 async def toggle_reaction(message_id: int, data: ReactionData, user: User = Depends(require_user)):
-    """Toggle реакции: если уже есть — удаляем, если нет — добавляем."""
     emoji = data.emoji.strip()
     if emoji not in ALLOWED_REACTIONS:
         return {"error": "Недопустимая реакция"}
 
     with SessionLocal() as session:
-        # Проверяем что сообщение существует
         msg = session.query(ChatMessage).filter_by(id=message_id).first()
         if not msg:
             return {"error": "Сообщение не найдено"}
@@ -194,11 +305,8 @@ async def toggle_reaction(message_id: int, data: ReactionData, user: User = Depe
             action = "added"
 
         session.commit()
-
-        # Возвращаем обновлённые реакции
         reactions = _get_reactions(session, message_id)
 
-        # Update online status
         u = session.query(User).filter_by(id=user.id).first()
         if u:
             u.last_active_at = datetime.now(timezone.utc)
@@ -209,16 +317,14 @@ async def toggle_reaction(message_id: int, data: ReactionData, user: User = Depe
 
 @router.get("/chat/messages/{message_id}/reactions")
 async def get_message_reactions(message_id: int):
-    """Получить реакции для сообщения."""
     with SessionLocal() as session:
         return _get_reactions(session, message_id)
 
 
-# ── Онлайн-статус (heartbeat) ──
+# ── Heartbeat / Online ──
 
 @router.post("/heartbeat")
 async def heartbeat(user: User = Depends(require_user)):
-    """Обновить last_active_at для онлайн-статуса."""
     with SessionLocal() as session:
         u = session.query(User).filter_by(id=user.id).first()
         if u:
@@ -229,7 +335,6 @@ async def heartbeat(user: User = Depends(require_user)):
 
 @router.get("/online-users")
 async def online_users():
-    """Список онлайн пользователей (активны < 5 мин)."""
     threshold = datetime.now(timezone.utc) - timedelta(minutes=5)
     with SessionLocal() as session:
         users = session.query(User).filter(
@@ -245,18 +350,27 @@ async def online_users():
 async def init_dm(target_user_id: int, user: User = Depends(require_user)):
     if target_user_id == user.id:
         return {"error": "Нельзя написать самому себе"}
-    ids = sorted([user.id, target_user_id])
-    channel = f"dm:{ids[0]}_{ids[1]}"
     with SessionLocal() as session:
+        blocked = session.query(UserBlock).filter(
+            or_(
+                (UserBlock.blocker_id == user.id) & (UserBlock.blocked_id == target_user_id),
+                (UserBlock.blocker_id == target_user_id) & (UserBlock.blocked_id == user.id),
+            )
+        ).first()
+        if blocked:
+            return {"error": "Пользователь заблокирован"}
         target = session.query(User).filter_by(id=target_user_id).first()
         target_name = target.display_name if target else "Пользователь"
+    ids = sorted([user.id, target_user_id])
+    channel = f"dm:{ids[0]}_{ids[1]}"
     return {"channel": channel, "target_name": target_name}
 
 
 @router.get("/chat/dm-list")
 async def dm_list(user: User = Depends(require_user)):
     with SessionLocal() as session:
-        from sqlalchemy import or_
+        blocked_ids = _get_blocked_ids(session, user.id) | _get_blocked_by_ids(session, user.id)
+
         channels = session.query(ChatMessage.channel).filter(
             or_(
                 ChatMessage.channel.like(f"dm:{user.id}_%"),
@@ -266,7 +380,13 @@ async def dm_list(user: User = Depends(require_user)):
         result = []
         for (ch,) in channels:
             parts = ch.replace("dm:", "").split("_")
+            if len(parts) != 2:
+                continue
             other_id = int(parts[0]) if int(parts[1]) == user.id else int(parts[1])
+            if other_id == user.id:
+                continue
+            if other_id in blocked_ids:
+                continue
             other = session.query(User).filter_by(id=other_id).first()
             last_msg = session.query(ChatMessage).filter_by(channel=ch).order_by(
                 ChatMessage.id.desc()
@@ -312,7 +432,6 @@ def _msg_dict(m, u):
     sticker_data = None
     if m.sticker and m.sticker in STICKER_MAP:
         sticker_data = STICKER_MAP[m.sticker]
-
     return {
         "id": m.id, "text": m.text, "channel": m.channel,
         "reply_to_id": m.reply_to_id,
@@ -323,7 +442,6 @@ def _msg_dict(m, u):
 
 
 def _online_user_dict(u):
-    """User dict with online status."""
     if not u:
         return {"id": 0, "display_name": "Аноним"}
     is_online = False
@@ -341,13 +459,11 @@ def _online_user_dict(u):
 
 
 def _get_reactions(session, message_id: int) -> list[dict]:
-    """Агрегированные реакции для сообщения: [{emoji, count, user_ids}]."""
     rows = session.query(
         ChatReaction.emoji,
         func.count(ChatReaction.id).label("cnt"),
         func.group_concat(ChatReaction.user_id).label("uids"),
     ).filter_by(message_id=message_id).group_by(ChatReaction.emoji).all()
-
     result = []
     for emoji, cnt, uids in rows:
         uid_list = [int(x) for x in (uids or "").split(",") if x]
@@ -356,7 +472,6 @@ def _get_reactions(session, message_id: int) -> list[dict]:
 
 
 def _get_reply_preview(session, reply_to_id: int) -> Optional[dict]:
-    """Короткое превью цитируемого сообщения."""
     msg = session.query(ChatMessage, User).outerjoin(
         User, ChatMessage.user_id == User.id
     ).filter(ChatMessage.id == reply_to_id).first()
@@ -383,7 +498,6 @@ def _trim_channel(session, channel: str, max_count: int):
                 ChatMessage.channel == channel,
                 ChatMessage.id < cutoff,
             ).delete()
-            # Also clean up reactions for deleted messages
             session.query(ChatReaction).filter(
                 ChatReaction.message_id < cutoff,
             ).delete()
@@ -396,8 +510,19 @@ def _notify_dm(sender: User, channel: str, text: str):
         return
     ids = [int(x) for x in parts]
     target_id = ids[0] if ids[1] == sender.id else ids[1]
+    if target_id == sender.id:
+        return
 
     with SessionLocal() as session:
+        blocked = session.query(UserBlock).filter(
+            or_(
+                (UserBlock.blocker_id == sender.id) & (UserBlock.blocked_id == target_id),
+                (UserBlock.blocker_id == target_id) & (UserBlock.blocked_id == sender.id),
+            )
+        ).first()
+        if blocked:
+            return
+
         notif = UserNotification(
             user_id=target_id, type="message",
             title=f"💬 {sender.display_name}",

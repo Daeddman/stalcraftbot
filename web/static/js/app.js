@@ -662,13 +662,20 @@ async function P_chat(channel){
     const dmUser=await _getDMPartner(channel);
     const av=_chatAvatar(dmUser,'sm');
     const name=dmUser?dmUser.display_name:'Пользователь';
+    const dmUserId=dmUser?dmUser.id:0;
     const onlineText=dmUser&&dmUser.is_online?'<span style="font-size:10px;color:var(--grn);margin-left:6px">● онлайн</span>':'';
     h+='<div class="ch-header">';
     h+='<div class="ch-header-back" onclick="go(\'#/chat/dm-list\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><path d="M15 18l-6-6 6-6"/></svg></div>';
-    h+='<div class="ch-header-user" onclick="'+(dmUser?'go(\'#/user/'+dmUser.id+'\')':'')+'">';
+    h+='<div class="ch-header-user" onclick="'+(dmUser?'go(\'#/user/'+dmUser.id+'\')':'')+'" style="flex:1">';
     h+=av;
     h+='<div class="ch-header-name">'+name+onlineText+'</div>';
-    h+='</div></div>';
+    h+='</div>';
+    // DM actions menu
+    h+='<div class="ch-header-actions">';
+    h+='<button class="ch-header-btn" onclick="deleteDMChat(\''+channel+'\')" title="Удалить чат">🗑</button>';
+    if(dmUserId)h+='<button class="ch-header-btn" onclick="blockUserFromChat('+dmUserId+',\''+esc(name)+'\')" title="Заблокировать">🚫</button>';
+    h+='</div>';
+    h+='</div>';
   } else {
     h+='<div class="ch-tabs">';
     h+='<div class="ch-tab'+(channel==='general'?' act':'')+'" onclick="go(\'#/chat/general\')"><span class="ch-tab-icon">💬</span>Общий</div>';
@@ -783,7 +790,7 @@ function chatMsg(m){
   const replyName=esc(u.display_name);
   const replyText=esc((m.sticker?'['+m.sticker.label+']':m.text||'').substring(0,60));
 
-  return'<div class="ch-msg" id="msg-'+m.id+'" data-id="'+m.id+'" data-reply-name="'+replyName+'" data-reply-text="'+replyText+'">'
+  return'<div class="ch-msg" id="msg-'+m.id+'" data-id="'+m.id+'" data-own="'+(m.is_own?'1':'0')+'" data-user-id="'+u.id+'" data-reply-name="'+replyName+'" data-reply-text="'+replyText+'">'
     +'<div class="ch-msg-av" onclick="go(\'#/user/'+u.id+'\')">'+av+'</div>'
     +'<div class="ch-msg-body">'
     +'<div class="ch-msg-head"><span class="ch-msg-name" style="color:'+color+'" onclick="go(\'#/user/'+u.id+'\')">'+u.display_name+'</span>'+rep+'<span class="ch-msg-time">'+fmtChatTime(m.created_at)+'</span></div>'
@@ -944,18 +951,16 @@ function _initChatGestures(){
 }
 
 function _showReactOverlay(msgId,msgEl){
-  // Remove existing overlay
   _closeReactOverlay();
-  // Create fullscreen overlay
   const overlay=document.createElement('div');
   overlay.className='react-overlay';
   overlay.id='react-overlay';
 
-  // Picker bubble positioned near message
   const rect=msgEl.getBoundingClientRect();
   const picker=document.createElement('div');
   picker.className='react-picker-float';
 
+  // Reactions row
   const REACT=['👍','❤️','🔥','😂','😢','💀','🎉','💎','☢️','👎'];
   for(const emoji of REACT){
     const btn=document.createElement('button');
@@ -965,16 +970,62 @@ function _showReactOverlay(msgId,msgEl){
   }
 
   overlay.appendChild(picker);
+
+  // Action buttons row (delete own / reply / block)
+  const actions=document.createElement('div');
+  actions.className='react-actions';
+
+  const isOwn=msgEl.dataset.own==='1';
+  const userId=msgEl.dataset.userId;
+
+  // Reply
+  const replyBtn=document.createElement('button');
+  replyBtn.className='react-action-btn';
+  replyBtn.innerHTML='↩️ Ответить';
+  replyBtn.onclick=(ev)=>{
+    ev.stopPropagation();
+    const name=msgEl.dataset.replyName||'';
+    const text=msgEl.dataset.replyText||'';
+    setReply(msgId,name,text);
+    _closeReactOverlay();
+  };
+  actions.appendChild(replyBtn);
+
+  // Delete own message
+  if(isOwn){
+    const delBtn=document.createElement('button');
+    delBtn.className='react-action-btn react-action-danger';
+    delBtn.innerHTML='🗑 Удалить';
+    delBtn.onclick=async(ev)=>{
+      ev.stopPropagation();
+      _closeReactOverlay();
+      if(!confirm('Удалить сообщение?'))return;
+      try{
+        const r=await API.del('/api/chat/messages/'+msgId);
+        if(r.ok){
+          const el=document.getElementById('msg-'+msgId);
+          if(el)el.remove();
+          toast('🗑 Удалено');
+        } else {
+          toast('❌ '+(r.error||'Ошибка'));
+        }
+      }catch(e){toast('❌ Ошибка')}
+    };
+    actions.appendChild(delBtn);
+  }
+
+  overlay.appendChild(actions);
   overlay.onclick=()=>_closeReactOverlay();
   document.body.appendChild(overlay);
 
-  // Position picker near the message (above or below)
   requestAnimationFrame(()=>{
-    const ph=picker.offsetHeight;
+    const ph=picker.offsetHeight+actions.offsetHeight+8;
     let top=rect.top-ph-8;
     if(top<10)top=rect.bottom+8;
     picker.style.top=top+'px';
     picker.style.left=Math.max(10,Math.min(rect.left,window.innerWidth-picker.offsetWidth-10))+'px';
+    actions.style.top=(top+picker.offsetHeight+4)+'px';
+    actions.style.left=picker.style.left;
   });
 }
 
