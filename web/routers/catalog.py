@@ -122,7 +122,7 @@ async def search_items(
 @router.get("/popular")
 async def popular_items(limit: int = 8):
     """Самые популярные предметы — по количеству продаж за 7 дней или по количеству отслеживаний."""
-    from datetime import datetime, timezone, timedelta
+    from datetime import datetime, timedelta
     limit = max(1, min(limit, 20))
 
     result = []

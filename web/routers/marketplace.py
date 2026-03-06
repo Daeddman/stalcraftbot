@@ -1,5 +1,5 @@
 """API: торговая площадка (маркетплейс)."""
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from typing import Optional
