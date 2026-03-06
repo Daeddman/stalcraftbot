@@ -104,14 +104,25 @@ window.addEventListener('load',()=>{showOnboarding();route()});
 
 /* ═══════════ HOME ═══════════ */
 async function P_home(rid){
-  render(skelBlock()+skelCards(3));
+  // Show cached home instantly if available
+  const ck='home_data';
+  const cached=cG(ck);
+  if(cached){
+    _renderHome(cached.emi,cached.mkt,cached.pop);
+  } else {
+    render(skelBlock()+skelCards(3));
+  }
+  // Fetch fresh data
   const [emi,mkt,pop]=await Promise.all([
     getEmi(),
     API.get('/api/market?status=active&per_page=6').catch(()=>({items:[]})),
     API.get('/api/popular?limit=8').catch(()=>[]),
   ]);
-  // Guard: if user navigated away, don't render stale content
   if(rid!==undefined && rid!==_routeId)return;
+  cS(ck,{emi,mkt,pop});
+  _renderHome(emi,mkt,pop);
+}
+function _renderHome(emi,mkt,pop){
   let h='';
   h+=emiHTML(emi);
   h+='<div class="quick-row">';
@@ -853,6 +864,11 @@ async function P_market_my(){
       h+='<div class="mcard-head"><div class="mcard-icon">'+ico+'</div><div class="mcard-info"><div class="mcard-name">'+l.item_name+'</div><div class="mcard-meta"><span class="mcard-status '+st+'">'+statusRu(st)+'</span></div></div></div>';
       h+='<div class="mcard-price">'+fmt(l.price)+' ₽'+(l.amount>1?' × '+l.amount:'')+'</div>';
       if(l.sold_price)h+='<div style="font-size:11px;color:var(--grn);margin-top:4px">Продано за '+fmt(l.sold_price)+' ₽</div>';
+      // Offers section
+      if(st==='active'&&l.offers_count>0){
+        h+='<div class="offers-badge" onclick="event.stopPropagation();toggleOffers(this,'+l.id+')">💰 '+l.offers_count+' предложени'+(l.offers_count===1?'е':l.offers_count<5?'я':'й')+' <span class="offers-arrow">▾</span></div>';
+        h+='<div class="offers-list" id="offers-'+l.id+'" style="display:none"></div>';
+      }
       if(st==='active'){
         h+='<div class="bgrp" style="margin-top:8px">';
         h+='<button class="btn btn-g btn-sm" onclick="event.stopPropagation();markSold('+l.id+')">✅ Продано</button>';
@@ -864,6 +880,49 @@ async function P_market_my(){
     }
   }
   render(h);
+}
+async function toggleOffers(badge,listingId){
+  const el=document.getElementById('offers-'+listingId);
+  if(!el)return;
+  if(el.style.display!=='none'){el.style.display='none';return}
+  el.innerHTML='<div class="inf-spinner"></div>';
+  el.style.display='block';
+  try{
+    const offers=await API.get('/api/market/'+listingId+'/offers');
+    if(!offers||!offers.length){el.innerHTML='<div style="padding:8px;font-size:11px;color:var(--t3)">Нет предложений</div>';return}
+    let oh='';
+    for(const o of offers){
+      const u=o.user||{};
+      const av=u.avatar_url?'<img src="'+u.avatar_url+'" style="width:24px;height:24px;border-radius:50%;object-fit:cover">':'<span style="font-size:14px">👤</span>';
+      const statusCls=o.status==='accepted'?'offer-accepted':o.status==='declined'?'offer-declined':'';
+      oh+='<div class="offer-row '+statusCls+'">';
+      oh+='<div class="offer-user" onclick="event.stopPropagation();go(\'#/user/'+u.id+'\')">'+av+' <span>'+escHtml(u.display_name||'Аноним')+'</span></div>';
+      oh+='<div class="offer-price">'+fmt(o.price)+' ₽</div>';
+      if(o.message)oh+='<div class="offer-msg">'+escHtml(o.message)+'</div>';
+      oh+='<div class="offer-time">'+fmtSaleDate(o.created_at)+'</div>';
+      if(o.status==='pending'){
+        oh+='<div class="offer-actions">';
+        oh+='<button class="btn btn-g btn-xs" onclick="event.stopPropagation();respondOffer('+o.id+',\'accepted\','+listingId+')">✅ Принять</button>';
+        oh+='<button class="btn btn-r btn-xs" onclick="event.stopPropagation();respondOffer('+o.id+',\'declined\','+listingId+')">✕ Отклонить</button>';
+        oh+='</div>';
+      } else {
+        oh+='<div class="offer-status-label">'+({accepted:'✅ Принято',declined:'✕ Отклонено',withdrawn:'↩ Отозвано'}[o.status]||o.status)+'</div>';
+      }
+      oh+='</div>';
+    }
+    el.innerHTML=oh;
+  }catch(e){el.innerHTML='<div style="padding:8px;font-size:11px;color:var(--t3)">Ошибка загрузки</div>'}
+}
+async function respondOffer(offerId,status,listingId){
+  try{
+    const r=await API.put('/api/market/offer/'+offerId,{status});
+    if(r.error){toast('❌ '+r.error);return}
+    toast(status==='accepted'?'✅ Предложение принято':'✕ Предложение отклонено');
+    H.success();
+    // Refresh offers
+    const el=document.getElementById('offers-'+listingId);
+    if(el){el.style.display='none';toggleOffers(null,listingId)}
+  }catch(e){toast('❌ Ошибка')}
 }
 async function markSold(id){
   const price=prompt('За какую цену продано? (₽)');
@@ -1526,6 +1585,14 @@ async function blockUserFromChat(userId,name){
     else toast('❌ '+(r.error||'Ошибка'));
   }catch(e){toast('❌ Ошибка')}
 }
+async function blockUserFromProfile(userId,name){
+  if(!confirm('Заблокировать '+name+'? Вы не будете видеть сообщения друг друга.'))return;
+  try{
+    const r=await API.post('/api/users/'+userId+'/block',{});
+    if(r.ok||r.blocked){toast('🚫 '+name+' заблокирован');H.success();P_user(userId)}
+    else toast('❌ '+(r.error||'Ошибка'));
+  }catch(e){toast('❌ Ошибка')}
+}
 
 // ── Blocked users page ──
 async function P_blocked(){
@@ -1671,6 +1738,7 @@ async function P_user(uid){
     } else {
       h+='<button class="btn btn-b btn-sm" onclick="followUser('+uid+')">👤 Подписаться</button>';
     }
+    h+='<button class="btn btn-r btn-sm" onclick="blockUserFromProfile('+uid+',\''+esc(u.display_name)+'\')">🚫 Блокировать</button>';
   }
   h+='</div>';
   const mkt=await API.get('/api/market?status=active&per_page=10');

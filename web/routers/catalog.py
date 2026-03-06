@@ -119,9 +119,20 @@ async def search_items(
     return [_item_short(i) for i in results]
 
 
+_popular_cache = None
+_popular_cache_ts = 0
+_POPULAR_TTL = 60  # seconds
+
+
 @router.get("/popular")
 async def popular_items(limit: int = 8):
     """Самые популярные предметы — по количеству продаж за 7 дней или по количеству отслеживаний."""
+    global _popular_cache, _popular_cache_ts
+    import time as _time
+    now = _time.time()
+    if _popular_cache is not None and now - _popular_cache_ts < _POPULAR_TTL and len(_popular_cache) >= limit:
+        return _popular_cache[:limit]
+
     from datetime import datetime, timedelta
     limit = max(1, min(limit, 20))
 
@@ -192,11 +203,13 @@ async def popular_items(limit: int = 8):
     # Add trend data
     _attach_trends(result)
 
+    _popular_cache = result
+    _popular_cache_ts = now
     return result
 
 
 def _attach_trends(items: list[dict]):
-    """Добавляет тренд (изменение цены за 7д) к каждому предмету."""
+    """Добавляет тренд (изменение цены за 7д) к каждому предмету — батчевый запрос."""
     from datetime import datetime, timedelta
     from db.models import SaleRecord
     if not items:
@@ -206,19 +219,29 @@ def _attach_trends(items: list[dict]):
     ids = [i["id"] for i in items]
     try:
         with SessionLocal() as session:
+            # Batch: avg price per item for last 7 days
+            avg7_rows = session.query(
+                SaleRecord.item_id, func.avg(SaleRecord.price)
+            ).filter(
+                SaleRecord.item_id.in_(ids),
+                SaleRecord.time_sold >= cutoff_7d,
+            ).group_by(SaleRecord.item_id).all()
+            avg7_map = {r[0]: r[1] for r in avg7_rows}
+
+            # Batch: avg price per item for 7-14 days ago
+            avg14_rows = session.query(
+                SaleRecord.item_id, func.avg(SaleRecord.price)
+            ).filter(
+                SaleRecord.item_id.in_(ids),
+                SaleRecord.time_sold >= cutoff_14d,
+                SaleRecord.time_sold < cutoff_7d,
+            ).group_by(SaleRecord.item_id).all()
+            avg14_map = {r[0]: r[1] for r in avg14_rows}
+
             for item_dict in items:
                 iid = item_dict["id"]
-                # Avg price last 7d
-                avg7 = session.query(func.avg(SaleRecord.price)).filter(
-                    SaleRecord.item_id == iid,
-                    SaleRecord.time_sold >= cutoff_7d,
-                ).scalar()
-                # Avg price 7-14d ago
-                avg14 = session.query(func.avg(SaleRecord.price)).filter(
-                    SaleRecord.item_id == iid,
-                    SaleRecord.time_sold >= cutoff_14d,
-                    SaleRecord.time_sold < cutoff_7d,
-                ).scalar()
+                avg7 = avg7_map.get(iid)
+                avg14 = avg14_map.get(iid)
                 if avg7 and avg14 and avg14 > 0:
                     pct = round((avg7 - avg14) / avg14 * 100, 1)
                     item_dict["trend"] = pct
