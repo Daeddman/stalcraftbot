@@ -244,8 +244,11 @@ table.lt{width:100%;border-collapse:collapse;font-size:11px}
 
 /* Chart container */
 .chart-wrap{background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);padding:4px;margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow)}
-.chart-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 6px}
-.chart-title{font-size:11px;font-weight:800;color:var(--t2)}
+.chart-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 6px;gap:8px}
+.chart-title{font-size:11px;font-weight:800;color:var(--t2);white-space:nowrap}
+.chart-controls{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.chart-qlt-sel{background:var(--bg2);border:1px solid var(--brd);color:var(--t);border-radius:4px;padding:2px 22px 2px 6px;font-size:9px;outline:none;font-family:var(--font);appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center}
+.chart-qlt-sel:focus{border-color:var(--acc)}
 .chart-period{display:flex;gap:4px}
 .chart-period button{background:var(--bg2);border:1px solid var(--brd);color:var(--t3);border-radius:4px;padding:2px 8px;font-size:9px;cursor:pointer;font-family:var(--font)}
 .chart-period button.act{border-color:var(--acc);color:var(--acc);background:var(--acc-bg)}

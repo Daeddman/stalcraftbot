@@ -8,7 +8,7 @@ function go(h){location.hash=h}
 function _goBack(){history.back()}
 
 /* ── State ── */
-let S={lotPP:20,salePP:20,lotSort:'buyout_price',lotOrder:'asc',saleQlt:'all',saleUpg:'all',saleSort:'time_desc',lotQlt:'all',chatCh:'general',searchTab:'market',chartDays:30};
+let S={lotPP:20,salePP:20,lotSort:'buyout_price',lotOrder:'asc',saleQlt:'all',saleUpg:'all',saleSort:'time_desc',lotQlt:'all',chartQlt:'all',chatCh:'general',searchTab:'market',chartDays:30};
 try{Object.assign(S,JSON.parse(localStorage.getItem('ph11')||'{}'))}catch(e){}
 function saveS(){localStorage.setItem('ph11',JSON.stringify(S))}
 
@@ -202,7 +202,7 @@ async function P_auc(id,lp,sp){
     API.get(lotsUrl),
     API.get(histUrl),
     API.get('/api/auction/'+id+'/sync-status').catch(()=>({})),
-    API.get('/api/auction/'+id+'/chart-data?days='+S.chartDays+(isA&&S.saleQlt!=='all'?'&quality='+S.saleQlt:'')).catch(()=>({points:[]})),
+    API.get('/api/auction/'+id+'/chart-data?days='+S.chartDays+(S.chartQlt!=='all'?'&quality='+S.chartQlt:'')).catch(()=>({points:[]})),
   ]);
 
   const lots=ld.lots||[];
@@ -226,11 +226,21 @@ async function P_auc(id,lp,sp){
   }
 
   // ── Price Chart ──
-  h+='<div class="chart-wrap"><div class="chart-header"><div class="chart-title">📈 График цен</div><div class="chart-period">';
+  h+='<div class="chart-wrap"><div class="chart-header"><div class="chart-title">📈 График цен</div><div class="chart-controls">';
+  // Quality filter for chart (only for artefacts)
+  if(isA){
+    h+='<select class="chart-qlt-sel" onchange="setChartQlt(this.value)">';
+    h+='<option value="all"'+(S.chartQlt==='all'?' selected':'')+'>Все</option>';
+    for(const[v,l] of[['0','Обычный'],['1','Необычный'],['2','Особый'],['3','Редкий'],['4','Исключ.'],['5','Легенд.']]){
+      h+='<option value="'+v+'"'+(S.chartQlt===v?' selected':'')+'>'+l+'</option>';
+    }
+    h+='</select>';
+  }
+  h+='<div class="chart-period">';
   for(const[d,l] of[[7,'7д'],[30,'30д'],[90,'90д']]){
     h+='<button class="'+(S.chartDays===d?'act':'')+'" onclick="setChartDays('+d+')">'+l+'</button>';
   }
-  h+='</div></div><div id="price-chart"></div></div>';
+  h+='</div></div></div><div id="price-chart"></div></div>';
 
   // ── Active Lots ──
   h+='<div class="sec">Активные лоты · '+fmtK(lTotal)+'</div>';
@@ -318,6 +328,7 @@ function setSaleQlt(v){S.saleQlt=v;saveS();if(_aucState.id)P_auc(_aucState.id,_a
 function setSaleUpg(v){S.saleUpg=v;saveS();if(_aucState.id)P_auc(_aucState.id,_aucState.lp||1,1)}
 function setSaleSort(v){S.saleSort=v;saveS();if(_aucState.id)P_auc(_aucState.id,_aucState.lp||1,_aucState.sp||1)}
 function setChartDays(d){S.chartDays=d;saveS();if(_aucState.id)P_auc(_aucState.id,_aucState.lp||1,_aucState.sp||1)}
+function setChartQlt(v){S.chartQlt=v;saveS();if(_aucState.id)P_auc(_aucState.id,_aucState.lp||1,_aucState.sp||1)}
 
 /* ── Price Chart (lightweight-charts) ── */
 function _renderPriceChart(points){

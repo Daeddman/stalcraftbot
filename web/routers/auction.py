@@ -246,30 +246,66 @@ async def chart_data(
     quality: int = -99,
     days: int = 30,
 ):
-    """Агрегированные данные для графика цен (по дням)."""
+    """Агрегированные данные для графика цен (по дням).
+    Приоритет: БД → API fallback.
+    """
+    from datetime import datetime, timedelta
+    from collections import defaultdict
+
+    cutoff = (datetime.utcnow() - timedelta(days=days)).isoformat()
+
+    # 1) Пробуем из БД (SaleRecord)
     with SessionLocal() as session:
         q = session.query(SaleRecord).filter(SaleRecord.item_id == item_id)
         if quality != -99:
             q = q.filter(SaleRecord.quality == quality)
-
-        from datetime import datetime, timedelta, timezone
-        cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
         q = q.filter(SaleRecord.time_sold >= cutoff)
         q = q.order_by(asc(SaleRecord.time_sold))
-
         records = q.all()
 
-        from collections import defaultdict
+    if records:
+        return _build_chart_points(records)
+
+    # 2) Fallback: API history (без фильтра quality — API не поддерживает)
+    if quality != -99:
+        return {"points": [], "total_sales": 0}
+
+    try:
+        all_prices = []
+        api_offset = 0
+        for _ in range(10):  # макс 2000 записей
+            data = await get_price_history(
+                item_id, limit=200, offset=api_offset, additional=True,
+            )
+            prices = data.get("prices", [])
+            if not prices:
+                break
+            all_prices.extend(prices)
+            api_total = data.get("total", 0)
+            api_offset += 200
+            if api_offset >= api_total:
+                break
+            await asyncio.sleep(0.2)
+
+        if not all_prices:
+            return {"points": [], "total_sales": 0}
+
+        # Фильтруем по дате
         daily: dict[str, list[int]] = defaultdict(list)
-        for r in records:
-            day = r.time_sold[:10] if r.time_sold else ""
-            if day:
-                daily[day].append(r.price)
+        for p in all_prices:
+            t = p.get("time", "")
+            day = t[:10] if t else ""
+            if day and day >= cutoff[:10]:
+                price = p.get("price", 0)
+                if price > 0:
+                    daily[day].append(price)
 
         points = []
+        total = 0
         for day, prices_list in sorted(daily.items()):
             prices_sorted = sorted(prices_list)
             n = len(prices_sorted)
+            total += n
             points.append({
                 "date": day,
                 "min": prices_sorted[0],
@@ -279,7 +315,36 @@ async def chart_data(
                 "count": n,
             })
 
-        return {"points": points, "total_sales": len(records)}
+        return {"points": points, "total_sales": total}
+
+    except Exception as exc:
+        logger.warning("Chart fallback error for %s: %s", item_id, exc)
+        return {"points": [], "total_sales": 0}
+
+
+def _build_chart_points(records) -> dict:
+    """Строит chart points из списка SaleRecord."""
+    from collections import defaultdict
+    daily: dict[str, list[int]] = defaultdict(list)
+    for r in records:
+        day = r.time_sold[:10] if r.time_sold else ""
+        if day:
+            daily[day].append(r.price)
+
+    points = []
+    for day, prices_list in sorted(daily.items()):
+        prices_sorted = sorted(prices_list)
+        n = len(prices_sorted)
+        points.append({
+            "date": day,
+            "min": prices_sorted[0],
+            "max": prices_sorted[-1],
+            "avg": sum(prices_sorted) // n,
+            "median": prices_sorted[n // 2],
+            "count": n,
+        })
+
+    return {"points": points, "total_sales": len(records)}
 
 
 @router.get("/auction/{item_id}/sync-status")
