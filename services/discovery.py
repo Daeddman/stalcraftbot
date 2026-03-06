@@ -1,7 +1,8 @@
 """
-Discovery-сканер: полный обход аукциона по offset.
-Находит ВСЕ лоты, включая предметы которых нет в official DB.
-Вариант B: state + history (active_lots + lot_events).
+Discovery-сканер: обход аукциона по известным предметам.
+Stalcraft API не имеет общего /auction endpoint —
+только /{region}/auction/{item_id}/lots для конкретного предмета.
+Поэтому сканируем лоты по всем известным item_id из ItemRegistry.
 """
 
 import asyncio
@@ -10,7 +11,7 @@ import logging
 import statistics
 from datetime import datetime, timezone
 
-from api.client import stalcraft_client
+from api.client import stalcraft_client, InvalidItemError
 from config import STALCRAFT_REGION
 from db.models import (
     SessionLocal,
@@ -24,8 +25,9 @@ from db.models import (
 logger = logging.getLogger("discovery")
 
 PAGE_SIZE = 200   # макс лотов за запрос (API limit)
-MAX_PAGES = 500   # защита от бесконечного цикла
-SCAN_DELAY = 0.35 # задержка между страницами (rate limit)
+MAX_PAGES_PER_ITEM = 10  # макс страниц на один предмет
+SCAN_DELAY = 0.25  # задержка между запросами (rate limit)
+BATCH_SIZE = 5     # кол-во параллельных запросов
 
 
 # ══════════════════════════════════════════════════════════════
@@ -52,39 +54,87 @@ def _parse_additional(lot: dict) -> tuple[int, int]:
 
 
 # ══════════════════════════════════════════════════════════════
-#  Сбор всех лотов с аукциона
+#  Сбор лотов по конкретному предмету
 # ══════════════════════════════════════════════════════════════
 
-async def _fetch_all_lots(region: str) -> list[dict]:
-    """Обходит весь аукцион по offset, возвращает все лоты."""
+async def _fetch_item_lots(item_id: str, region: str) -> list[dict]:
+    """Получить все активные лоты конкретного предмета."""
     all_lots: list[dict] = []
     offset = 0
 
-    for _ in range(MAX_PAGES):
+    for _ in range(MAX_PAGES_PER_ITEM):
         try:
             data = await stalcraft_client.get(
-                f"/{region}/auction",
+                f"/{region}/auction/{item_id}/lots",
                 params={
-                    "sort": "time_created",
+                    "sort": "buyout_price",
                     "order": "asc",
                     "offset": offset,
                     "limit": PAGE_SIZE,
                     "additional": "true",
                 },
             )
+        except InvalidItemError:
+            return []  # предмет не поддерживается API
         except Exception as exc:
-            logger.error("Ошибка получения страницы offset=%d: %s", offset, exc)
+            logger.debug("Ошибка лотов %s offset=%d: %s", item_id, offset, exc)
             break
 
-        lots = data.get("lots", []) if isinstance(data, dict) else data if isinstance(data, list) else []
+        lots = data.get("lots", []) if isinstance(data, dict) else []
         if not lots:
             break
+
+        # Добавляем itemId в каждый лот (API может не включать)
+        for lot in lots:
+            lot.setdefault("itemId", item_id)
 
         all_lots.extend(lots)
         offset += PAGE_SIZE
 
         if len(lots) < PAGE_SIZE:
             break
+
+        await asyncio.sleep(SCAN_DELAY)
+
+    return all_lots
+
+
+async def _fetch_all_lots(region: str) -> list[dict]:
+    """
+    Обходит аукцион по всем известным item_id.
+    Запрашивает лоты батчами по BATCH_SIZE предметов параллельно.
+    """
+    # Получаем все item_id из registry
+    with SessionLocal() as session:
+        item_ids = [
+            r[0] for r in session.query(ItemRegistry.item_id).all()
+        ]
+
+    if not item_ids:
+        logger.warning("ItemRegistry пуст — нечего сканировать")
+        return []
+
+    logger.info("📋 Сканируем лоты по %d предметам...", len(item_ids))
+
+    all_lots: list[dict] = []
+    scanned = 0
+
+    # Батч-обработка
+    for i in range(0, len(item_ids), BATCH_SIZE):
+        batch = item_ids[i : i + BATCH_SIZE]
+        tasks = [_fetch_item_lots(iid, region) for iid in batch]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+
+        for result in results:
+            if isinstance(result, list):
+                all_lots.extend(result)
+            elif isinstance(result, Exception):
+                logger.debug("Ошибка batch-scan: %s", result)
+
+        scanned += len(batch)
+        if scanned % 50 == 0:
+            logger.info("  ... просканировано %d/%d предметов, лотов: %d",
+                        scanned, len(item_ids), len(all_lots))
 
         await asyncio.sleep(SCAN_DELAY)
 

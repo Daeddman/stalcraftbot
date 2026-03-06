@@ -288,10 +288,10 @@ async def main() -> None:
 
     scheduler.add_job(
         _discovery_job, "interval",
-        seconds=45,
+        minutes=10,
         id="discovery_scan",
-        name="Discovery: полный обход аукциона",
-        misfire_grace_time=60,
+        name="Discovery: обход аукциона по предметам",
+        misfire_grace_time=120,
         max_instances=1,
     )
 
