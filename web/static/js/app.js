@@ -8,7 +8,7 @@ function go(h){location.hash=h}
 function _goBack(){history.back()}
 
 /* ── State ── */
-let S={lotPP:20,salePP:20,lotSort:'buyout_price',lotOrder:'asc',saleQlt:'all',saleUpg:'all',saleSort:'time_desc',lotQlt:'all',chartQlt:'all',chatCh:'general',searchTab:'market',chartDays:30,mktCat:'all',mktType:'',mktSort:'newest',mktSearch:''};
+let S={lotPP:20,salePP:20,lotSort:'buyout_price',lotOrder:'asc',saleQlt:'all',saleUpg:'all',saleSort:'time_desc',lotQlt:'all',chartQlt:'all',chatCh:'general',searchTab:'market',chartDays:30,mktCat:'all',mktType:'',mktSort:'newest',mktSearch:'',lotView:'list'};
 try{Object.assign(S,JSON.parse(localStorage.getItem('ph11')||'{}'))}catch(e){}
 function saveS(){localStorage.setItem('ph11',JSON.stringify(S))}
 
@@ -37,7 +37,7 @@ async function _updateUnreadBadge(){
 }
 
 /* ── Render ── */
-function render(h){A.innerHTML='<div class="page">'+h+'</div>';A.scrollTop=0}
+function render(h){A.innerHTML='<div class="page">'+h+'</div>';A.scrollTop=0;requestAnimationFrame(()=>initRevealAnim())}
 
 /* ── Parse quality + potency ── */
 function parseQU(add){
@@ -314,16 +314,22 @@ async function P_auc(id,lp,sp){
     h+='</select>';
   }
   h+=ppSel(S.lotPP,[10,20,50],'lot');
+  h+=viewToggle(S.lotView);
   h+='</div>';
 
+  const isGrid=S.lotView==='grid';
   if(lots.length){
-    h+='<div class="card">';
+    h+='<div class="'+(isGrid?'lot-grid':'card')+'">';
     for(const l of lots){
       const pr=l.buyoutPrice||l.currentPrice||l.startPrice||0;
       const isBuyout=l.buyoutPrice>0;
       let meta='<span class="lot-type '+(isBuyout?'buyout':'bid')+'">'+(isBuyout?'Выкуп':'Ставка')+'</span>';
       if(isA){const{q,u}=parseQU(l.additional);if(q>=0)meta+=qb(q);if(u>0)meta+=' '+upg(u);}
-      h+='<div class="lot-card"><div class="lot-price">'+fmt(pr)+' ₽</div><div class="lot-meta">'+meta+'</div><div class="lot-expire">'+fmtRemain(l.endTime)+'</div></div>';
+      if(isGrid){
+        h+='<div class="lot-grid-card reveal-on-scroll"><div class="lot-price">'+fmt(pr)+' ₽</div><div class="lot-meta">'+meta+'</div><div class="lot-expire">'+fmtRemain(l.endTime)+'</div></div>';
+      } else {
+        h+='<div class="lot-card reveal-on-scroll"><div class="lot-price">'+fmt(pr)+' ₽</div><div class="lot-meta">'+meta+'</div><div class="lot-expire">'+fmtRemain(l.endTime)+'</div></div>';
+      }
     }
     h+='</div>';
     if(lPages>1)h+=pgBar(lp,lPages,"P_auc('"+id+"',{p},"+sp+")");
@@ -372,6 +378,12 @@ async function P_auc(id,lp,sp){
 
   // Render chart after DOM is ready
   _renderPriceChart(chartD.points || []);
+
+  // First-visit tooltips
+  const vtBtn=document.querySelector('.vt-btn');
+  if(vtBtn)showTip('lot_view','Переключайте между списком и сеткой',vtBtn);
+  const chartEl=document.querySelector('.chart-wrap');
+  if(chartEl&&chartD.points&&chartD.points.length)showTip('chart_interact','Нажмите на график чтобы увидеть цену в конкретный день',chartEl);
 }
 
 /* ── Auction filter setters ── */
@@ -381,7 +393,8 @@ function setSaleQlt(v){S.saleQlt=v;saveS();if(_aucState.id)P_auc(_aucState.id,_a
 function setSaleUpg(v){S.saleUpg=v;saveS();if(_aucState.id)P_auc(_aucState.id,_aucState.lp||1,1)}
 function setSaleSort(v){S.saleSort=v;saveS();if(_aucState.id)P_auc(_aucState.id,_aucState.lp||1,_aucState.sp||1)}
 function setChartDays(d){S.chartDays=d;saveS();if(_aucState.id)P_auc(_aucState.id,_aucState.lp||1,_aucState.sp||1)}
-function setChartQlt(v){S.chartQlt=v;saveS();if(_aucState.id)P_auc(_aucState.id,_aucState.lp||1,_aucState.sp||1)}
+function setChartQlt(v){S.chartQlt=v;saveS();if(_aucState.id)P_auc(_aucState.id,_aucState.lp||1,1)}
+function setLotView(v){S.lotView=v;saveS();if(_aucState.id)P_auc(_aucState.id,_aucState.lp||1,_aucState.sp||1)}
 
 /* ── Price Chart (lightweight-charts) ── */
 function _renderPriceChart(points){
@@ -547,6 +560,7 @@ async function P_search(){
     si.addEventListener('input',e=>{clearTimeout(_st);_lastQ=e.target.value;_st=setTimeout(()=>doSearch(e.target.value),250)});
     if(_lastQ)doSearch(_lastQ);
     si.focus();
+    showTip('search_tabs','Переключайтесь между маркетом (объявления игроков) и аукционом (игровые лоты)',document.querySelector('.tabs'));
   }
 }
 function switchSearchTab(tab){S.searchTab=tab;saveS();_lastQ='';P_search()}
@@ -579,9 +593,27 @@ async function P_tracked(){
   if(!tr.length){
     h+='<div class="empty"><div class="empty-i">📭</div><div class="empty-t">Ничего не добавлено</div><button class="btn btn-g btn-sm" style="margin:14px auto 0" onclick="go(\'#/search\')">🔍 Найти предметы</button></div>';
   } else {
-    h+='<div class="card">';for(const t of tr)h+=R(t.item_id,t.icon,t.name,'',t.color,null,t.api_supported);h+='</div>';
+    h+='<div class="card drag-container" id="tracked-list">';
+    for(const t of tr){
+      h+='<div class="drag-item irow rk-'+(t.color||'DEFAULT')+'" data-id="'+t.item_id+'" onclick="haptic();go(\'#/item/'+t.item_id+'\')">';
+      h+='<div class="drag-handle" onclick="event.stopPropagation()">⠿</div>';
+      h+='<div class="irow-icon">'+ICO(t.icon)+'</div>';
+      h+='<div class="ib"><div class="in">'+t.name+'</div></div>';
+      h+='</div>';
+    }
+    h+='</div>';
   }
   render(h);
+  if(tr.length){
+    initDragReorder('#tracked-list',ids=>{
+      // Save new order
+      API.post('/api/tracked/reorder',{ids}).catch(()=>{});
+      H.success();
+    });
+    // First-visit tooltip
+    const handle=document.querySelector('.drag-handle');
+    if(handle)showTip('drag_reorder','Зажмите ⠿ и перетащите для изменения порядка',handle);
+  }
 }
 
 /* ═══════════ CLAN ═══════════ */
@@ -659,10 +691,31 @@ async function P_market(sub){
   if(!d.items||!d.items.length){
     h+=emptyMsg('Нет объявлений по фильтру');
   } else {
+    h+='<div id="mkt-list">';
     for(const l of d.items)h+=marketCard(l);
-    if(d.pages>1)h+='<div class="sub" style="text-align:center">Всего: '+d.total+' объявлений</div>';
+    h+='</div>';
+    if(d.pages>1)h+='<div id="mkt-sentinel"></div>';
   }
   render(h);
+  // Init infinite scroll for marketplace
+  if(d.pages>1){
+    let mktPage=1;
+    initInfScroll('mkt-sentinel',(done,end)=>{
+      mktPage++;
+      let u='/api/market?status=active&per_page=30&page='+mktPage+'&sort='+mSort;
+      if(mCat&&mCat!=='all')u+='&category='+mCat;
+      if(mType)u+='&listing_type='+mType;
+      if(mSearch)u+='&search='+encodeURIComponent(mSearch);
+      API.get(u).then(nd=>{
+        const list=document.getElementById('mkt-list');
+        if(!list||!nd.items||!nd.items.length){end();return}
+        let nh='';for(const l of nd.items)nh+=marketCard(l);
+        list.insertAdjacentHTML('beforeend',nh);
+        initRevealAnim();
+        if(mktPage>=nd.pages)end();else done();
+      }).catch(()=>end());
+    });
+  }
 }
 function setMktCat(v){S.mktCat=v;saveS();go('#/market')}
 function setMktType(v){S.mktType=v;saveS();go('#/market')}
@@ -690,7 +743,7 @@ function marketCard(l){
   // Offers badge
   let offersBadge='';
   if(l.offers_count>0)offersBadge='<span class="offers-badge">💬 '+l.offers_count+' предл.</span>';
-  return'<div class="mcard" onclick="go(\'#/user/'+((l.user&&l.user.id)||0)+'\')">'
+  return'<div class="mcard reveal-on-scroll" onclick="go(\'#/user/'+((l.user&&l.user.id)||0)+'\')">'
     +'<div class="mcard-head"><div class="mcard-icon">'+ico+'</div><div class="mcard-info"><div class="mcard-name" '+nameColor+'>'+l.item_name+'</div><div class="mcard-meta">'+meta+offersBadge+'</div></div><div class="mcard-price-col"><div class="mcard-price">'+fmt(l.price)+' ₽</div>'+(l.amount>1?'<div class="mcard-amount">×'+l.amount+'</div>':'')+'</div></div>'
     +(l.description?'<div class="mcard-desc">'+escHtml(l.description)+'</div>':'')
     +'<div class="mcard-bottom"><div class="mcard-user"><div class="mcard-avatar">'+av+'</div><span>'+uname+'</span>'+sellerBadge+'</div><div class="mcard-time">'+fmtSaleDate(l.created_at)+'</div></div>'
@@ -703,7 +756,7 @@ function openOffer(listingId,askPrice){
   if(!price)return;
   const msg=prompt('Сообщение продавцу (необязательно):','');
   API.post('/api/market/'+listingId+'/offer',{price:parseInt(price),message:msg||''}).then(r=>{
-    if(r.error){toast('❌ '+r.error)}else{toast('✅ Предложение отправлено!')}
+    if(r.error){toast('❌ '+r.error);H.error()}else{toast('✅ Предложение отправлено!');H.success()}
   }).catch(()=>toast('❌ Ошибка'));
 }
 
@@ -778,9 +831,9 @@ async function submitListing(){
   };
   try{
     const r=await API.post('/api/market',d);
-    if(r.error){toast('❌ '+r.error);return}
-    toast('✅ Объявление создано!');go('#/market-my');
-  }catch(e){toast('❌ Ошибка: требуется авторизация через Telegram')}
+    if(r.error){toast('❌ '+r.error);H.error();return}
+    toast('✅ Объявление создано!');H.sell();go('#/market-my');
+  }catch(e){toast('❌ Ошибка: требуется авторизация через Telegram');H.error()}
 }
 
 /* ═══════════ MY LISTINGS ═══════════ */

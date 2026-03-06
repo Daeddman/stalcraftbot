@@ -632,3 +632,53 @@ table.lt{width:100%;border-collapse:collapse;font-size:11px}
 @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
+/* ═══════════════════════════════════
+   INFINITE SCROLL
+   ═══════════════════════════════════ */
+.inf-spinner{text-align:center;padding:16px}
+.inf-spinner::after{content:'';display:inline-block;width:24px;height:24px;border:3px solid var(--brd2);border-top-color:var(--acc);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.inf-end{text-align:center;padding:14px;font-size:11px;color:var(--t3);font-weight:600}
+
+/* ═══════════════════════════════════
+   MICRO-ANIMATIONS (reveal on scroll)
+   ═══════════════════════════════════ */
+.reveal-on-scroll{opacity:0;transform:translateY(12px);transition:opacity .35s ease,transform .35s ease}
+.reveal-on-scroll.revealed{opacity:1;transform:none}
+
+/* ═══════════════════════════════════
+   CONTEXTUAL TOOLTIPS
+   ═══════════════════════════════════ */
+.ctx-tip{position:fixed;z-index:250;background:var(--acc);color:#111;padding:8px 12px;border-radius:10px;font-size:11px;font-weight:700;max-width:240px;box-shadow:0 4px 20px rgba(0,0,0,.25);animation:tipPop .25s ease;display:flex;align-items:center;gap:6px}
+.ctx-tip::before{content:'';position:absolute;top:-5px;left:20px;width:10px;height:10px;background:var(--acc);transform:rotate(45deg)}
+.ctx-tip-text{flex:1;line-height:1.35}
+.ctx-tip-close{background:none;border:none;color:#111;font-size:14px;cursor:pointer;padding:0;line-height:1;opacity:.6}
+.ctx-tip-close:hover{opacity:1}
+@keyframes tipPop{from{opacity:0;transform:scale(.9) translateY(4px)}to{opacity:1;transform:none}}
+
+/* ═══════════════════════════════════
+   DRAG TO REORDER
+   ═══════════════════════════════════ */
+.drag-container{position:relative}
+.drag-item{display:flex;align-items:center;gap:10px;touch-action:pan-y;user-select:none;-webkit-user-select:none;transition:transform .15s ease,box-shadow .15s}
+.drag-item.dragging{background:var(--surf2);box-shadow:0 4px 20px rgba(0,0,0,.2);z-index:10;border-radius:var(--r-sm);opacity:.9;transform:scale(1.02)}
+.drag-handle{display:flex;align-items:center;justify-content:center;width:28px;height:32px;color:var(--t3);font-size:14px;cursor:grab;flex-shrink:0;touch-action:none;-webkit-user-select:none;user-select:none;letter-spacing:-1px;opacity:.5;transition:.15s}
+.drag-handle:active{opacity:1;color:var(--acc);cursor:grabbing}
+
+/* ═══════════════════════════════════
+   GRID / LIST VIEW TOGGLE
+   ═══════════════════════════════════ */
+.view-toggle{display:inline-flex;border:1px solid var(--brd);border-radius:var(--r-xs);overflow:hidden;margin-left:8px;flex-shrink:0}
+.vt-btn{background:var(--surf);border:none;color:var(--t3);padding:4px 8px;font-size:12px;cursor:pointer;transition:.12s;font-family:var(--font);line-height:1}
+.vt-btn.act{background:var(--acc);color:#111}
+.vt-btn:not(.act):hover{background:var(--bg3)}
+
+/* Lot grid layout */
+.lot-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+.lot-grid-card{background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:4px;transition:.12s;cursor:pointer}
+.lot-grid-card:active{background:var(--bg3);transform:scale(.98)}
+.lot-grid-card .lot-price{font-size:15px;font-weight:900;color:var(--acc)}
+.lot-grid-card .lot-meta{display:flex;flex-wrap:wrap;gap:3px;font-size:10px}
+.lot-grid-card .lot-expire{font-size:9px;color:var(--t3);margin-top:auto}
+
+

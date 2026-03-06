@@ -188,3 +188,148 @@ function favAnim(x, y) {
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 700);
 }
+
+/* ═══════════════════════════════════════════
+   INFINITE SCROLL
+   ═══════════════════════════════════════════ */
+let _infObs = null;
+let _infLoading = false;
+let _infDone = false;
+function initInfScroll(sentinelId, loadFn) {
+  _infLoading = false;
+  _infDone = false;
+  if (_infObs) _infObs.disconnect();
+  const sentinel = document.getElementById(sentinelId);
+  if (!sentinel) return;
+  _infObs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting && !_infLoading && !_infDone) {
+      _infLoading = true;
+      sentinel.innerHTML = '<div class="inf-spinner"></div>';
+      loadFn(() => { _infLoading = false; }, () => { _infDone = true; _infLoading = false; sentinel.innerHTML = '<div class="inf-end">Всё загружено</div>'; });
+    }
+  }, { root: document.getElementById('app'), rootMargin: '200px' });
+  _infObs.observe(sentinel);
+}
+
+/* ═══════════════════════════════════════════
+   MICRO-ANIMATIONS (IntersectionObserver)
+   ═══════════════════════════════════════════ */
+let _animObs = null;
+function initRevealAnim() {
+  if (_animObs) _animObs.disconnect();
+  _animObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('revealed');
+        _animObs.unobserve(e.target);
+      }
+    });
+  }, { root: document.getElementById('app'), threshold: 0.05 });
+  document.querySelectorAll('.reveal-on-scroll').forEach(el => _animObs.observe(el));
+}
+
+/* ═══════════════════════════════════════════
+   HAPTIC PATTERNS
+   ═══════════════════════════════════════════ */
+const H = {
+  tap: () => haptic('light'),
+  success: () => haptic('medium'),
+  error: () => { haptic('heavy'); setTimeout(() => haptic('rigid'), 80); },
+  sell: () => { haptic('medium'); setTimeout(() => haptic('light'), 100); },
+  buy: () => { haptic('soft'); setTimeout(() => haptic('medium'), 100); },
+  drag: () => haptic('selection'),
+  warn: () => haptic('rigid'),
+};
+
+/* ═══════════════════════════════════════════
+   CONTEXTUAL TOOLTIPS
+   ═══════════════════════════════════════════ */
+const _shownTips = JSON.parse(localStorage.getItem('ph_tips') || '{}');
+function showTip(id, text, targetEl) {
+  if (_shownTips[id]) return;
+  _shownTips[id] = 1;
+  localStorage.setItem('ph_tips', JSON.stringify(_shownTips));
+  const tip = document.createElement('div');
+  tip.className = 'ctx-tip';
+  tip.innerHTML = '<div class="ctx-tip-text">' + text + '</div><button class="ctx-tip-close" onclick="this.parentElement.remove()">✕</button>';
+  if (targetEl) {
+    const r = targetEl.getBoundingClientRect();
+    tip.style.position = 'fixed';
+    tip.style.top = (r.bottom + 8) + 'px';
+    tip.style.left = Math.max(12, Math.min(r.left, window.innerWidth - 260)) + 'px';
+  }
+  document.body.appendChild(tip);
+  setTimeout(() => { if (tip.parentElement) tip.remove(); }, 6000);
+}
+
+/* ═══════════════════════════════════════════
+   DRAG TO REORDER (tracked items)
+   ═══════════════════════════════════════════ */
+let _dragEl = null, _dragY = 0, _dragList = null, _dragIdx = -1;
+function initDragReorder(containerSel, onReorder) {
+  const container = document.querySelector(containerSel);
+  if (!container) return;
+  _dragList = container;
+  const items = container.querySelectorAll('.drag-item');
+  items.forEach((item, idx) => {
+    const handle = item.querySelector('.drag-handle');
+    if (!handle) return;
+    handle.addEventListener('touchstart', e => {
+      e.preventDefault();
+      _dragEl = item;
+      _dragIdx = idx;
+      _dragY = e.touches[0].clientY;
+      item.classList.add('dragging');
+      H.drag();
+    });
+  });
+  document.addEventListener('touchmove', e => {
+    if (!_dragEl) return;
+    const dy = e.touches[0].clientY - _dragY;
+    _dragEl.style.transform = 'translateY(' + dy + 'px)';
+    // Find swap target
+    const items = _dragList.querySelectorAll('.drag-item');
+    items.forEach((it, i) => {
+      if (it === _dragEl) return;
+      const r = it.getBoundingClientRect();
+      const mid = r.top + r.height / 2;
+      if (e.touches[0].clientY > r.top && e.touches[0].clientY < r.bottom && e.touches[0].clientY < mid && i < _dragIdx) {
+        _dragList.insertBefore(_dragEl, it);
+        _dragIdx = i;
+        _dragY = e.touches[0].clientY;
+        _dragEl.style.transform = '';
+        H.drag();
+      } else if (e.touches[0].clientY > r.top && e.touches[0].clientY < r.bottom && e.touches[0].clientY > mid && i > _dragIdx) {
+        _dragList.insertBefore(_dragEl, it.nextSibling);
+        _dragIdx = i;
+        _dragY = e.touches[0].clientY;
+        _dragEl.style.transform = '';
+        H.drag();
+      }
+    });
+  }, { passive: true });
+  document.addEventListener('touchend', () => {
+    if (!_dragEl) return;
+    _dragEl.classList.remove('dragging');
+    _dragEl.style.transform = '';
+    _dragEl = null;
+    // Collect new order
+    if (onReorder && _dragList) {
+      const ids = Array.from(_dragList.querySelectorAll('.drag-item')).map(el => el.dataset.id).filter(Boolean);
+      onReorder(ids);
+    }
+  });
+}
+
+/* ═══════════════════════════════════════════
+   GRID / LIST VIEW TOGGLE
+   ═══════════════════════════════════════════ */
+function viewToggle(current) {
+  const isList = current === 'list';
+  return '<div class="view-toggle">' +
+    '<button class="vt-btn' + (isList ? ' act' : '') + '" onclick="setLotView(\'list\')" title="Список">☰</button>' +
+    '<button class="vt-btn' + (!isList ? ' act' : '') + '" onclick="setLotView(\'grid\')" title="Сетка">⊞</button>' +
+    '</div>';
+}
+
+

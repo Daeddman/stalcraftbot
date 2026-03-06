@@ -35,6 +35,7 @@ class TrackedItem(Base):
     name = Column(String(256), nullable=False)
     category = Column(String(128), default="")
     is_active = Column(Boolean, default=True)
+    sort_order = Column(Integer, default=0)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     def __repr__(self) -> str:
