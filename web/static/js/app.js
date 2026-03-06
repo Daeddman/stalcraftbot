@@ -1118,8 +1118,52 @@ async function sendChat(ch){
     }
   }catch(e){toast('❌ Авторизуйтесь через Telegram');inp.value=text}
 }
+// ── WebSocket Chat + Polling fallback ──
+let _chatWs=null,_wsOk=false;
+
 function startChatPoll(ch){
+  _connectChatWs(ch);
+  _startFallbackPoll(ch);
+}
+
+function _connectChatWs(ch){
+  try{
+    if(_chatWs){try{_chatWs.close()}catch(e){}_chatWs=null}
+    const proto=location.protocol==='https:'?'wss:':'ws:';
+    const token=tg&&tg.initData?encodeURIComponent(tg.initData):'';
+    const url=proto+'//'+location.host+'/ws/chat?channel='+encodeURIComponent(ch)+'&token='+token;
+    const ws=new WebSocket(url);
+    ws.onopen=()=>{_chatWs=ws;_wsOk=true};
+    ws.onmessage=(e)=>{
+      try{
+        const ev=JSON.parse(e.data);
+        if(ev.type==='new_message'&&ev.message){
+          const box=document.getElementById('chat-msgs');
+          if(box&&ev.message.id>(_ctx.chatLastId||0)){
+            const wasBottom=_isChatAtBottom(box);
+            box.insertAdjacentHTML('beforeend',chatMsg(ev.message));
+            _ctx.chatLastId=ev.message.id;
+            if(wasBottom)box.scrollTop=box.scrollHeight;
+            else _showScrollBtn(true);
+          }
+        }
+      }catch(err){}
+    };
+    ws.onclose=()=>{_chatWs=null;_wsOk=false};
+    ws.onerror=()=>{_chatWs=null;_wsOk=false};
+    const pingIv=setInterval(()=>{
+      if(ws&&ws.readyState===1)ws.send('ping');
+      else clearInterval(pingIv);
+    },25000);
+  }catch(e){_wsOk=false}
+}
+
+function _startFallbackPoll(ch){
   async function poll(){
+    if(_wsOk){
+      if(location.hash.startsWith('#/chat'))_chatPoll=setTimeout(poll,5000);
+      return;
+    }
     try{
       const msgs=await API.get('/api/chat/'+ch+'/messages?since_id='+(_ctx.chatLastId||0)+'&limit=20');
       if(msgs.length){
@@ -1132,11 +1176,8 @@ function startChatPoll(ch){
               _ctx.chatLastId=m.id;
             }
           }
-          if(wasAtBottom){
-            box.scrollTop=box.scrollHeight;
-          } else {
-            _showScrollBtn(true);
-          }
+          if(wasAtBottom)box.scrollTop=box.scrollHeight;
+          else _showScrollBtn(true);
         }
       }
     }catch(e){}
