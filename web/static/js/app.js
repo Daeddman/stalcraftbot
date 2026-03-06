@@ -91,6 +91,7 @@ async function route(){
     else if(pg==='chat')await P_chat(p[1]);
     else if(pg==='profile')await P_profile(p[1]);
     else if(pg==='user')await P_user(p[1]);
+    else if(pg==='blocked')await P_blocked();
     else await P_home();
   }catch(e){render('<div class="empty"><div class="empty-i">⚠️</div><div class="empty-t">'+e.message+'</div></div>')}
   if(tg)tg.expand();
@@ -685,6 +686,9 @@ async function P_chat(channel){
   }
 
   if(channel==='dm-list'){
+    // Mark notifications as read when viewing DM list
+    try{await API.post('/api/notifications/read',{})}catch(e){}
+    _updateUnreadBadge();
     try{
       const dms=await API.get('/api/chat/dm-list');
       if(!dms.length){
@@ -1128,6 +1132,54 @@ function _startHeartbeat(){
   _hbInterval=setInterval(beat,60000);
 }
 
+// ── DM actions ──
+async function deleteDMChat(channel){
+  if(!confirm('Удалить всю переписку?'))return;
+  try{
+    const r=await API.del('/api/chat/dm-channel/'+encodeURIComponent(channel));
+    if(r.ok){toast('🗑 Чат удалён');go('#/chat/dm-list')}
+    else toast('❌ '+(r.error||'Ошибка'));
+  }catch(e){toast('❌ Ошибка')}
+}
+async function blockUserFromChat(userId,name){
+  if(!confirm('Заблокировать '+name+'? Вы не будете видеть сообщения друг друга.'))return;
+  try{
+    const r=await API.post('/api/users/'+userId+'/block',{});
+    if(r.ok||r.blocked){toast('🚫 '+name+' заблокирован');go('#/chat/dm-list')}
+    else toast('❌ '+(r.error||'Ошибка'));
+  }catch(e){toast('❌ Ошибка')}
+}
+
+// ── Blocked users page ──
+async function P_blocked(){
+  render(skelRows(3));
+  try{
+    const list=await API.get('/api/blocked-users');
+    let h='<a class="back" href="#/profile">← Профиль</a>';
+    h+='<div class="hdr">🚫 Заблокированные</div>';
+    if(!list.length){
+      h+='<div class="ch-empty"><div class="ch-empty-icon">✅</div><div class="ch-empty-text">Нет заблокированных</div></div>';
+    } else {
+      for(const u of list){
+        h+='<div class="card" style="display:flex;align-items:center;gap:12px;padding:12px;margin-bottom:6px">';
+        h+=_chatAvatar(u,'md');
+        h+='<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:13px">'+escHtml(u.display_name)+'</div>';
+        h+='<div style="font-size:10px;color:var(--t3)">Заблокирован '+fmtSaleDate(u.blocked_at)+'</div></div>';
+        h+='<button class="btn btn-sm btn-r" onclick="unblockUser('+u.id+')">Разблокировать</button>';
+        h+='</div>';
+      }
+    }
+    render(h);
+  }catch(e){render(emptyMsg('Авторизуйтесь через Telegram'))}
+}
+async function unblockUser(userId){
+  try{
+    const r=await API.del('/api/users/'+userId+'/block');
+    toast('✅ Разблокирован');
+    P_blocked();
+  }catch(e){toast('❌ Ошибка')}
+}
+
 
 /* ═══════════ PROFILE ═══════════ */
 async function P_profile(sub){
@@ -1153,6 +1205,7 @@ async function P_profile(sub){
   h+='<button class="btn btn-o" onclick="go(\'#/profile/edit\')">✏️ Редактировать</button>';
   h+='<div style="margin-top:14px"><button class="btn btn-o" onclick="go(\'#/tracked\')">⭐ Избранное</button></div>';
   h+='<div style="margin-top:8px"><button class="btn btn-o" onclick="go(\'#/market-my\')">📋 Мои объявления</button></div>';
+  h+='<div style="margin-top:8px"><button class="btn btn-o" onclick="go(\'#/blocked\')">🚫 Заблокированные</button></div>';
 
   // Settings
   h+='<div class="sec" style="margin-top:18px">⚙️ Настройки</div>';
