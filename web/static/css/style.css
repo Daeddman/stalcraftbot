@@ -366,7 +366,6 @@ table.lt{width:100%;border-collapse:collapse;font-size:11px}
 /* Avatar component */
 .ch-av{width:32px;height:32px;border-radius:50%;background:var(--surf2);overflow:visible;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;position:relative}
 .ch-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
-.ch-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .ch-av-sm{width:28px;height:28px;font-size:11px}
 .ch-av-md{width:44px;height:44px;font-size:17px}
 .ch-av-lg{width:56px;height:56px;font-size:22px}
