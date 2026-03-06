@@ -750,7 +750,12 @@ async function P_chat(channel){
   render(h);
   const box=document.getElementById('chat-msgs');
   if(box){
-    box.scrollTop=box.scrollHeight;
+    // Ensure scroll-to-bottom after full DOM render + image load
+    requestAnimationFrame(()=>{
+      box.scrollTop=box.scrollHeight;
+      setTimeout(()=>{box.scrollTop=box.scrollHeight},100);
+      setTimeout(()=>{box.scrollTop=box.scrollHeight},300);
+    });
     box.addEventListener('scroll',_chatScrollHandler);
   }
   _ctx.chatLastId=msgs.length?msgs[msgs.length-1].id:0;

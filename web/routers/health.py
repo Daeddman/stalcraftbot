@@ -60,6 +60,26 @@ async def health(request: Request):
     from config import TELEGRAM_BOT_TOKEN
     bot_configured = bool(TELEGRAM_BOT_TOKEN)
 
+    # WebSocket stats
+    ws_stats = {}
+    try:
+        from web.routers.ws_chat import manager as ws_manager
+        ws_stats = ws_manager.stats()
+    except Exception:
+        pass
+
+    # Cache stats
+    cache_stats = {}
+    try:
+        from services.cache import auction_cache, api_cache, compute_cache
+        cache_stats = {
+            "auction": auction_cache.stats(),
+            "api": api_cache.stats(),
+            "compute": compute_cache.stats(),
+        }
+    except Exception:
+        pass
+
     # Sync status
     sync_info = {}
     try:
@@ -76,6 +96,18 @@ async def health(request: Request):
     except Exception:
         pass
 
+    # Backups info
+    backups_info = {}
+    try:
+        from services.backup import list_backups
+        bkps = list_backups()
+        backups_info = {
+            "count": len(bkps),
+            "latest": bkps[0] if bkps else None,
+        }
+    except Exception:
+        pass
+
     return {
         "status": "ok" if db_ok else "degraded",
         "uptime_seconds": round(uptime_sec),
@@ -87,6 +119,9 @@ async def health(request: Request):
         },
         "scheduler": sched_info,
         "bot": {"configured": bot_configured},
+        "websocket": ws_stats,
+        "cache": cache_stats,
+        "backups": backups_info,
         "history_sync": sync_info,
         "timestamp": now,
     }

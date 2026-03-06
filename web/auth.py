@@ -62,13 +62,13 @@ def get_or_create_user(telegram_id: int, **kwargs) -> User:
     with SessionLocal() as session:
         user = session.query(User).filter_by(telegram_id=telegram_id).first()
         if user:
-            # Обновляем данные из Telegram
+            # Обновляем только telegram_username (всегда актуальный)
+            # display_name НЕ перезаписываем — пользователь мог задать своё
             changed = False
-            for key in ("telegram_username", "display_name", "avatar_url"):
-                val = kwargs.get(key)
-                if val and getattr(user, key) != val:
-                    setattr(user, key, val)
-                    changed = True
+            tg_username = kwargs.get("telegram_username")
+            if tg_username and user.telegram_username != tg_username:
+                user.telegram_username = tg_username
+                changed = True
             if changed:
                 session.commit()
             session.expunge(user)

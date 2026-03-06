@@ -364,7 +364,8 @@ table.lt{width:100%;border-collapse:collapse;font-size:11px}
 .ch-header-btn:active{transform:scale(.9)}
 
 /* Avatar component */
-.ch-av{width:32px;height:32px;border-radius:50%;background:var(--surf2);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.ch-av{width:32px;height:32px;border-radius:50%;background:var(--surf2);overflow:visible;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;position:relative}
+.ch-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .ch-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .ch-av-sm{width:28px;height:28px;font-size:11px}
 .ch-av-md{width:44px;height:44px;font-size:17px}
@@ -530,8 +531,7 @@ table.lt{width:100%;border-collapse:collapse;font-size:11px}
 /* ════════════════════════════════════════════
    ONLINE STATUS DOT
    ════════════════════════════════════════════ */
-.ch-av{position:relative}
-.online-dot{position:absolute;bottom:0;right:0;width:9px;height:9px;border-radius:50%;background:var(--grn);border:2px solid var(--bg);box-shadow:0 0 6px rgba(34,197,94,.4)}
+.online-dot{position:absolute;bottom:-1px;right:-1px;width:10px;height:10px;border-radius:50%;background:var(--grn);border:2px solid var(--bg);box-shadow:0 0 6px rgba(34,197,94,.5);z-index:2}
 .online-dot-sm{width:7px;height:7px}
 .online-dot-lg{width:11px;height:11px;border-width:2.5px}
 

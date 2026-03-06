@@ -123,14 +123,14 @@
 - [ ] **Антифрод** — детекция подозрительных цен
 
 ### 🔧 Технические
-- [ ] **WebSocket для чата** — вместо polling каждые 3 сек
-- [ ] **Redis кеш** — для горячих данных (цены, лоты, popular)
-- [ ] **Миниатюры иконок** — thumbnails для быстрой загрузки
-- [ ] **Service Worker** — offline-кеш для статики Mini App
-- [ ] **Логирование действий** — аудит: кто что купил/продал/изменил
-- [ ] **Бекапы БД** — автоматические ежедневные бекапы SQLite
-- [ ] **Мониторинг** — health endpoint + uptime бота
-- [ ] **Миграции Alembic** — вместо самописного ALTER TABLE
+- [x] **WebSocket для чата** — замена polling на WebSocket с fallback (ws_chat.py + ConnectionManager)
+- [x] **Улучшенный кеш** — TTLCache с maxsize/TTL/stats вместо разрозненных dict (cache.py)
+- [x] **Миниатюры иконок** — генерация 64×64 thumbnails через Pillow (thumbnails.py)
+- [x] **Service Worker** — offline-кеш статики, stale-while-revalidate (sw.js)
+- [x] **Логирование действий** — AuditLog модель + log_action() в chat/marketplace/users (audit.py)
+- [x] **Бекапы БД** — ежедневный бекап через sqlite3.backup() + ротация 7 дней (backup.py)
+- [x] **Мониторинг** — /api/health с uptime, DB, scheduler, WS, cache, backups, sync (health.py)
+- [x] **Миграции Alembic** — настроен Alembic с batch_mode для SQLite, начальная миграция
 
 ### 🎮 Игровые фичи
 - [ ] **Калькулятор крафта** — что нужно для рецепта, сколько стоит на аукционе

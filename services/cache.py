@@ -6,7 +6,6 @@
 import time
 import logging
 from typing import Any
-from functools import wraps
 
 logger = logging.getLogger("cache")
 
