@@ -1321,10 +1321,10 @@ async function P_profile_edit(){
   if(!me||!me.id){render(emptyMsg('Авторизуйтесь через Telegram'));return}
   let h='<a class="back" href="#/profile">← Профиль</a>';
   h+='<div class="hdr">✏️ Редактирование</div>';
-  h+='<div class="profile-field"><label>Отображаемое имя</label><input id="pe-name" value="'+(me.display_name||'')+'"></div>';
-  h+='<div class="profile-field"><label>Ник в игре</label><input id="pe-game" value="'+(me.game_nickname||'')+'" placeholder="Например: Player-1"></div>';
-  h+='<div class="profile-field"><label>Discord</label><input id="pe-disc" value="'+(me.discord||'')+'" placeholder="username#1234"></div>';
-  h+='<div class="profile-field"><label>О себе</label><textarea id="pe-bio" rows="3" placeholder="Расскажите о себе...">'+(me.bio||'')+'</textarea></div>';
+  h+='<div class="profile-field"><label>Отображаемое имя</label><input id="pe-name" value="'+escHtml(me.display_name||'')+'"></div>';
+  h+='<div class="profile-field"><label>Ник в игре</label><input id="pe-game" value="'+escHtml(me.game_nickname||'')+'" placeholder="Например: Player-1"></div>';
+  h+='<div class="profile-field"><label>Discord</label><input id="pe-disc" value="'+escHtml(me.discord||'')+'" placeholder="username#1234"></div>';
+  h+='<div class="profile-field"><label>О себе</label><textarea id="pe-bio" rows="3" placeholder="Расскажите о себе...">'+escHtml(me.bio||'')+'</textarea></div>';
   h+='<button class="btn btn-g" onclick="saveProfile()">💾 Сохранить</button>';
   render(h);
 }

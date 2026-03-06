@@ -1,16 +1,46 @@
+# ── Окружение и конфиг ──
 .env
 .venv/
 __pycache__/
 *.pyc
+.idea/
+
+# ── БД ──
 *.db
 *.db-shm
 *.db-wal
 *.sqlite
-*.log
-.idea/
-bot_log.txt
-test_*.txt
-certs/
-_tunnel.log
-_lt*.txt
+backups/
 
+# ── Логи ──
+*.log
+bot_log.txt
+_tunnel.log
+
+# ── SSL ──
+certs/
+
+# ── Загруженные файлы ──
+uploads/
+
+# ── Stalcraft DB (скачивается при запуске) ──
+stalcraft-database-main/
+
+# ── Alembic ──
+# Версии миграций коммитим, но не локальную БД
+# alembic/versions/ — коммитим
+
+# ── Thumbnails (генерируются) ──
+icon-thumbs/
+
+# ── Временные файлы ──
+_err.txt
+_wiki_test.json
+_lt*.txt
+test_*.txt
+test_*.py
+validate.py
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
