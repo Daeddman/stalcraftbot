@@ -130,9 +130,9 @@ async def check_emission_and_notify():
     from datetime import datetime, timezone
 
     try:
-        data = await get_emission()
+        data = await get_emission(force=True)
     except Exception as exc:
-        logger.debug("Emission check error: %s", exc)
+        logger.warning("Emission check error: %s", exc)
         return
 
     # Определяем текущее состояние
@@ -140,24 +140,32 @@ async def check_emission_and_notify():
     cs = data.get("currentStart")
     ce = data.get("currentEnd")
     is_active = False
+
     if cs and ce:
         try:
-            start = datetime.fromisoformat(cs.replace("Z", "+00:00"))
-            end = datetime.fromisoformat(ce.replace("Z", "+00:00"))
+            # Поддерживаем разные форматы даты
+            start_str = cs.replace("Z", "+00:00")
+            end_str = ce.replace("Z", "+00:00")
+            start = datetime.fromisoformat(start_str)
+            end = datetime.fromisoformat(end_str)
             is_active = start <= now <= end
-        except Exception:
-            pass
+            logger.debug("Emission: start=%s end=%s now=%s active=%s", start, end, now, is_active)
+        except Exception as exc:
+            logger.warning("Emission datetime parse error: %s (cs=%r, ce=%r)", exc, cs, ce)
 
     # Первый запуск — запоминаем без уведомлений
     if _last_emission_active is None:
         _last_emission_active = is_active
+        logger.info("☢️ Emission init: active=%s", is_active)
         return
 
     # Нет изменений
     if is_active == _last_emission_active:
         return
 
+    prev = _last_emission_active
     _last_emission_active = is_active
+    logger.info("☢️ Emission changed: %s → %s", prev, is_active)
 
     # Готовим сообщение
     if is_active:
@@ -168,19 +176,22 @@ async def check_emission_and_notify():
     # Рассылаем подписчикам
     bot = _get_bot()
     if not bot:
+        logger.warning("☢️ Emission: бот не инициализирован")
         return
 
     with SessionLocal() as session:
         subscribers = session.query(EmissionNotifySetting).filter_by(enabled=True).all()
         tg_ids = [s.telegram_id for s in subscribers]
 
+    logger.info("☢️ Emission: подписчиков=%d", len(tg_ids))
+
     if not tg_ids:
-        # Если нет подписчиков, отправляем хотя бы в основной чат
+        # Если нет подписчиков, отправляем в основной чат
         if TELEGRAM_CHAT_ID:
             try:
                 await bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=text, parse_mode=ParseMode.HTML)
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.error("Emission send to main chat error: %s", exc)
         return
 
     sent = 0
@@ -189,7 +200,7 @@ async def check_emission_and_notify():
             await bot.send_message(chat_id=tg_id, text=text, parse_mode=ParseMode.HTML)
             sent += 1
         except Exception as exc:
-            logger.debug("Emission notify error for %s: %s", tg_id, exc)
+            logger.warning("Emission notify error for %s: %s", tg_id, exc)
 
     event = "начался" if is_active else "завершён"
     logger.info("☢️ Выброс %s — уведомлено %d/%d", event, sent, len(tg_ids))
