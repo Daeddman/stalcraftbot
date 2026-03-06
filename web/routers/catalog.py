@@ -297,3 +297,37 @@ def _txt(obj: dict) -> str:
     return ""
 
 
+@router.get("/compare")
+async def compare_items(ids: str = Query("", description="item_ids через запятую")):
+    """Данные для сравнения предметов (до 5 штук)."""
+    id_list = [x.strip() for x in ids.split(",") if x.strip()]
+    if not id_list:
+        return {"error": "Укажите id предметов через запятую"}
+    id_list = id_list[:5]
+
+    results = []
+    for iid in id_list:
+        item = item_db.get(iid)
+        if not item:
+            continue
+        details = item_db.get_item_details(iid)
+        stats = _parse_stats(details) if details else []
+        is_art = item.category.startswith("artefact")
+        d = {
+            "id": item.item_id,
+            "name": item.name_ru,
+            "category": item.category,
+            "category_name": item.category_name,
+            "color": item.color,
+            "rank_name": RANK_NAMES.get(item.color, ""),
+            "icon": _icon_url(item),
+            "is_artefact": is_art,
+            "stats": stats,
+        }
+        # Attach trend
+        _attach_trends([d])
+        results.append(d)
+
+    return {"items": results}
+
+

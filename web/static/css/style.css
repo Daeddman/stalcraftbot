@@ -90,6 +90,10 @@ body{background:var(--bg);min-height:100vh;min-height:100dvh;overflow-x:hidden;t
 .hcard-img{width:44px;height:44px;margin:0 auto 6px;border-radius:10px;background:var(--bg2);border:1px solid var(--brd);overflow:hidden;display:flex;align-items:center;justify-content:center}
 .hcard-img img{width:100%;height:100%;object-fit:contain}
 .hcard-name{font-size:10px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+.trend{font-size:9px;font-weight:800;border-radius:6px;padding:1px 5px;display:inline-block}
+.trend.up{color:#22c55e;background:rgba(34,197,94,.1)}
+.trend.down{color:#ef4444;background:rgba(239,68,68,.1)}
+.trend.flat{color:var(--t3);background:var(--bg3)}
 .hcard-price{font-size:11px;font-weight:900;color:var(--acc)}
 
 /* ══ Item Row ══ */
