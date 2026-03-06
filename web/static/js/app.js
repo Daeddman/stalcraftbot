@@ -136,7 +136,7 @@ function colorCssVar(c){
 
 /* ═══════════ ITEM ═══════════ */
 async function P_item(id){
-  render(skelRows(4));
+  render(skelBlock()+'<div style="height:12px"></div>'+skelRows(3));
   const [item,tr,mkt]=await Promise.all([
     API.get('/api/items/'+id),
     API.get('/api/tracked'),
@@ -145,28 +145,55 @@ async function P_item(id){
   if(item.error){render('<div class="empty"><div class="empty-i">❌</div><div class="empty-t">Не найден</div></div>');return}
   const isTr=tr.some(t=>t.item_id===id);
   const ok=item.api_supported!==false;
+  const rkCls=item.color||'DEFAULT';
+  const rkVar=colorCssVar(rkCls);
+
   let h='<a class="back" onclick="history.back()">← Назад</a>';
-  h+='<div class="hero rk-'+item.color+'"><div class="hero-img">'+ICO(item.icon)+'</div><div class="hero-r"><div class="hero-t">'+item.name+'</div><div class="hero-s">'+item.category_name;
-  if(item.rank_name)h+=' · <span class="rk-tag rk-tag-'+item.color+'">'+item.rank_name+'</span>';
-  h+='</div></div></div>';
-  if(mkt.items&&mkt.items.length){
-    h+='<div class="sec">🏪 На маркете</div>';
-    for(const l of mkt.items)h+=marketCard(l);
-  }
-  h+='<div class="bgrp">';
-  if(ok){
-    h+=(isTr?'<button class="btn btn-r" onclick="haptic(\'medium\');UT(\''+id+'\')">✕ Убрать</button>':'<button class="btn btn-g" onclick="haptic(\'medium\');TK(\''+id+'\',event)">⭐ В избранное</button>');
-    h+='<a class="btn btn-o" href="#/auction/'+id+'">📊 Аукцион</a>';
+
+  // ── Hero Card ──
+  h+='<div class="item-hero rk-'+rkCls+'">';
+  h+='<div class="item-hero-glow"></div>';
+  h+='<div class="item-hero-icon">'+ICO(item.icon)+'</div>';
+  h+='<div class="item-hero-name" style="color:var(--rk-'+rkVar+')">'+item.name+'</div>';
+  h+='<div class="item-hero-cat">'+item.category_name;
+  if(item.rank_name)h+=' · <span class="rk-pill rk-pill-'+rkCls+'">'+item.rank_name+'</span>';
+  h+='</div>';
+
+  // ── Action pills inside hero ──
+  h+='<div class="item-actions">';
+  if(isTr){
+    h+='<button class="item-act-pill act-remove" onclick="event.stopPropagation();haptic(\'medium\');UT(\''+id+'\')"><span class="pill-icon">✕</span>Убрать</button>';
   } else {
-    h+=warnBox('Аукцион недоступен','Предмет не поддерживается API.');
+    h+='<button class="item-act-pill act-fav" onclick="event.stopPropagation();haptic(\'medium\');TK(\''+id+'\',event)"><span class="pill-icon">⭐</span>В избранное</button>';
+  }
+  if(ok){
+    h+='<a class="item-act-pill act-auc" href="#/auction/'+id+'"><span class="pill-icon">📊</span>Аукцион</a>';
+    h+='<button class="item-act-pill act-sell" onclick="event.stopPropagation();go(\'#/market-create\');setTimeout(()=>selectMcItem(\''+id+'\'),200)"><span class="pill-icon">🏪</span>Продать</button>';
   }
   h+='</div>';
-  if(ok)h+='<button class="btn btn-b btn-sm" style="margin-top:6px" onclick="go(\'#/market-create\');setTimeout(()=>selectMcItem(\''+id+'\'),200)">🏪 Продать на маркете</button>';
-  if(item.stats&&item.stats.length){
-    h+='<div class="sec">Характеристики</div><div class="card" style="padding:10px 12px"><div class="stl">';
-    for(const s of item.stats){let c='';if(s.color==='53C353')c='sg';else if(s.color==='C15252')c='sr';h+='<div class="str"><span class="stk">'+s.key+'</span><span class="stv '+c+'">'+s.value+'</span></div>'}
-    h+='</div></div>';
+  h+='</div>';
+
+  if(!ok){
+    h+='<div class="item-notice">⚠️ Аукцион для этого предмета недоступен через API</div>';
   }
+
+  // ── Market listings ──
+  if(mkt.items&&mkt.items.length){
+    h+='<div class="item-section-title">🏪 Объявления игроков</div>';
+    for(const l of mkt.items)h+=marketCard(l);
+  }
+
+  // ── Stats ──
+  if(item.stats&&item.stats.length){
+    h+='<div class="item-section-title">📋 Характеристики</div>';
+    h+='<div class="item-stats-card">';
+    for(const s of item.stats){
+      let c='';if(s.color==='53C353')c='sg';else if(s.color==='C15252')c='sr';
+      h+='<div class="item-stat"><span class="item-stat-k">'+s.key+'</span><span class="item-stat-v '+c+'">'+s.value+'</span></div>';
+    }
+    h+='</div>';
+  }
+
   render(h);
 }
 async function TK(id,ev){

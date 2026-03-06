@@ -116,7 +116,45 @@ body{background:var(--bg);min-height:100vh;min-height:100dvh;overflow-x:hidden;t
 .rk-tag-RANK_MASTER{background:rgba(239,68,68,.08);color:var(--rk-mas)}
 .rk-tag-RANK_LEGEND{background:rgba(234,179,8,.08);color:var(--rk-leg)}
 
-/* ── Hero ── */
+/* ── Item Detail Hero ── */
+.item-hero{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;padding:24px 16px 20px;margin:-4px -14px 16px;border-radius:0 0 24px 24px;background:var(--surf);overflow:hidden}
+.item-hero-glow{position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:200px;height:200px;border-radius:50%;opacity:.15;pointer-events:none;filter:blur(60px)}
+.item-hero.rk-DEFAULT .item-hero-glow{background:var(--rk-def)}
+.item-hero.rk-RANK_NEWBIE .item-hero-glow{background:var(--rk-new)}
+.item-hero.rk-RANK_STALKER .item-hero-glow{background:var(--rk-stk)}
+.item-hero.rk-RANK_VETERAN .item-hero-glow{background:var(--rk-vet)}
+.item-hero.rk-RANK_MASTER .item-hero-glow{background:var(--rk-mas)}
+.item-hero.rk-RANK_LEGEND .item-hero-glow{background:var(--rk-leg)}
+.item-hero-icon{position:relative;z-index:1;width:88px;height:88px;border-radius:20px;background:var(--bg2);border:2px solid var(--brd2);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:12px;box-shadow:var(--shadow)}
+.item-hero.rk-DEFAULT .item-hero-icon{border-color:var(--rk-def)}.item-hero.rk-RANK_NEWBIE .item-hero-icon{border-color:var(--rk-new)}.item-hero.rk-RANK_STALKER .item-hero-icon{border-color:var(--rk-stk)}.item-hero.rk-RANK_VETERAN .item-hero-icon{border-color:var(--rk-vet)}.item-hero.rk-RANK_MASTER .item-hero-icon{border-color:var(--rk-mas)}.item-hero.rk-RANK_LEGEND .item-hero-icon{border-color:var(--rk-leg)}
+.item-hero-icon img{width:100%;height:100%;object-fit:contain}
+.item-hero-name{position:relative;z-index:1;font-size:19px;font-weight:900;line-height:1.2;margin-bottom:4px}
+.item-hero-cat{position:relative;z-index:1;font-size:11px;color:var(--t3);margin-bottom:16px}
+.rk-pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+.rk-pill-DEFAULT{background:rgba(156,163,175,.12);color:var(--rk-def)}
+.rk-pill-RANK_NEWBIE{background:rgba(34,197,94,.12);color:var(--rk-new)}
+.rk-pill-RANK_STALKER{background:rgba(59,130,246,.12);color:var(--rk-stk)}
+.rk-pill-RANK_VETERAN{background:rgba(236,72,153,.12);color:var(--rk-vet)}
+.rk-pill-RANK_MASTER{background:rgba(239,68,68,.12);color:var(--rk-mas)}
+.rk-pill-RANK_LEGEND{background:rgba(234,179,8,.12);color:var(--rk-leg)}
+.item-actions{position:relative;z-index:1;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.item-act-pill{display:inline-flex;align-items:center;gap:5px;padding:9px 16px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:none;text-decoration:none;transition:transform .12s,box-shadow .12s;font-family:var(--font);-webkit-user-select:none;user-select:none}
+.item-act-pill:active{transform:scale(.94)}
+.pill-icon{font-size:13px}
+.act-fav{background:linear-gradient(135deg,var(--acc2),var(--acc));color:#111;box-shadow:0 3px 14px var(--acc-g)}
+.act-remove{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.18)}
+.act-auc{background:rgba(59,130,246,.1);color:var(--blue);border:1px solid rgba(59,130,246,.18)}
+.act-sell{background:rgba(34,197,94,.1);color:var(--grn);border:1px solid rgba(34,197,94,.18)}
+.item-notice{padding:10px 14px;margin-bottom:14px;border-radius:var(--r-sm);background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.1);font-size:12px;color:var(--t2);text-align:center}
+.item-section-title{font-size:13px;font-weight:800;color:var(--t2);margin:16px 0 8px;padding-left:2px}
+.item-stats-card{background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);padding:10px 14px}
+.item-stat{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--brd)}
+.item-stat:last-child{border-bottom:none}
+.item-stat-k{font-size:12px;color:var(--t2)}
+.item-stat-v{font-size:12px;font-weight:700;color:var(--t)}
+.item-stat-v.sg{color:var(--grn)}.item-stat-v.sr{color:var(--red)}
+
+/* ── Hero (legacy — used in auction header) ── */
 .hero{display:flex;align-items:center;gap:14px;padding:6px 0 14px}
 .hero-img{width:72px;height:72px;border-radius:var(--r);background:var(--bg2);border:2px solid var(--brd);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
 .hero.rk-DEFAULT .hero-img{border-color:var(--rk-def)}.hero.rk-RANK_NEWBIE .hero-img{border-color:var(--rk-new)}.hero.rk-RANK_STALKER .hero-img{border-color:var(--rk-stk)}.hero.rk-RANK_VETERAN .hero-img{border-color:var(--rk-vet)}.hero.rk-RANK_MASTER .hero-img{border-color:var(--rk-mas)}.hero.rk-RANK_LEGEND .hero-img{border-color:var(--rk-leg)}
