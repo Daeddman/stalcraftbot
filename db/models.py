@@ -68,6 +68,7 @@ class SaleRecord(Base):
     __table_args__ = (
         UniqueConstraint("item_id", "time_sold", "price", "amount", name="uq_sale_dedup"),
         Index("ix_sale_item_time", "item_id", "time_sold"),
+        Index("ix_sale_recorded_at", "recorded_at"),
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -287,6 +288,9 @@ class UserFollow(Base):
 
 class UserNotification(Base):
     __tablename__ = "user_notifications"
+    __table_args__ = (
+        Index("ix_notif_user_read", "user_id", "is_read"),
+    )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, nullable=False, index=True)  # кому
@@ -359,6 +363,8 @@ class MarketListing(Base):
     __tablename__ = "market_listings"
     __table_args__ = (
         Index("ix_market_status_item", "status", "item_id"),
+        Index("ix_market_status_created", "status", "created_at"),
+        Index("ix_market_user_status", "user_id", "status"),
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -441,6 +447,9 @@ def init_db() -> None:
         cursor = dbapi_conn.cursor()
         cursor.execute("PRAGMA journal_mode=WAL")
         cursor.execute("PRAGMA synchronous=NORMAL")
+        cursor.execute("PRAGMA cache_size=-64000")   # 64MB cache
+        cursor.execute("PRAGMA mmap_size=268435456")  # 256MB mmap
+        cursor.execute("PRAGMA temp_store=MEMORY")
         cursor.close()
 
     Base.metadata.create_all(engine)

@@ -91,14 +91,44 @@ async def list_market(
             q = q.order_by(MarketListing.created_at.desc())
 
         rows = q.offset(offset).limit(per_page).all()
+
+        # ── Batch: offer counts for all listings on this page ──
+        listing_ids = [l.id for l, u in rows]
+        offer_map = {}
+        if listing_ids:
+            offer_rows = session.query(
+                PriceOffer.listing_id, func.count(PriceOffer.id)
+            ).filter(
+                PriceOffer.listing_id.in_(listing_ids),
+                PriceOffer.status == "pending",
+            ).group_by(PriceOffer.listing_id).all()
+            offer_map = {lid: cnt for lid, cnt in offer_rows}
+
+        # ── Batch: user stats (deals + reviews) ──
+        user_ids = list({u.id for l, u in rows if u})
+        deals_map = {}
+        reviews_map = {}
+        if user_ids:
+            deals_rows = session.query(
+                MarketListing.user_id, func.count(MarketListing.id)
+            ).filter(
+                MarketListing.user_id.in_(user_ids),
+                MarketListing.status == "sold",
+            ).group_by(MarketListing.user_id).all()
+            deals_map = {uid: cnt for uid, cnt in deals_rows}
+
+            reviews_rows = session.query(
+                ReputationReview.target_id, func.count(ReputationReview.id)
+            ).filter(
+                ReputationReview.target_id.in_(user_ids),
+            ).group_by(ReputationReview.target_id).all()
+            reviews_map = {uid: cnt for uid, cnt in reviews_rows}
+
         items = []
         for l, u in rows:
             gi = item_db.get(l.item_id)
             is_art = gi and gi.category.startswith("artefact") if gi else False
-            # Count offers on this listing
-            offer_cnt = session.query(func.count(PriceOffer.id)).filter(
-                PriceOffer.listing_id == l.id, PriceOffer.status == "pending"
-            ).scalar() or 0
+            offer_cnt = offer_map.get(l.id, 0)
             items.append({
                 "id": l.id, "item_id": l.item_id, "item_name": l.item_name or (gi.name_ru if gi else l.item_id),
                 "icon": _icon(gi), "listing_type": l.listing_type, "price": l.price,
@@ -111,7 +141,7 @@ async def list_market(
                 "offers_count": offer_cnt,
                 "created_at": l.created_at.isoformat() + "Z" if l.created_at else None,
                 "expires_at": l.expires_at.isoformat() + "Z" if l.expires_at else None,
-                "user": _user_short(u, session) if u else None,
+                "user": _user_short_fast(u, deals_map, reviews_map) if u else None,
             })
         return {"items": items, "total": total, "pages": max(1, -(-total // per_page))}
 
@@ -135,6 +165,19 @@ def _user_short(u, session):
         "reputation": rep,
         "deals_count": deals,
         "reviews_count": reviews,
+    }
+
+
+def _user_short_fast(u, deals_map: dict, reviews_map: dict):
+    """Build user dict using pre-computed maps (batch-optimized)."""
+    return {
+        "id": u.id,
+        "display_name": u.display_name,
+        "game_nickname": getattr(u, 'game_nickname', None),
+        "avatar_url": u.avatar_url,
+        "reputation": u.reputation if hasattr(u, 'reputation') else 0,
+        "deals_count": deals_map.get(u.id, 0),
+        "reviews_count": reviews_map.get(u.id, 0),
     }
 
 

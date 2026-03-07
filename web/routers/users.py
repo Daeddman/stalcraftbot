@@ -35,11 +35,22 @@ class ReviewData(BaseModel):
     comment: Optional[str] = None
 
 
+_me_cache: dict[int, tuple[dict, float]] = {}
+_ME_CACHE_TTL = 5  # seconds — short, just to debounce duplicate calls
+
+
 @router.get("/me")
 async def get_me(user: User = Depends(get_current_user)):
     if not user:
         return {"authenticated": False}
-    return _full_user_dict(user)
+    import time
+    now = time.time()
+    cached = _me_cache.get(user.id)
+    if cached and now - cached[1] < _ME_CACHE_TTL:
+        return cached[0]
+    d = _full_user_dict(user)
+    _me_cache[user.id] = (d, now)
+    return d
 
 
 @router.put("/me")
@@ -61,6 +72,8 @@ async def update_me(data: ProfileUpdate, user: User = Depends(require_user)):
                 u.chat_color = data.chat_color
         session.commit()
         session.refresh(u)
+        # Invalidate me cache
+        _me_cache.pop(user.id, None)
         # Audit
         try:
             from services.audit import log_action, ACTION_PROFILE_EDIT

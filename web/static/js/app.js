@@ -14,7 +14,7 @@ function saveS(){localStorage.setItem('ph11',JSON.stringify(S))}
 
 /* ── Cache ── */
 const _c=new Map();
-function cG(k){const e=_c.get(k);return(e&&Date.now()-e.t<120000)?e.v:null}
+function cG(k){const e=_c.get(k);return(e&&Date.now()-e.t<300000)?e.v:null}
 function cS(k,v){_c.set(k,{v,t:Date.now()})}
 
 /* ── Toast ── */
@@ -112,15 +112,27 @@ async function P_home(rid){
   } else {
     render(skelBlock()+skelCards(3));
   }
-  // Fetch fresh data
-  const [emi,mkt,pop]=await Promise.all([
-    getEmi(),
-    API.get('/api/market?status=active&per_page=6').catch(()=>({items:[]})),
-    API.get('/api/popular?limit=8').catch(()=>[]),
-  ]);
-  if(rid!==undefined && rid!==_routeId)return;
-  cS(ck,{emi,mkt,pop});
-  _renderHome(emi,mkt,pop);
+  // Fetch fresh data — single combined endpoint
+  try{
+    const data=await API.get('/api/home');
+    if(rid!==undefined && rid!==_routeId)return;
+    const emi=data.emission||{};
+    const mkt=data.market||{items:[]};
+    const pop=data.popular||[];
+    cS(ck,{emi,mkt,pop});
+    _emi=emi;_emiTs=Date.now();
+    _renderHome(emi,mkt,pop);
+  }catch(e){
+    // Fallback: 3 parallel calls if combined endpoint fails
+    const [emi,mkt,pop]=await Promise.all([
+      getEmi(),
+      API.get('/api/market?status=active&per_page=6').catch(()=>({items:[]})),
+      API.get('/api/popular?limit=8').catch(()=>[]),
+    ]);
+    if(rid!==undefined && rid!==_routeId)return;
+    cS(ck,{emi,mkt,pop});
+    _renderHome(emi,mkt,pop);
+  }
 }
 function _renderHome(emi,mkt,pop){
   let h='';

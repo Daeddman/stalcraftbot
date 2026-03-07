@@ -40,8 +40,10 @@ APP_VERSION = str(int(time.time()))
 app = FastAPI(title="PerekupHelper", docs_url=None, redoc_url=None)
 
 
-# ── Middleware: запрет кеширования JS/CSS/HTML ──
-class NoCacheStaticMiddleware(BaseHTTPMiddleware):
+# ── Middleware: кеширование и no-cache ──
+_CACHEABLE_API = ("/api/home", "/api/popular", "/api/emission", "/api/categories")
+
+class CacheControlMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         response = await call_next(request)
         path = request.url.path
@@ -49,10 +51,13 @@ class NoCacheStaticMiddleware(BaseHTTPMiddleware):
             response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
             response.headers["Pragma"] = "no-cache"
             response.headers["Expires"] = "0"
+        elif any(path == p for p in _CACHEABLE_API):
+            # Short browser cache for heavy endpoints (reduces repeated fetches)
+            response.headers["Cache-Control"] = "public, max-age=15"
         return response
 
 
-app.add_middleware(NoCacheStaticMiddleware)
+app.add_middleware(CacheControlMiddleware)
 
 app.add_middleware(
     CORSMiddleware,

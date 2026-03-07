@@ -72,11 +72,12 @@ function haptic(t) { if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurr
 
 /* ── Current user state ── */
 let _me = null;
+let _meTs = 0;
 async function getMe() {
-  if (_me) return _me;
+  if (_me && Date.now() - _meTs < 30000) return _me;
   try {
     const d = await API.get('/api/me');
-    if (d && d.id) _me = d;
+    if (d && d.id) { _me = d; _meTs = Date.now(); }
   } catch (e) {}
   return _me;
 }

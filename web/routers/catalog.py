@@ -121,7 +121,7 @@ async def search_items(
 
 _popular_cache = None
 _popular_cache_ts = 0
-_POPULAR_TTL = 60  # seconds
+_POPULAR_TTL = 300  # 5 min — heavy query, cache aggressively
 
 
 @router.get("/popular")
@@ -139,9 +139,11 @@ async def popular_items(limit: int = 8):
     result = []
     seen_ids = set()
 
-    # 1) Items with most sales in last 7 days
+    # Single DB session for all queries — avoid repeated open/close overhead
     with SessionLocal() as session:
         cutoff = datetime.utcnow() - timedelta(days=7)
+
+        # 1) Items with most sales in last 7 days
         try:
             from db.models import SaleRecord
             sale_rows = session.query(
@@ -164,25 +166,27 @@ async def popular_items(limit: int = 8):
         except Exception:
             pass
 
-    # 2) Tracked items fallback
-    if len(result) < limit:
-        with SessionLocal() as session:
-            rows = session.query(
-                TrackedItem.item_id, func.count(TrackedItem.id).label("cnt")
-            ).filter(TrackedItem.is_active == True).group_by(
-                TrackedItem.item_id
-            ).order_by(func.count(TrackedItem.id).desc()).limit(limit * 2).all()
-            for item_id, cnt in rows:
-                if item_id in seen_ids:
-                    continue
-                gi = item_db.get(item_id)
-                if gi:
-                    d = _item_short(gi)
-                    d["activity"] = cnt
-                    result.append(d)
-                    seen_ids.add(item_id)
-                if len(result) >= limit:
-                    break
+        # 2) Tracked items fallback
+        if len(result) < limit:
+            try:
+                rows = session.query(
+                    TrackedItem.item_id, func.count(TrackedItem.id).label("cnt")
+                ).filter(TrackedItem.is_active == True).group_by(
+                    TrackedItem.item_id
+                ).order_by(func.count(TrackedItem.id).desc()).limit(limit * 2).all()
+                for item_id, cnt in rows:
+                    if item_id in seen_ids:
+                        continue
+                    gi = item_db.get(item_id)
+                    if gi:
+                        d = _item_short(gi)
+                        d["activity"] = cnt
+                        result.append(d)
+                        seen_ids.add(item_id)
+                    if len(result) >= limit:
+                        break
+            except Exception:
+                pass
 
     # 3) Fill with known popular artefacts if still not enough
     if len(result) < limit:
@@ -352,5 +356,73 @@ async def compare_items(ids: str = Query("", description="item_ids через з
         results.append(d)
 
     return {"items": results}
+
+
+# ── Combined home endpoint (1 request instead of 3) ──
+_home_cache = None
+_home_cache_ts = 0
+_HOME_CACHE_TTL = 30  # seconds
+
+
+@router.get("/home")
+async def home_data():
+    """Возвращает все данные главной страницы одним запросом."""
+    global _home_cache, _home_cache_ts
+    import time as _time
+    now = _time.time()
+    if _home_cache and now - _home_cache_ts < _HOME_CACHE_TTL:
+        return _home_cache
+
+    import asyncio
+    from api.emission import get_emission
+    from db.models import MarketListing, User as UserModel
+
+    # Emission (cached internally at 15s)
+    emi = await get_emission()
+
+    # Popular items (cached internally at 300s)
+    pop = await popular_items(limit=8)
+
+    # Recent market listings — lightweight inline query
+    mkt_items = []
+    try:
+        with SessionLocal() as session:
+            rows = session.query(MarketListing, UserModel).outerjoin(
+                UserModel, MarketListing.user_id == UserModel.id
+            ).filter(
+                MarketListing.status == "active"
+            ).order_by(
+                MarketListing.created_at.desc()
+            ).limit(6).all()
+
+            for l, u in rows:
+                gi = item_db.get(l.item_id)
+                mkt_items.append({
+                    "id": l.id, "item_id": l.item_id,
+                    "item_name": l.item_name or (gi.name_ru if gi else l.item_id),
+                    "icon": _icon_url(gi) if gi else "",
+                    "listing_type": l.listing_type, "price": l.price,
+                    "amount": l.amount, "quality": l.quality,
+                    "upgrade_level": l.upgrade_level,
+                    "color": gi.color if gi else "DEFAULT",
+                    "is_artefact": gi and gi.category.startswith("artefact") if gi else False,
+                    "category_group": l.category_group or "other",
+                    "status": l.status,
+                    "created_at": l.created_at.isoformat() + "Z" if l.created_at else None,
+                    "expires_at": l.expires_at.isoformat() + "Z" if l.expires_at else None,
+                    "user": {"id": u.id, "display_name": u.display_name,
+                             "avatar_url": u.avatar_url} if u else None,
+                })
+    except Exception:
+        pass
+
+    result = {
+        "emission": emi,
+        "popular": pop,
+        "market": {"items": mkt_items, "total": len(mkt_items)},
+    }
+    _home_cache = result
+    _home_cache_ts = now
+    return result
 
 
