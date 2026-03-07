@@ -28,13 +28,13 @@ async def get_clans_list(region: str = STALCRAFT_REGION, offset: int = 0, limit:
 
 
 async def get_clan_info(clan_id: str, region: str = STALCRAFT_REGION) -> dict[str, Any]:
-    """GET /{region}/clan/info/{clan}"""
+    """GET /{region}/clan/{id}/info"""
     cache_key = f"clan_info:{region}:{clan_id}"
     cached = api_cache.get(cache_key)
     if cached is not None:
         return cached
     try:
-        data = await stalcraft_client.get(f"/{region}/clan/info/{clan_id}")
+        data = await stalcraft_client.get(f"/{region}/clan/{clan_id}/info")
         api_cache.set(cache_key, data, ttl=120)
         return data
     except Exception as exc:
@@ -43,13 +43,13 @@ async def get_clan_info(clan_id: str, region: str = STALCRAFT_REGION) -> dict[st
 
 
 async def get_clan_members(clan_id: str, region: str = STALCRAFT_REGION) -> dict[str, Any]:
-    """GET /{region}/clan/members/{clan}"""
+    """GET /{region}/clan/{id}/members"""
     cache_key = f"clan_members:{region}:{clan_id}"
     cached = api_cache.get(cache_key)
     if cached is not None:
         return cached
     try:
-        data = await stalcraft_client.get(f"/{region}/clan/members/{clan_id}")
+        data = await stalcraft_client.get(f"/{region}/clan/{clan_id}/members")
         api_cache.set(cache_key, data, ttl=120)
         return data
     except Exception as exc:

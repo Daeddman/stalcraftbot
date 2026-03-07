@@ -807,17 +807,29 @@ async function P_leaderboard(){
 }
 
 /* ═══════════ CLANS BROWSER ═══════════ */
-let _clansPage=0;
+let _clansPage=0,_clansSearch='',_clansAll=null;
 async function P_clans(){
   render(skelRows(6));
-  const limit=20;
-  const offset=_clansPage*limit;
-  const d=await API.get('/api/clans?offset='+offset+'&limit='+limit);
   let h='<a class="back" onclick="history.back()">← Назад</a>';
   h+='<div class="hdr">🏰 Кланы региона</div>';
-  if(d.totalClans)h+='<div style="font-size:12px;color:var(--t3);margin-bottom:12px">Всего: '+d.totalClans+' кланов</div>';
-  const clans=d.data||[];
-  if(!clans.length){h+=emptyMsg('Кланы не найдены');render(h);return}
+  // Search
+  h+='<div class="srch" style="margin-bottom:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
+  h+='<input id="clan-search" placeholder="Поиск клана по названию или тегу..." value="'+escHtml(_clansSearch)+'">';
+  h+='</div>';
+  // Fetch
+  const limit=50;
+  const offset=_clansPage*limit;
+  const d=await API.get('/api/clans?offset='+offset+'&limit='+limit);
+  if(d.error&&!d.data){h+=emptyMsg('Ошибка загрузки: '+d.error);render(h);setupClanSearch();return}
+  let clans=d.data||[];
+  const totalFromApi=d.totalClans||0;
+  if(d.totalClans)h+='<div style="font-size:12px;color:var(--t3);margin-bottom:12px">Всего: '+totalFromApi+' кланов</div>';
+  // Client-side filter
+  if(_clansSearch){
+    const q=_clansSearch.toLowerCase();
+    clans=clans.filter(c=>(c.name||'').toLowerCase().includes(q)||(c.tag||'').toLowerCase().includes(q)||(c.alliance||'').toLowerCase().includes(q));
+  }
+  if(!clans.length){h+=emptyMsg(_clansSearch?'По запросу «'+escHtml(_clansSearch)+'» ничего не найдено':'Кланы не найдены');render(h);setupClanSearch();return}
   for(const c of clans){
     h+='<div class="clan-card" onclick="go(\'#/clan/'+c.id+'\')">';
     h+='<div class="clan-badge">'+(c.tag?c.tag[0]:'?')+'</div>';
@@ -828,18 +840,43 @@ async function P_clans(){
     h+='<div class="clan-level">Lvl '+(c.level||'?')+'</div>';
     h+='</div>';
   }
-  // Pagination
-  const total=d.totalClans||0;
-  const totalPages=Math.max(1,Math.ceil(total/limit));
-  const curPage=_clansPage+1;
-  if(totalPages>1){
-    h+='<div class="pgr">';
-    h+='<button '+(curPage<=1?'disabled':'')+' onclick="_clansPage='+(curPage-2)+';P_clans()">‹</button>';
-    h+='<span class="pi">'+curPage+' / '+totalPages+'</span>';
-    h+='<button '+(curPage>=totalPages?'disabled':'')+' onclick="_clansPage='+curPage+';P_clans()">›</button>';
-    h+='</div>';
+  // Pagination (only if not searching — search is within loaded page)
+  if(!_clansSearch){
+    const totalPages=Math.max(1,Math.ceil(totalFromApi/limit));
+    const curPage=_clansPage+1;
+    if(totalPages>1){
+      h+='<div class="pgr">';
+      h+='<button '+(curPage<=1?'disabled':'')+' onclick="_clansPage='+(curPage-2)+';P_clans()">‹</button>';
+      h+='<span class="pi">'+curPage+' / '+totalPages+'</span>';
+      h+='<button '+(curPage>=totalPages?'disabled':'')+' onclick="_clansPage='+curPage+';P_clans()">›</button>';
+      h+='</div>';
+    }
   }
   render(h);
+  setupClanSearch();
+}
+function setupClanSearch(){
+  const el=document.getElementById('clan-search');
+  if(!el)return;
+  el.focus();
+  // Set cursor at end
+  el.selectionStart=el.selectionEnd=el.value.length;
+  let debounce;
+  el.addEventListener('input',()=>{
+    clearTimeout(debounce);
+    debounce=setTimeout(()=>{
+      _clansSearch=el.value.trim();
+      _clansPage=0;
+      P_clans();
+    },400);
+  });
+  el.addEventListener('keypress',(e)=>{
+    if(e.key==='Enter'){
+      _clansSearch=el.value.trim();
+      _clansPage=0;
+      P_clans();
+    }
+  });
 }
 
 /* ═══════════ MARKETPLACE ═══════════ */
