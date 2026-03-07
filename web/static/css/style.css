@@ -523,8 +523,46 @@ table.lt{width:100%;border-collapse:collapse;font-size:11px}
 .ch-empty-sub{font-size:12px;color:var(--t3)}
 
 /* ════════════════════════════════════════════
-   PROFILE
+   PROFILE — Discord / Instagram style
    ════════════════════════════════════════════ */
+.prof-banner{height:120px;border-radius:var(--r);background:linear-gradient(135deg,#1a1a2e 0%,#16213e 30%,#0f3460 60%,#e94560 100%);position:relative;margin:-16px -16px 0 -16px}
+[data-theme="light"] .prof-banner{background:linear-gradient(135deg,#667eea 0%,#764ba2 50%,#f093fb 100%)}
+.prof-av-wrap{position:relative;display:flex;justify-content:center;margin-top:-44px;z-index:2}
+.prof-avatar{width:88px;height:88px;border-radius:50%;background:var(--bg1);border:4px solid var(--bg1);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:36px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.3);position:relative}
+.prof-avatar img{width:100%;height:100%;object-fit:cover}
+.prof-avatar:hover{opacity:.85}
+.prof-avatar .online-dot{position:absolute;bottom:4px;right:4px;width:14px;height:14px;border-radius:50%;background:var(--grn);border:3px solid var(--bg1)}
+.prof-name-row{text-align:center;margin-top:10px}
+.prof-display-name{font-size:20px;font-weight:900;letter-spacing:-.3px}
+.prof-handle{font-size:12px;color:var(--t3);margin-top:2px}
+.prof-bio{text-align:center;font-size:12px;color:var(--t2);margin:8px 16px 0;line-height:1.5}
+.prof-stats{display:flex;justify-content:center;gap:0;margin:16px 0;border-top:1px solid var(--brd);border-bottom:1px solid var(--brd);padding:12px 0}
+.prof-stat{flex:1;text-align:center;border-right:1px solid var(--brd);cursor:pointer}
+.prof-stat:last-child{border-right:none}
+.prof-stat-val{font-size:18px;font-weight:900;color:var(--t)}
+.prof-stat-val.pos{color:var(--grn)}
+.prof-stat-val.neg{color:var(--red)}
+.prof-stat-lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.prof-actions{display:flex;gap:8px;justify-content:center;margin:14px 0}
+.prof-actions .btn{flex:1;max-width:160px}
+.prof-section{margin-top:18px}
+.prof-section-hdr{font-size:11px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;padding:0 4px}
+.prof-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.prof-info-card{background:var(--surf);border:1px solid var(--brd);border-radius:var(--r-sm);padding:10px 12px}
+.prof-info-card .pil{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
+.prof-info-card .piv{font-size:13px;font-weight:700;margin-top:2px}
+.prof-listing-mini{display:flex;align-items:center;gap:10px;padding:8px;background:var(--surf);border:1px solid var(--brd);border-radius:var(--r-sm);margin-bottom:6px;cursor:pointer;transition:.15s}
+.prof-listing-mini:hover{border-color:var(--acc)}
+.prof-listing-mini .plm-icon{width:36px;height:36px;border-radius:6px;overflow:hidden;flex-shrink:0;background:var(--surf2);display:flex;align-items:center;justify-content:center}
+.prof-listing-mini .plm-icon img{width:100%;height:100%;object-fit:contain}
+.prof-listing-mini .plm-info{flex:1;min-width:0}
+.prof-listing-mini .plm-name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prof-listing-mini .plm-price{font-size:11px;color:var(--acc);font-weight:700}
+.prof-listing-mini .plm-type{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:700;text-transform:uppercase}
+.plm-type-sell{background:rgba(233,69,96,.15);color:#e94560}
+.plm-type-buy{background:rgba(46,213,115,.15);color:var(--grn)}
+
+/* ── Profile field (edit) ── */
 .profile-header{display:flex;align-items:center;gap:16px;margin-bottom:20px}
 .profile-avatar{width:72px;height:72px;border-radius:50%;background:var(--surf2);border:2px solid var(--acc);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;cursor:pointer;position:relative}
 .profile-avatar img{width:100%;height:100%;object-fit:cover}
@@ -537,6 +575,60 @@ table.lt{width:100%;border-collapse:collapse;font-size:11px}
 .profile-field input,.profile-field textarea{width:100%;padding:10px 14px;background:var(--surf);border:1px solid var(--brd);border-radius:var(--r-sm);color:var(--t);font-size:13px;outline:none;transition:.15s;font-family:var(--font);resize:vertical}
 .profile-field input:focus,.profile-field textarea:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-g)}
 .profile-field input::placeholder,.profile-field textarea::placeholder{color:var(--t3)}
+
+/* ════════════════════════════════════════════
+   LEADERBOARD
+   ════════════════════════════════════════════ */
+.lb-podium{display:flex;justify-content:center;align-items:flex-end;gap:8px;margin:16px 0 20px;height:180px}
+.lb-pod{display:flex;flex-direction:column;align-items:center;width:100px;position:relative;cursor:pointer}
+.lb-pod-av{width:52px;height:52px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:22px;background:var(--surf2);border:3px solid var(--brd);margin-bottom:6px}
+.lb-pod-av img{width:100%;height:100%;object-fit:cover}
+.lb-pod-1 .lb-pod-av{width:64px;height:64px;border-color:#ffd700;box-shadow:0 0 20px rgba(255,215,0,.3)}
+.lb-pod-2 .lb-pod-av{border-color:#c0c0c0}
+.lb-pod-3 .lb-pod-av{border-color:#cd7f32}
+.lb-pod-medal{font-size:20px;margin-bottom:2px}
+.lb-pod-name{font-size:11px;font-weight:700;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px}
+.lb-pod-val{font-size:10px;color:var(--t3);margin-top:1px}
+.lb-pod-bar{width:100%;border-radius:var(--r-xs) var(--r-xs) 0 0;margin-top:6px}
+.lb-pod-1 .lb-pod-bar{height:80px;background:linear-gradient(180deg,#ffd700 0%,#b8860b 100%)}
+.lb-pod-2 .lb-pod-bar{height:56px;background:linear-gradient(180deg,#c0c0c0 0%,#808080 100%)}
+.lb-pod-3 .lb-pod-bar{height:40px;background:linear-gradient(180deg,#cd7f32 0%,#8b4513 100%)}
+.lb-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surf);border:1px solid var(--brd);border-radius:var(--r-sm);margin-bottom:6px;cursor:pointer;transition:.15s}
+.lb-row:hover{border-color:var(--acc)}
+.lb-rank{width:28px;text-align:center;font-size:14px;font-weight:900;color:var(--t3)}
+.lb-av{width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--surf2);font-size:16px}
+.lb-av img{width:100%;height:100%;object-fit:cover}
+.lb-info{flex:1;min-width:0}
+.lb-name{font-size:13px;font-weight:700}
+.lb-sub{font-size:10px;color:var(--t3)}
+.lb-val{font-size:14px;font-weight:900;color:var(--acc);text-align:right}
+
+/* ════════════════════════════════════════════
+   CLAN BROWSER
+   ════════════════════════════════════════════ */
+.clan-card{display:flex;align-items:center;gap:12px;padding:12px;background:var(--surf);border:1px solid var(--brd);border-radius:var(--r-sm);margin-bottom:8px;cursor:pointer;transition:.15s}
+.clan-card:hover{border-color:var(--acc);background:var(--surf2)}
+.clan-badge{width:44px;height:44px;border-radius:var(--r-sm);background:linear-gradient(135deg,var(--acc-bg),var(--surf2));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--acc);flex-shrink:0}
+.clan-info{flex:1;min-width:0}
+.clan-name{font-size:14px;font-weight:800}
+.clan-tag{font-size:11px;color:var(--acc);font-weight:700}
+.clan-meta{font-size:10px;color:var(--t3);margin-top:2px}
+.clan-level{font-size:12px;font-weight:700;color:var(--t2);text-align:right}
+.clan-detail-hdr{text-align:center;padding:20px 0 10px}
+.clan-detail-name{font-size:22px;font-weight:900}
+.clan-detail-tag{font-size:14px;color:var(--acc);font-weight:700}
+.clan-detail-desc{font-size:12px;color:var(--t2);margin:8px 0 16px;line-height:1.5;text-align:center}
+.clan-stats-row{display:flex;justify-content:center;gap:0;margin:12px 0;border:1px solid var(--brd);border-radius:var(--r-sm);overflow:hidden}
+.clan-stat{flex:1;text-align:center;padding:10px 8px;border-right:1px solid var(--brd)}
+.clan-stat:last-child{border-right:none}
+.clan-stat-val{font-size:16px;font-weight:900}
+.clan-stat-lbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.clan-member-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--brd)}
+.clan-member-row:last-child{border-bottom:none}
+.clan-member-name{flex:1;font-size:13px;font-weight:600;color:var(--acc);cursor:pointer}
+.clan-member-name:hover{text-decoration:underline}
+.clan-member-rank{font-size:10px;color:var(--t3);padding:2px 8px;background:var(--surf);border-radius:var(--r-xs)}
+.clan-member-date{font-size:10px;color:var(--t3)}
 
 /* ── Form ── */
 .form-group{margin-bottom:14px}

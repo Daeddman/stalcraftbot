@@ -86,6 +86,8 @@ async function route(){
     else if(pg==='search')await P_search();
     else if(pg==='tracked')await P_tracked();
     else if(pg==='clan')await P_clan(p[1]);
+    else if(pg==='clans')await P_clans();
+    else if(pg==='leaderboard')await P_leaderboard();
     else if(pg==='player')await P_player(p.slice(1).join('/'));
     else if(pg==='market')await P_market(p[1]);
     else if(pg==='market-create')P_market_create();
@@ -141,6 +143,8 @@ function _renderHome(emi,mkt,pop){
   h+='<div class="quick-card" onclick="go(\'#/search\')"><div class="quick-icon">🔍</div><div class="quick-label">Поиск</div></div>';
   h+='<div class="quick-card" onclick="go(\'#/tracked\')"><div class="quick-icon">⭐</div><div class="quick-label">Избранное</div></div>';
   h+='<div class="quick-card" onclick="go(\'#/market\')"><div class="quick-icon">🏪</div><div class="quick-label">Маркет</div></div>';
+  h+='<div class="quick-card" onclick="go(\'#/leaderboard\')"><div class="quick-icon">🏆</div><div class="quick-label">Лидерборд</div></div>';
+  h+='<div class="quick-card" onclick="go(\'#/clans\')"><div class="quick-icon">🏰</div><div class="quick-label">Кланы</div></div>';
   h+='</div>';
   if(pop&&pop.length){
     h+='<div class="sec">🔥 Популярные предметы</div><div class="hscroll">';
@@ -639,43 +643,201 @@ async function P_tracked(){
   }
 }
 
-/* ═══════════ CLAN ═══════════ */
+/* ═══════════ CLAN (detail) ═══════════ */
+const CLAN_RANK_NAMES={RECRUIT:'Рекрут',PLAYER:'Игрок',OFFICER:'Офицер',LEADER:'Лидер'};
 async function P_clan(id){
   if(!id){render(emptyMsg('Укажите ID клана'));return}
   render(skelRows(5));
   const [info,members]=await Promise.all([API.get('/api/clan/'+id),API.get('/api/clan/'+id+'/members')]);
-  if(info.error){render('<a class="back" onclick="history.back()">← Назад</a>'+emptyMsg('Клан не найден'));return}
+  if(info.error){render('<a class="back" onclick="history.back()">← Назад</a>'+emptyMsg('Клан не найден: '+info.error));return}
   let h='<a class="back" onclick="history.back()">← Назад</a>';
-  h+='<div class="hdr">🏰 '+(info.name||id)+'</div>';
-  if(info.tag)h+='<div class="sub">['+info.tag+'] · '+(info.memberCount||0)+' участников · Уровень '+(info.level||'?')+'</div>';
-  if(info.description)h+='<div class="card" style="padding:12px"><div style="font-size:12px;color:var(--t2)">'+info.description+'</div></div>';
+  // Header
+  h+='<div class="clan-detail-hdr">';
+  h+='<div class="clan-detail-name">🏰 '+(info.name||id)+'</div>';
+  if(info.tag)h+='<div class="clan-detail-tag">['+info.tag+']</div>';
+  if(info.alliance)h+='<div style="font-size:11px;color:var(--t3);margin-top:2px">Альянс: '+info.alliance+'</div>';
+  h+='</div>';
+  if(info.description)h+='<div class="clan-detail-desc">'+escHtml(info.description)+'</div>';
+  // Stats
+  h+='<div class="clan-stats-row">';
+  h+='<div class="clan-stat"><div class="clan-stat-val">'+(info.level||'?')+'</div><div class="clan-stat-lbl">Уровень</div></div>';
+  h+='<div class="clan-stat"><div class="clan-stat-val">'+(info.memberCount||0)+'</div><div class="clan-stat-lbl">Участники</div></div>';
+  h+='<div class="clan-stat"><div class="clan-stat-val">'+fmtK(info.levelPoints||0)+'</div><div class="clan-stat-lbl">Очки</div></div>';
+  h+='</div>';
+  if(info.leader)h+='<div style="text-align:center;margin:8px 0;font-size:12px;color:var(--t2)">👑 Лидер: <a style="color:var(--acc);cursor:pointer" onclick="go(\'#/player/'+encodeURIComponent(info.leader)+'\')">'+escHtml(info.leader)+'</a></div>';
+  if(info.registrationTime)h+='<div style="text-align:center;font-size:11px;color:var(--t3)">📅 Создан: '+fmtFullDate(new Date(info.registrationTime))+'</div>';
+  // Members
   const ml=members.members||members||[];
   if(ml.length){
-    h+='<div class="sec">Участники · '+ml.length+'</div><div class="card"><div class="tw"><table class="lt"><thead><tr><th>Имя</th><th>Ранг</th></tr></thead><tbody>';
+    h+='<div class="prof-section"><div class="prof-section-hdr">Участники · '+ml.length+'</div>';
+    h+='<div class="card" style="padding:0;overflow:hidden">';
     for(const m of ml){
       const name=m.name||m.username||'—';
-      h+='<tr><td><a style="color:var(--acc);cursor:pointer;text-decoration:none" onclick="go(\'#/player/'+encodeURIComponent(name)+'\')">'+name+'</a></td><td class="td-date">'+(m.rank||m.role||'—')+'</td></tr>';
+      const rank=CLAN_RANK_NAMES[m.rank]||m.rank||'—';
+      const joined=m.joinTime?fmtFullDate(new Date(m.joinTime)):'';
+      h+='<div class="clan-member-row">';
+      h+='<div class="clan-member-name" onclick="go(\'#/player/'+encodeURIComponent(name)+'\')">'+escHtml(name)+'</div>';
+      h+='<span class="clan-member-rank">'+rank+'</span>';
+      if(joined)h+='<span class="clan-member-date">'+joined+'</span>';
+      h+='</div>';
     }
-    h+='</tbody></table></div></div>';
+    h+='</div></div>';
   }
   render(h);
 }
 
-/* ═══════════ PLAYER ═══════════ */
+/* ═══════════ PLAYER (game character) ═══════════ */
+const STAT_NAMES={
+  'player.play_time_h':'Время в игре (ч)',
+  'player.pve.kills':'PvE убийства',
+  'player.pvp.kills':'PvP убийства',
+  'player.pvp.deaths':'PvP смерти',
+  'player.artifacts_looted':'Артефактов найдено',
+  'player.mutants.killed':'Мутантов убито',
+  'player.distance_traveled':'Пройдено (км)',
+  'player.quests_completed':'Квестов выполнено',
+};
 async function P_player(name){
   if(!name){render(emptyMsg('Укажите имя'));return}
   render(skelRows(3));
   const d=await API.get('/api/character/'+encodeURIComponent(name)+'/profile');
-  if(d.error){render('<a class="back" onclick="history.back()">← Назад</a>'+emptyMsg('Профиль не найден'));return}
+  if(d.error){render('<a class="back" onclick="history.back()">← Назад</a>'+emptyMsg('Профиль не найден: '+d.error));return}
   let h='<a class="back" onclick="history.back()">← Назад</a>';
-  h+='<div class="hdr">👤 '+name+'</div>';
-  if(d.clanInfo)h+='<div class="sub">Клан: <a style="color:var(--acc);cursor:pointer" onclick="go(\'#/clan/'+d.clanInfo.id+'\')">'+(d.clanInfo.name||d.clanInfo.id)+'</a></div>';
-  const skip=new Set(['clanInfo','username','id']);
-  const entries=Object.entries(d).filter(([k])=>!skip.has(k));
-  if(entries.length){
-    h+='<div class="card" style="padding:10px 12px"><div class="stl">';
-    for(const[k,v]of entries){if(typeof v==='object')continue;h+='<div class="str"><span class="stk">'+k+'</span><span class="stv">'+v+'</span></div>'}
+  // Banner & name
+  h+='<div class="prof-banner" style="height:80px"></div>';
+  h+='<div style="text-align:center;margin-top:-20px;position:relative;z-index:2">';
+  h+='<div class="prof-display-name" style="font-size:22px">🎮 '+escHtml(d.username||name)+'</div>';
+  if(d.status)h+='<div style="font-size:11px;color:var(--t3);margin-top:2px">'+escHtml(d.status)+'</div>';
+  if(d.alliance)h+='<div style="font-size:11px;color:var(--acc);margin-top:2px">⚔️ '+escHtml(d.alliance)+'</div>';
+  h+='</div>';
+  // Clan info
+  if(d.clan&&d.clan.info){
+    const ci=d.clan.info;
+    h+='<div class="clan-card" style="margin-top:14px" onclick="go(\'#/clan/'+ci.id+'\')">';
+    h+='<div class="clan-badge">'+((ci.tag||'?')[0])+'</div>';
+    h+='<div class="clan-info"><div class="clan-name">'+(ci.name||ci.id)+'</div>';
+    if(ci.tag)h+='<span class="clan-tag">['+ci.tag+']</span>';
+    if(d.clan.member)h+='<div class="clan-meta">'+(CLAN_RANK_NAMES[d.clan.member.rank]||d.clan.member.rank||'')+'</div>';
+    h+='</div><div class="clan-level">Lvl '+(ci.level||'?')+'</div></div>';
+  }
+  // Achievements
+  if(d.displayedAchievements&&d.displayedAchievements.length){
+    h+='<div class="prof-section"><div class="prof-section-hdr">Достижения</div>';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:6px">';
+    for(const a of d.displayedAchievements){
+      h+='<span style="padding:4px 10px;background:var(--surf);border:1px solid var(--brd);border-radius:var(--r-xs);font-size:11px;color:var(--acc)">🏆 '+escHtml(a)+'</span>';
+    }
     h+='</div></div>';
+  }
+  // Stats
+  if(d.stats&&d.stats.length){
+    h+='<div class="prof-section"><div class="prof-section-hdr">Статистика</div>';
+    h+='<div class="prof-info-grid">';
+    for(const s of d.stats){
+      const label=STAT_NAMES[s.id]||s.id;
+      let val=s.value;
+      if(typeof val==='object')val=JSON.stringify(val);
+      if(s.type==='FLOAT')val=parseFloat(val).toFixed(1);
+      h+='<div class="prof-info-card"><div class="pil">'+escHtml(label)+'</div><div class="piv">'+escHtml(String(val))+'</div></div>';
+    }
+    h+='</div></div>';
+  }
+  // Last login
+  if(d.lastLogin)h+='<div style="text-align:center;font-size:11px;color:var(--t3);margin-top:14px">Посл. вход: '+fmtSaleDate(d.lastLogin)+'</div>';
+  render(h);
+}
+
+/* ═══════════ LEADERBOARD ═══════════ */
+let _lbSort='deals',_lbPeriod='all';
+async function P_leaderboard(){
+  render(skelRows(6));
+  const d=await API.get('/api/leaderboard?sort='+_lbSort+'&period='+_lbPeriod);
+  let h='<a class="back" onclick="history.back()">← Назад</a>';
+  h+='<div class="hdr">🏆 Лидерборд трейдеров</div>';
+  // Sort tabs
+  h+='<div class="tabs">';
+  for(const[v,l]of[['deals','Сделки'],['reputation','Репутация'],['volume','Оборот']]){
+    h+='<button class="tab-btn'+(_lbSort===v?' act':'')+'" onclick="_lbSort=\''+v+'\';P_leaderboard()">'+l+'</button>';
+  }
+  h+='</div>';
+  // Period
+  h+='<div class="sort-bar" style="margin-bottom:14px">';
+  for(const[v,l]of[['week','Неделя'],['month','Месяц'],['all','Все время']]){
+    h+='<button class="'+(_lbPeriod===v?'act':'')+'" onclick="_lbPeriod=\''+v+'\';P_leaderboard()">'+l+'</button>';
+  }
+  h+='</div>';
+  const items=d.items||[];
+  if(!items.length){h+=emptyMsg('Пока нет трейдеров с активностью');render(h);return}
+  // Podium (top 3)
+  const top=items.slice(0,3);
+  if(top.length>=3){
+    const order=[top[1],top[0],top[2]]; // silver, gold, bronze
+    const medals=['🥈','🥇','🥉'];
+    const classes=['lb-pod-2','lb-pod-1','lb-pod-3'];
+    h+='<div class="lb-podium">';
+    for(let i=0;i<3;i++){
+      const t=order[i],m=medals[i],c=classes[i];
+      const av=t.avatar_url?'<img src="'+t.avatar_url+'" alt="">':'👤';
+      const val=_lbSort==='reputation'?((t.reputation>0?'+':'')+t.reputation):_lbSort==='volume'?fmtK(t.deals_volume):t.deals_count;
+      h+='<div class="lb-pod '+c+'" onclick="go(\'#/user/'+t.id+'\')">';
+      h+='<div class="lb-pod-medal">'+m+'</div>';
+      h+='<div class="lb-pod-av">'+av+'</div>';
+      h+='<div class="lb-pod-name">'+escHtml(t.display_name)+'</div>';
+      h+='<div class="lb-pod-val">'+val+'</div>';
+      h+='<div class="lb-pod-bar"></div>';
+      h+='</div>';
+    }
+    h+='</div>';
+  }
+  // Rest of list
+  const rest=items.slice(top.length>=3?3:0);
+  for(const t of rest){
+    const av=t.avatar_url?'<img src="'+t.avatar_url+'" alt="">':'👤';
+    const val=_lbSort==='reputation'?((t.reputation>0?'+':'')+t.reputation):_lbSort==='volume'?fmt(t.deals_volume)+' ₽':t.deals_count+' сделок';
+    h+='<div class="lb-row" onclick="go(\'#/user/'+t.id+'\')">';
+    h+='<div class="lb-rank">#'+t.rank+'</div>';
+    h+='<div class="lb-av">'+av+'</div>';
+    h+='<div class="lb-info"><div class="lb-name">'+escHtml(t.display_name)+'</div>';
+    if(t.game_nickname)h+='<div class="lb-sub">🎮 '+escHtml(t.game_nickname)+'</div>';
+    h+='</div>';
+    h+='<div class="lb-val">'+val+'</div>';
+    h+='</div>';
+  }
+  render(h);
+}
+
+/* ═══════════ CLANS BROWSER ═══════════ */
+let _clansPage=0;
+async function P_clans(){
+  render(skelRows(6));
+  const limit=20;
+  const offset=_clansPage*limit;
+  const d=await API.get('/api/clans?offset='+offset+'&limit='+limit);
+  let h='<a class="back" onclick="history.back()">← Назад</a>';
+  h+='<div class="hdr">🏰 Кланы региона</div>';
+  if(d.totalClans)h+='<div style="font-size:12px;color:var(--t3);margin-bottom:12px">Всего: '+d.totalClans+' кланов</div>';
+  const clans=d.data||[];
+  if(!clans.length){h+=emptyMsg('Кланы не найдены');render(h);return}
+  for(const c of clans){
+    h+='<div class="clan-card" onclick="go(\'#/clan/'+c.id+'\')">';
+    h+='<div class="clan-badge">'+(c.tag?c.tag[0]:'?')+'</div>';
+    h+='<div class="clan-info"><div class="clan-name">'+escHtml(c.name||c.id)+'</div>';
+    if(c.tag)h+='<span class="clan-tag">['+c.tag+']</span>';
+    h+='<div class="clan-meta">👥 '+(c.memberCount||0)+' участников'+(c.alliance?' · ⚔️ '+c.alliance:'')+'</div>';
+    h+='</div>';
+    h+='<div class="clan-level">Lvl '+(c.level||'?')+'</div>';
+    h+='</div>';
+  }
+  // Pagination
+  const total=d.totalClans||0;
+  const totalPages=Math.max(1,Math.ceil(total/limit));
+  const curPage=_clansPage+1;
+  if(totalPages>1){
+    h+='<div class="pgr">';
+    h+='<button '+(curPage<=1?'disabled':'')+' onclick="_clansPage='+(curPage-2)+';P_clans()">‹</button>';
+    h+='<span class="pi">'+curPage+' / '+totalPages+'</span>';
+    h+='<button '+(curPage>=totalPages?'disabled':'')+' onclick="_clansPage='+curPage+';P_clans()">›</button>';
+    h+='</div>';
   }
   render(h);
 }
@@ -1641,7 +1803,7 @@ async function unblockUser(userId){
 }
 
 
-/* ═══════════ PROFILE ═══════════ */
+/* ═══════════ PROFILE — Discord/Instagram style ═══════════ */
 async function P_profile(sub){
   if(sub==='edit'){await P_profile_edit();return}
   render(skelRows(3));
@@ -1653,32 +1815,45 @@ async function P_profile(sub){
   }
   _me=me;
   const av=me.avatar_url?'<img src="'+me.avatar_url+'" alt="">':'👤';
-  const rep=me.reputation>0?'<span class="rep pos">+'+me.reputation+'</span>':(me.reputation<0?'<span class="rep neg">'+me.reputation+'</span>':'');
-  let h='<div class="profile-header">';
-  h+='<div class="profile-avatar" onclick="document.getElementById(\'av-upload\').click()">'+av+'<input type="file" id="av-upload" accept="image/*" style="display:none" onchange="uploadAvatar(this)"></div>';
-  h+='<div class="profile-info"><div class="profile-name">'+me.display_name+' '+rep+'</div>';
-  h+='<div class="profile-sub">';
-  if(me.game_nickname)h+='🎮 '+me.game_nickname+'<br>';
-  if(me.discord)h+='💬 '+me.discord;
-  h+='</div></div></div>';
-  if(me.bio)h+='<div class="card" style="padding:12px"><div style="font-size:12px;color:var(--t2)">'+me.bio+'</div></div>';
-  h+='<button class="btn btn-o" onclick="go(\'#/profile/edit\')">✏️ Редактировать</button>';
-  h+='<div style="margin-top:14px"><button class="btn btn-o" onclick="go(\'#/tracked\')">⭐ Избранное</button></div>';
-  h+='<div style="margin-top:8px"><button class="btn btn-o" onclick="go(\'#/market-my\')">📋 Мои объявления</button></div>';
-  h+='<div style="margin-top:8px"><button class="btn btn-o" onclick="go(\'#/blocked\')">🚫 Заблокированные</button></div>';
-
+  // Banner
+  let h='<div class="prof-banner"></div>';
+  // Avatar
+  h+='<div class="prof-av-wrap"><div class="prof-avatar" onclick="document.getElementById(\'av-upload\').click()">'+av+'<input type="file" id="av-upload" accept="image/*" style="display:none" onchange="uploadAvatar(this)"></div></div>';
+  // Name
+  h+='<div class="prof-name-row"><div class="prof-display-name">'+escHtml(me.display_name)+'</div>';
+  if(me.game_nickname)h+='<div class="prof-handle">🎮 '+escHtml(me.game_nickname)+'</div>';
+  h+='</div>';
+  // Bio
+  if(me.bio)h+='<div class="prof-bio">'+escHtml(me.bio)+'</div>';
+  // Stats row
+  const rep=me.reputation||0;
+  const repClass=rep>0?'pos':rep<0?'neg':'';
+  h+='<div class="prof-stats">';
+  h+='<div class="prof-stat"><div class="prof-stat-val '+repClass+'">'+(rep>0?'+':'')+rep+'</div><div class="prof-stat-lbl">Репутация</div></div>';
+  h+='<div class="prof-stat" onclick="go(\'#/tracked\')"><div class="prof-stat-val">⭐</div><div class="prof-stat-lbl">Избранное</div></div>';
+  h+='<div class="prof-stat" onclick="go(\'#/market-my\')"><div class="prof-stat-val">📋</div><div class="prof-stat-lbl">Объявления</div></div>';
+  h+='</div>';
+  // Actions
+  h+='<div class="prof-actions">';
+  h+='<button class="btn btn-o" onclick="go(\'#/profile/edit\')">✏️ Изменить</button>';
+  h+='<button class="btn btn-o" onclick="go(\'#/blocked\')">🚫 Чёрный список</button>';
+  h+='</div>';
+  // Info cards
+  h+='<div class="prof-section"><div class="prof-section-hdr">Информация</div><div class="prof-info-grid">';
+  if(me.game_nickname)h+='<div class="prof-info-card"><div class="pil">Ник в игре</div><div class="piv">🎮 '+escHtml(me.game_nickname)+'</div></div>';
+  if(me.discord)h+='<div class="prof-info-card"><div class="pil">Discord</div><div class="piv">💬 '+escHtml(me.discord)+'</div></div>';
+  h+='<div class="prof-info-card"><div class="pil">Регистрация</div><div class="piv">📅 '+(me.created_at?fmtFullDate(new Date(me.created_at)):'—')+'</div></div>';
+  h+='<div class="prof-info-card"><div class="pil">Telegram</div><div class="piv">@'+(me.telegram_username||'—')+'</div></div>';
+  h+='</div></div>';
   // Settings
-  h+='<div class="sec" style="margin-top:18px">⚙️ Настройки</div>';
-
-  // Theme toggle
+  h+='<div class="prof-section"><div class="prof-section-hdr">Настройки</div>';
   const isLight=(document.documentElement.dataset.theme||'dark')==='light';
   h+='<div class="theme-toggle" onclick="toggleTheme();P_profile()"><div><div class="theme-toggle-label">'+(isLight?'☀️ Светлая тема':'🌙 Тёмная тема')+'</div><div class="theme-toggle-sub">Переключить оформление</div></div><div class="theme-switch'+(isLight?' on':'')+'"></div></div>';
-
-  // Emission
   const emiOn=emiS&&emiS.enabled;
-  h+='<div class="card" style="padding:12px;display:flex;align-items:center;justify-content:space-between">';
+  h+='<div class="card" style="padding:12px;display:flex;align-items:center;justify-content:space-between;margin-top:8px">';
   h+='<div><div style="font-weight:700;font-size:13px">☢️ Уведомления о выбросе</div><div style="font-size:11px;color:var(--t3)">При начале и конце выброса</div></div>';
   h+='<button class="btn btn-sm '+(emiOn?'btn-r':'btn-g')+'" onclick="toggleEmission()" style="flex-shrink:0">'+(emiOn?'🔕 Выкл':'🔔 Вкл')+'</button>';
+  h+='</div>';
   h+='</div>';
   render(h);
 }
@@ -1727,41 +1902,68 @@ async function uploadAvatar(input){
   }catch(e){toast('❌ Ошибка загрузки')}
 }
 
-/* ═══════════ USER (public profile) ═══════════ */
+/* ═══════════ USER (public profile) — Discord/Instagram style ═══════════ */
 async function P_user(uid){
   if(!uid||uid==='0'){render(emptyMsg('Пользователь не найден'));return}
   render(skelRows(3));
   const u=await API.get('/api/users/'+uid);
   if(u.error){render('<a class="back" onclick="history.back()">← Назад</a>'+emptyMsg('Не найден'));return}
   const av=u.avatar_url?'<img src="'+u.avatar_url+'" alt="">':'👤';
-  const onlineHtml=u.is_online?'<span style="font-size:11px;color:var(--grn);margin-left:6px">● онлайн</span>':'';
-  const rep=u.reputation>0?'<span class="rep pos">+'+u.reputation+'</span>':(u.reputation<0?'<span class="rep neg">'+u.reputation+'</span>':'');
-  let h='<a class="back" onclick="history.back()">← Назад</a>';
-  h+='<div class="profile-header">';
-  h+='<div class="profile-avatar" style="cursor:default;border-color:var(--brd)">'+av+(u.is_online?'<div class="online-dot online-dot-lg"></div>':'')+'</div>';
-  h+='<div class="profile-info"><div class="profile-name">'+u.display_name+' '+rep+onlineHtml+'</div>';
-  h+='<div class="profile-sub">';
-  if(u.game_nickname)h+='🎮 '+u.game_nickname+'<br>';
-  if(u.discord)h+='💬 '+u.discord;
-  if(u.followers_count)h+='<br>👥 '+u.followers_count+' подписчиков';
-  h+='</div></div></div>';
-  if(u.bio)h+='<div class="card" style="padding:12px"><div style="font-size:12px;color:var(--t2)">'+u.bio+'</div></div>';
-  h+='<div class="bgrp">';
+  // Banner
+  let h='<a class="back" onclick="history.back()" style="position:relative;z-index:3">← Назад</a>';
+  h+='<div class="prof-banner"></div>';
+  // Avatar
+  h+='<div class="prof-av-wrap"><div class="prof-avatar" style="cursor:default">'+av;
+  if(u.is_online)h+='<div class="online-dot" style="position:absolute;bottom:4px;right:4px;width:14px;height:14px;border-radius:50%;background:var(--grn);border:3px solid var(--bg1)"></div>';
+  h+='</div></div>';
+  // Name
+  h+='<div class="prof-name-row"><div class="prof-display-name">'+escHtml(u.display_name)+'</div>';
+  if(u.game_nickname)h+='<div class="prof-handle">🎮 '+escHtml(u.game_nickname)+'</div>';
+  h+='</div>';
+  // Bio
+  if(u.bio)h+='<div class="prof-bio">'+escHtml(u.bio)+'</div>';
+  // Stats row
+  const rep=u.reputation||0;
+  const repClass=rep>0?'pos':rep<0?'neg':'';
+  h+='<div class="prof-stats">';
+  h+='<div class="prof-stat"><div class="prof-stat-val '+repClass+'">'+(rep>0?'+':'')+rep+'</div><div class="prof-stat-lbl">Репутация</div></div>';
+  h+='<div class="prof-stat"><div class="prof-stat-val">'+(u.deals_count||0)+'</div><div class="prof-stat-lbl">Сделок</div></div>';
+  h+='<div class="prof-stat"><div class="prof-stat-val">'+(u.followers_count||0)+'</div><div class="prof-stat-lbl">Подписч.</div></div>';
+  h+='</div>';
+  // Action buttons
   if(!u.is_self){
-    h+='<button class="btn btn-o btn-sm" onclick="initDM('+uid+')">💬 Написать</button>';
+    h+='<div class="prof-actions">';
+    h+='<button class="btn btn-b btn-sm" onclick="initDM('+uid+')">💬 Написать</button>';
     if(u.is_following){
       h+='<button class="btn btn-r btn-sm" onclick="unfollowUser('+uid+')">✕ Отписаться</button>';
     } else {
-      h+='<button class="btn btn-b btn-sm" onclick="followUser('+uid+')">👤 Подписаться</button>';
+      h+='<button class="btn btn-o btn-sm" onclick="followUser('+uid+')">👤 Подписаться</button>';
     }
-    h+='<button class="btn btn-r btn-sm" onclick="blockUserFromProfile('+uid+',\''+esc(u.display_name)+'\')">🚫 Блокировать</button>';
+    h+='<button class="btn btn-r btn-sm" onclick="blockUserFromProfile('+uid+',\''+esc(u.display_name)+'\')">🚫</button>';
+    h+='</div>';
   }
-  h+='</div>';
-  const mkt=await API.get('/api/market?status=active&per_page=10');
-  const userListings=(mkt.items||[]).filter(l=>l.user&&l.user.id===parseInt(uid));
-  if(userListings.length){
-    h+='<div class="sec">Объявления</div>';
-    for(const l of userListings)h+=marketCard(l);
+  // Info cards
+  h+='<div class="prof-section"><div class="prof-section-hdr">Информация</div><div class="prof-info-grid">';
+  if(u.game_nickname)h+='<div class="prof-info-card"><div class="pil">Ник в игре</div><div class="piv">🎮 '+escHtml(u.game_nickname)+'</div></div>';
+  if(u.discord)h+='<div class="prof-info-card"><div class="pil">Discord</div><div class="piv">💬 '+escHtml(u.discord)+'</div></div>';
+  const posRev=u.positive_reviews||0,negRev=u.negative_reviews||0;
+  h+='<div class="prof-info-card"><div class="pil">Отзывы</div><div class="piv">👍 '+posRev+' / 👎 '+negRev+'</div></div>';
+  h+='<div class="prof-info-card"><div class="pil">С нами с</div><div class="piv">📅 '+(u.member_since?fmtFullDate(new Date(u.member_since)):'—')+'</div></div>';
+  h+='</div></div>';
+  // Active listings
+  if(u.listings&&u.listings.length){
+    h+='<div class="prof-section"><div class="prof-section-hdr">Объявления · '+u.active_listings+'</div>';
+    for(const l of u.listings){
+      const icon=l.icon?'<img src="'+l.icon+'" alt="">':'📦';
+      const typeClass=l.listing_type==='sell'?'plm-type-sell':'plm-type-buy';
+      const typeText=l.listing_type==='sell'?'Продаю':'Куплю';
+      h+='<div class="prof-listing-mini" onclick="go(\'#/market\')">';
+      h+='<div class="plm-icon">'+icon+'</div>';
+      h+='<div class="plm-info"><div class="plm-name">'+escHtml(l.item_name||l.item_id)+'</div><div class="plm-price">'+fmt(l.price)+' ₽</div></div>';
+      h+='<span class="plm-type '+typeClass+'">'+typeText+'</span>';
+      h+='</div>';
+    }
+    h+='</div>';
   }
   render(h);
 }

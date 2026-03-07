@@ -114,9 +114,48 @@ async def get_user(user_id: int, user: User = Depends(get_current_user)):
         else:
             d["is_following"] = False
             d["is_self"] = False
-        # Followers count
+        # Followers / following counts
         d["followers_count"] = session.query(UserFollow).filter_by(target_id=user_id).count()
+        d["following_count"] = session.query(UserFollow).filter_by(follower_id=user_id).count()
+        # Deals stats
+        d["deals_count"] = session.query(MarketListing).filter_by(
+            user_id=user_id, status="sold").count()
+        d["active_listings"] = session.query(MarketListing).filter_by(
+            user_id=user_id, status="active").count()
+        # Reviews
+        pos = session.query(ReputationReview).filter(
+            ReputationReview.target_id == user_id, ReputationReview.score > 0).count()
+        neg = session.query(ReputationReview).filter(
+            ReputationReview.target_id == user_id, ReputationReview.score < 0).count()
+        d["positive_reviews"] = pos
+        d["negative_reviews"] = neg
+        # Recent active listings
+        recent_listings = session.query(MarketListing).filter_by(
+            user_id=user_id, status="active"
+        ).order_by(MarketListing.created_at.desc()).limit(5).all()
+        from services.item_loader import item_db
+        d["listings"] = [{
+            "id": l.id, "item_id": l.item_id, "item_name": l.item_name,
+            "listing_type": l.listing_type, "price": l.price,
+            "icon": _listing_icon(l.item_id),
+            "created_at": l.created_at.isoformat() + "Z" if l.created_at else None,
+        } for l in recent_listings]
+        # Member since
+        d["member_since"] = u.created_at.isoformat() + "Z" if u.created_at else None
         return d
+
+
+def _listing_icon(item_id: str) -> str:
+    from services.item_loader import item_db
+    gi = item_db.get(item_id)
+    if not gi:
+        return ""
+    p = gi.icon_path
+    if not p or p.strip() == "":
+        return f"/custom-icons/{gi.item_id}.png" if not gi.api_supported else ""
+    if p.startswith("http") or p.startswith("/icons/"):
+        return p
+    return f"/icons/{p.lstrip('/')}"
 
 
 @router.get("/chat-colors")
@@ -222,6 +261,7 @@ def _full_user_dict(u: User) -> dict:
         pass
 
     return {
+        "authenticated": True,
         "id": u.id,
         "telegram_id": u.telegram_id,
         "telegram_username": u.telegram_username,

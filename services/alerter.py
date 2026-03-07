@@ -117,12 +117,14 @@ async def send_status_message(text: str) -> bool:
 # ══════════════════════════════════════════════════════════════
 
 _last_emission_active: bool | None = None  # None = неизвестно, True = идёт, False = чисто
+_emission_initialized: bool = False  # Флаг что первая проверка прошла
 
 
 def get_emission_debug() -> dict:
     """Диагностика состояния emission checker."""
     return {
         "last_known_state": _last_emission_active,
+        "initialized": _emission_initialized,
         "description": {
             None: "Не инициализирован (ожидает первую проверку)",
             True: "Выброс идёт",
@@ -166,7 +168,7 @@ async def check_emission_and_notify():
     Проверяет статус выброса и рассылает уведомления подписчикам
     при изменении состояния (начался / закончился).
     """
-    global _last_emission_active
+    global _last_emission_active, _emission_initialized
     from api.emission import get_emission
     from db.models import SessionLocal, EmissionNotifySetting
     from datetime import datetime, timezone
@@ -195,29 +197,32 @@ async def check_emission_and_notify():
             logger.debug("Emission: start=%s end=%s now=%s active=%s", start, end, now, is_active)
         else:
             logger.warning("Emission: не удалось распарсить даты cs=%r ce=%r", cs, ce)
+    else:
+        logger.debug("Emission: нет currentStart/currentEnd в ответе, зона чиста")
 
-    # Первый запуск
-    if _last_emission_active is None:
+    # Первый запуск — запоминаем состояние
+    if not _emission_initialized:
+        _emission_initialized = True
         _last_emission_active = is_active
-        logger.info("☢️ Emission init: active=%s (raw: cs=%r, ce=%r)", is_active, cs, ce)
-        # Если выброс уже идёт при старте — сразу шлём уведомление
+        logger.info("☢️ Emission init: active=%s (cs=%r, ce=%r)", is_active, cs, ce)
+        # Если выброс уже идёт при старте бота — шлём уведомление
         if is_active:
-            logger.info("☢️ Emission: выброс уже идёт при старте, шлём уведомление")
+            logger.info("☢️ Выброс уже идёт при запуске → рассылка уведомлений")
             await _send_emission_notifications(
                 "☢️ <b>Выброс идёт!</b>\n\n🚨 Немедленно укройтесь в безопасном месте!",
                 is_active=True,
             )
         return
 
-    # Нет изменений
+    # Нет изменений — выходим
     if is_active == _last_emission_active:
         return
 
+    # Состояние изменилось!
     prev = _last_emission_active
     _last_emission_active = is_active
     logger.info("☢️ Emission changed: %s → %s", prev, is_active)
 
-    # Готовим сообщение
     if is_active:
         text = "☢️ <b>Выброс начался!</b>\n\n🚨 Немедленно укройтесь в безопасном месте!"
     else:
@@ -227,40 +232,48 @@ async def check_emission_and_notify():
 
 
 async def _send_emission_notifications(text: str, is_active: bool):
-    """Рассылает уведомление о выбросе всем подписчикам."""
+    """Рассылает уведомление о выбросе всем подписчикам (в личку каждому)."""
     from db.models import SessionLocal, EmissionNotifySetting
+    import asyncio
 
     bot = _get_bot()
     if not bot:
-        logger.warning("☢️ Emission: бот не инициализирован (token=%s)", bool(TELEGRAM_BOT_TOKEN))
+        logger.error("☢️ Emission: бот не инициализирован! TELEGRAM_BOT_TOKEN=%s",
+                      "set" if TELEGRAM_BOT_TOKEN else "EMPTY")
         return
 
     with SessionLocal() as session:
         subscribers = session.query(EmissionNotifySetting).filter_by(enabled=True).all()
         tg_ids = [s.telegram_id for s in subscribers]
 
-    logger.info("☢️ Emission notify: подписчиков=%d, tg_ids=%s", len(tg_ids), tg_ids)
+    logger.info("☢️ Emission notify: %d подписчиков → tg_ids=%s", len(tg_ids), tg_ids)
 
     if not tg_ids:
+        # Fallback: отправить в основной чат если нет подписчиков
         if TELEGRAM_CHAT_ID:
             try:
                 await bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=text, parse_mode=ParseMode.HTML)
-                logger.info("☢️ Emission: отправлено в основной чат %s", TELEGRAM_CHAT_ID)
+                logger.info("☢️ Отправлено в основной чат %s (нет подписчиков)", TELEGRAM_CHAT_ID)
             except Exception as exc:
-                logger.error("Emission send to main chat error: %s", exc)
+                logger.error("Emission → main chat error: %s", exc)
         else:
-            logger.warning("☢️ Emission: нет подписчиков и нет TELEGRAM_CHAT_ID")
+            logger.warning("☢️ Нет подписчиков и нет TELEGRAM_CHAT_ID")
         return
 
     sent = 0
+    errors = 0
     for tg_id in tg_ids:
         try:
             await bot.send_message(chat_id=tg_id, text=text, parse_mode=ParseMode.HTML)
             sent += 1
-            logger.debug("☢️ Emission: отправлено %s", tg_id)
+            logger.debug("☢️ → %s OK", tg_id)
         except Exception as exc:
-            logger.warning("Emission notify error for %s: %s", tg_id, exc)
+            errors += 1
+            logger.warning("☢️ → %s FAIL: %s", tg_id, exc)
+        # Небольшая пауза чтобы не словить rate limit Telegram
+        if len(tg_ids) > 5:
+            await asyncio.sleep(0.05)
 
     event = "начался" if is_active else "завершён"
-    logger.info("☢️ Выброс %s — уведомлено %d/%d", event, sent, len(tg_ids))
+    logger.info("☢️ Выброс %s — отправлено %d/%d (ошибок: %d)", event, sent, len(tg_ids), errors)
 
