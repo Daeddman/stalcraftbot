@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 
 from api.client import stalcraft_client, InvalidItemError
 from config import STALCRAFT_REGION
+from services.scanner import _parse_additional
 from db.models import (
     SessionLocal,
     ActiveLot,
@@ -40,17 +41,6 @@ def _extract_price(lot: dict, key: str) -> int:
         return int(val)
     return 0
 
-
-def _parse_additional(lot: dict) -> tuple[int, int]:
-    """quality (-1..5) и upgrade_level (0..15) из additional."""
-    add = lot.get("additional") or {}
-    qlt = add.get("qlt", -1)
-    if qlt is None:
-        qlt = -1
-    # Заточка в поле "ptn" (potency), НЕ "upgrade_bonus"
-    ptn = add.get("ptn", 0) or 0
-    upgrade = min(15, max(0, int(ptn)))
-    return int(qlt), int(upgrade)
 
 
 # ══════════════════════════════════════════════════════════════
@@ -149,15 +139,36 @@ def _process_lots(lots: list[dict], region: str) -> dict[str, int]:
     """Обрабатывает полученные лоты. Возвращает статистику."""
     now = datetime.now(timezone.utc)
 
+    # Pre-extract all unique item_ids and lot_ids for batch queries
+    all_item_ids: set[str] = set()
+    all_lot_ids: set[str] = set()
+    for lot in lots:
+        lot_id = lot.get("id", "") or lot.get("lot_id", "")
+        item_id = lot.get("itemId", "") or lot.get("item_id", "")
+        if lot_id and item_id:
+            all_lot_ids.add(str(lot_id))
+            all_item_ids.add(str(item_id))
+
     with SessionLocal() as session:
-        # Текущие lot_id в БД
+        # Batch-load existing data (2 queries instead of N*2)
         existing_lot_ids: set[str] = {
             r[0] for r in session.query(ActiveLot.lot_id).filter(ActiveLot.region == region).all()
         }
+        registry_map: dict[str, ItemRegistry] = {
+            r.item_id: r for r in session.query(ItemRegistry).filter(
+                ItemRegistry.item_id.in_(all_item_ids)
+            ).all()
+        } if all_item_ids else {}
+        active_lot_map: dict[str, ActiveLot] = {
+            r.lot_id: r for r in session.query(ActiveLot).filter(
+                ActiveLot.lot_id.in_(all_lot_ids)
+            ).all()
+        } if all_lot_ids else {}
+
         seen_lot_ids: set[str] = set()
         new_items = 0
-        items_prices: dict[str, list[int]] = {}   # item_id -> [prices]
-        items_amounts: dict[str, int] = {}         # item_id -> total_amount
+        items_prices: dict[str, list[int]] = {}
+        items_amounts: dict[str, int] = {}
 
         for lot in lots:
             lot_id = lot.get("id", "") or lot.get("lot_id", "")
@@ -183,25 +194,26 @@ def _process_lots(lots: list[dict], region: str) -> dict[str, int]:
                 items_prices.setdefault(item_id, []).append(price)
             items_amounts[item_id] = items_amounts.get(item_id, 0) + amount
 
-            # ── ItemRegistry ──
-            reg = session.get(ItemRegistry, item_id)
+            # ── ItemRegistry (batch lookup) ──
+            reg = registry_map.get(item_id)
             if reg is None:
                 new_items += 1
                 reg = ItemRegistry(
                     item_id=item_id,
-                    name=item_id,  # stub
+                    name=item_id,
                     source="observed",
                     is_official_db=False,
                     first_seen_at=now,
                     last_seen_at=now,
                 )
                 session.add(reg)
+                registry_map[item_id] = reg
                 logger.info("🆕 Новый предмет: %s", item_id)
             else:
                 reg.last_seen_at = now
 
-            # ── ActiveLot upsert ──
-            existing = session.get(ActiveLot, lot_id)
+            # ── ActiveLot upsert (batch lookup) ──
+            existing = active_lot_map.get(lot_id)
             if existing is None:
                 session.add(ActiveLot(
                     lot_id=lot_id, item_id=item_id, region=region,

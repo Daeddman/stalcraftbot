@@ -8,6 +8,7 @@ from typing import Optional
 from config import BASE_DIR
 from db.models import SessionLocal, User, UserFollow, ReputationReview, MarketListing, UserNotification
 from web.auth import get_current_user, require_user
+from services.cache import api_cache
 
 router = APIRouter(tags=["users"])
 
@@ -35,21 +36,15 @@ class ReviewData(BaseModel):
     comment: Optional[str] = None
 
 
-_me_cache: dict[int, tuple[dict, float]] = {}
-_ME_CACHE_TTL = 5  # seconds — short, just to debounce duplicate calls
-
-
 @router.get("/me")
 async def get_me(user: User = Depends(get_current_user)):
     if not user:
         return {"authenticated": False}
-    import time
-    now = time.time()
-    cached = _me_cache.get(user.id)
-    if cached and now - cached[1] < _ME_CACHE_TTL:
-        return cached[0]
+    cached = api_cache.get(f"me:{user.id}")
+    if cached is not None:
+        return cached
     d = _full_user_dict(user)
-    _me_cache[user.id] = (d, now)
+    api_cache.set(f"me:{user.id}", d, ttl=5)
     return d
 
 
@@ -73,7 +68,7 @@ async def update_me(data: ProfileUpdate, user: User = Depends(require_user)):
         session.commit()
         session.refresh(u)
         # Invalidate me cache
-        _me_cache.pop(user.id, None)
+        api_cache.delete(f"me:{user.id}")
         # Audit
         try:
             from services.audit import log_action, ACTION_PROFILE_EDIT
@@ -244,12 +239,14 @@ def _full_user_dict(u: User) -> dict:
 
 def _public_user_dict(u: User) -> dict:
     """Public user dict — NO telegram_username for safety."""
-    from datetime import datetime, timedelta
+    from datetime import datetime, timedelta, timezone
     is_online = False
     if hasattr(u, 'last_active_at') and u.last_active_at:
         try:
-            threshold = datetime.utcnow() - timedelta(minutes=5)
-            last = u.last_active_at.replace(tzinfo=None) if u.last_active_at.tzinfo else u.last_active_at
+            threshold = datetime.now(timezone.utc) - timedelta(minutes=5)
+            last = u.last_active_at
+            if last.tzinfo is None:
+                last = last.replace(tzinfo=timezone.utc)
             is_online = last >= threshold
         except Exception:
             pass

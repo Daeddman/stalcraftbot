@@ -281,15 +281,6 @@ async def main() -> None:
             count = await asyncio.to_thread(generate_thumbnails)
             if count:
                 logger.info("🖼 Миниатюры: %d новых", count)
-                # Mount thumbs dir if it was just created
-                from services.thumbnails import THUMBS_DIR
-                if THUMBS_DIR.exists():
-                    try:
-                        fastapi_app.mount("/icon-thumbs",
-                            __import__('fastapi.staticfiles', fromlist=['StaticFiles']).StaticFiles(
-                                directory=str(THUMBS_DIR)), name="icon_thumbs_late")
-                    except Exception:
-                        pass
         except Exception as exc:
             logger.debug("Thumbnails: %s", exc)
 
@@ -442,6 +433,14 @@ async def main() -> None:
         )
     finally:
         scheduler.shutdown()
+        # Close HTTP clients
+        try:
+            from api.client import stalcraft_client
+            from api.auth import token_manager
+            await stalcraft_client.close()
+            await token_manager.close()
+        except Exception:
+            pass
         logger.info("⏹️  Остановлен")
 
 

@@ -82,9 +82,9 @@ app.include_router(ws_chat.router)
 
 # ── Статика ──
 app.mount("/icons", StaticFiles(directory=str(ICONS_DIR)), name="icons")
-# Миниатюры иконок (64x64)
-if THUMBS_DIR.exists():
-    app.mount("/icon-thumbs", StaticFiles(directory=str(THUMBS_DIR)), name="icon_thumbs")
+# Миниатюры иконок (64x64) — создаём директорию при старте
+THUMBS_DIR.mkdir(parents=True, exist_ok=True)
+app.mount("/icon-thumbs", StaticFiles(directory=str(THUMBS_DIR)), name="icon_thumbs")
 # Кастомные иконки (wiki-предметы, загруженные вручную)
 if CUSTOM_ICONS_DIR.exists():
     app.mount("/custom-icons", StaticFiles(directory=str(CUSTOM_ICONS_DIR)), name="custom_icons")

@@ -4,6 +4,7 @@ from services.item_loader import item_db
 from config import CATEGORY_NAMES, RANK_NAMES
 from db.models import SessionLocal, TrackedItem
 from sqlalchemy import func
+from services.cache import compute_cache, api_cache
 
 router = APIRouter(tags=["catalog"])
 
@@ -119,21 +120,14 @@ async def search_items(
     return [_item_short(i) for i in results]
 
 
-_popular_cache = None
-_popular_cache_ts = 0
-_POPULAR_TTL = 300  # 5 min — heavy query, cache aggressively
-
-
 @router.get("/popular")
 async def popular_items(limit: int = 8):
     """Самые популярные предметы — по количеству продаж за 7 дней или по количеству отслеживаний."""
-    global _popular_cache, _popular_cache_ts
-    import time as _time
-    now = _time.time()
-    if _popular_cache is not None and now - _popular_cache_ts < _POPULAR_TTL and len(_popular_cache) >= limit:
-        return _popular_cache[:limit]
+    cached = compute_cache.get(f"popular:{limit}")
+    if cached is not None:
+        return cached[:limit]
 
-    from datetime import datetime, timedelta
+    from datetime import datetime, timedelta, timezone
     limit = max(1, min(limit, 20))
 
     result = []
@@ -141,7 +135,7 @@ async def popular_items(limit: int = 8):
 
     # Single DB session for all queries — avoid repeated open/close overhead
     with SessionLocal() as session:
-        cutoff = datetime.utcnow() - timedelta(days=7)
+        cutoff = datetime.now(timezone.utc) - timedelta(days=7)
 
         # 1) Items with most sales in last 7 days
         try:
@@ -207,19 +201,18 @@ async def popular_items(limit: int = 8):
     # Add trend data
     _attach_trends(result)
 
-    _popular_cache = result
-    _popular_cache_ts = now
+    compute_cache.set(f"popular:{limit}", result, ttl=300)
     return result
 
 
 def _attach_trends(items: list[dict]):
     """Добавляет тренд (изменение цены за 7д) к каждому предмету — батчевый запрос."""
-    from datetime import datetime, timedelta
+    from datetime import datetime, timedelta, timezone
     from db.models import SaleRecord
     if not items:
         return
-    cutoff_7d = (datetime.utcnow() - timedelta(days=7)).isoformat()
-    cutoff_14d = (datetime.utcnow() - timedelta(days=14)).isoformat()
+    cutoff_7d = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+    cutoff_14d = (datetime.now(timezone.utc) - timedelta(days=14)).isoformat()
     ids = [i["id"] for i in items]
     try:
         with SessionLocal() as session:
@@ -359,21 +352,15 @@ async def compare_items(ids: str = Query("", description="item_ids через з
 
 
 # ── Combined home endpoint (1 request instead of 3) ──
-_home_cache = None
-_home_cache_ts = 0
-_HOME_CACHE_TTL = 30  # seconds
 
 
 @router.get("/home")
 async def home_data():
     """Возвращает все данные главной страницы одним запросом."""
-    global _home_cache, _home_cache_ts
-    import time as _time
-    now = _time.time()
-    if _home_cache and now - _home_cache_ts < _HOME_CACHE_TTL:
-        return _home_cache
+    cached = api_cache.get("home_data")
+    if cached is not None:
+        return cached
 
-    import asyncio
     from api.emission import get_emission
     from db.models import MarketListing, User as UserModel
 
@@ -421,8 +408,7 @@ async def home_data():
         "popular": pop,
         "market": {"items": mkt_items, "total": len(mkt_items)},
     }
-    _home_cache = result
-    _home_cache_ts = now
+    api_cache.set("home_data", result, ttl=30)
     return result
 
 

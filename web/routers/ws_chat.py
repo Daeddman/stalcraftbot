@@ -55,8 +55,8 @@ manager = ConnectionManager()
 
 def _auth_ws(token: str) -> int | None:
     try:
-        from web.auth import _parse_init_data
-        ud = _parse_init_data(token)
+        from web.auth import validate_init_data
+        ud = validate_init_data(token)
         if not ud:
             return None
         tg_id = ud.get("id")

@@ -23,7 +23,6 @@ TELEGRAM_CHAT_ID: str = os.getenv("TELEGRAM_CHAT_ID", "")
 
 # ── Сканирование ──
 SCAN_INTERVAL_MINUTES: int = int(os.getenv("SCAN_INTERVAL_MINUTES", "10"))
-DEAL_THRESHOLD_PERCENT: int = int(os.getenv("DEAL_THRESHOLD_PERCENT", "70"))
 
 # ── Обновление базы предметов ──
 DB_UPDATE_INTERVAL_HOURS: int = int(os.getenv("DB_UPDATE_INTERVAL_HOURS", "6"))

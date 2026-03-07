@@ -1,23 +1,16 @@
 """API аукциона — текущие лоты и история (v2: серверная фильтрация/сортировка)."""
 import asyncio
-import time
 import logging
-from fastapi import APIRouter, Query
+from fastapi import APIRouter
 from api.auction import get_active_lots, get_price_history
 from db.models import SessionLocal, SaleRecord, HistorySyncState
-from sqlalchemy import func, desc, asc
+from sqlalchemy import desc, asc
+from services.cache import auction_cache
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["auction"])
 
-# ── Кеш лотов (item_id, quality) → {lots, ts} ──
-_lots_cache: dict[tuple[str, int], dict] = {}
-_LOTS_CACHE_TTL = 60  # 1 мин для лотов
-
-# ── Кеш истории API (item_id, quality) → {prices, ts} ──
-_hist_cache: dict[tuple[str, int], dict] = {}
-_HIST_CACHE_TTL = 300  # 5 мин
 
 
 def _parse_qlt_upg(additional: dict | None) -> tuple[int, int]:
@@ -68,14 +61,13 @@ async def lots(
         return data
 
     # ── С фильтром по quality: загружаем все лоты, фильтруем, сортируем ──
-    cache_key = (item_id, quality)
-    cached = _lots_cache.get(cache_key)
-    if cached and time.time() - cached["ts"] < _LOTS_CACHE_TTL:
-        all_filtered = cached["lots"]
+    cache_key = f"lots:{item_id}:{quality}"
+    cached = auction_cache.get(cache_key)
+    if cached is not None:
+        all_filtered = cached
     else:
         all_filtered = await _fetch_filtered_lots(item_id, quality)
-        _lots_cache[cache_key] = {"lots": all_filtered, "ts": time.time()}
-        _cleanup_cache(_lots_cache, _LOTS_CACHE_TTL)
+        auction_cache.set(cache_key, all_filtered, ttl=60)
 
     # Серверная сортировка
     if sort == "buyout_price":
@@ -169,14 +161,13 @@ async def history(
         return {"prices": page, "total": data.get("total", len(prices))}
 
     # С фильтром — загружаем из API
-    cache_key = (item_id, quality)
-    cached = _hist_cache.get(cache_key)
-    if cached and time.time() - cached["ts"] < _HIST_CACHE_TTL:
-        all_filtered = cached["prices"]
+    cache_key = f"hist:{item_id}:{quality}"
+    cached = auction_cache.get(cache_key)
+    if cached is not None:
+        all_filtered = cached
     else:
         all_filtered = await _fetch_filtered_history(item_id, quality, upgrade)
-        _hist_cache[cache_key] = {"prices": all_filtered, "ts": time.time()}
-        _cleanup_cache(_hist_cache, _HIST_CACHE_TTL)
+        auction_cache.set(cache_key, all_filtered, ttl=300)
 
     # Сортировка
     if sort == "time_desc":
@@ -250,11 +241,11 @@ async def chart_data(
     Приоритет: БД → API fallback.
     Если за указанный период нет данных — отдаём за всё время.
     """
-    from datetime import datetime, timedelta
+    from datetime import datetime, timedelta, timezone
     from collections import defaultdict
 
     use_all_time = (days <= 0)
-    cutoff = "" if use_all_time else (datetime.utcnow() - timedelta(days=days)).isoformat()
+    cutoff = "" if use_all_time else (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
 
     # 1) Пробуем из БД (SaleRecord) за указанный период
     with SessionLocal() as session:
@@ -428,9 +419,3 @@ async def _fetch_filtered_history(item_id: str, quality: int, upgrade: int = -99
     )
     return collected
 
-
-def _cleanup_cache(cache: dict, ttl: int):
-    now = time.time()
-    expired = [k for k, v in cache.items() if now - v["ts"] > ttl * 3]
-    for k in expired:
-        del cache[k]
