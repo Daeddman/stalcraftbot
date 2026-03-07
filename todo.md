@@ -51,6 +51,27 @@
 
 ## ✅ Выполнено (07.03.2026)
 
+### ⚡ Оптимизация и рефакторинг кодовой базы
+- [x] **Удалён services/analyzer.py** — полностью мёртвый код (Deal, analyze_item, _analyze_artefact_lots)
+- [x] **Вычищен services/scanner.py** — оставлена только `_parse_additional()` как shared utility
+- [x] **Удалены неиспользуемые функции из db/repository.py** — save_price_records, save_sale_records, get_avg_price, get_min_price, get_price_count, get_price_history_db, get_quality_breakdown, get_avg_sale_price, was_alert_sent, quality_name, quality_short, upgrade_str, QUALITY_NAMES, QUALITY_SHORT
+- [x] **Удалён DEAL_THRESHOLD_PERCENT** из config.py
+- [x] **Консолидация `_parse_additional()`** — единая каноническая реализация в scanner.py, убраны дубликаты из discovery.py и analyzer.py
+- [x] **Централизация кеширования** — все ad-hoc dict-кеши заменены на TTLCache из services/cache.py:
+  - web/routers/auction.py: `_lots_cache`, `_hist_cache` → `auction_cache`
+  - web/routers/catalog.py: `_popular_cache`, `_home_cache` → `compute_cache`, `api_cache`
+  - web/routers/users.py: `_me_cache` → `api_cache`
+  - api/emission.py: `_cache` → `api_cache`
+- [x] **Token Bucket rate limiter** — заменён semaphore+sleep на точный token bucket алгоритм в api/client.py (~2 req/s реально вместо ~1 req/s)
+- [x] **Persistent httpx.AsyncClient** — TokenManager переиспользует клиент вместо создания нового при каждом refresh
+- [x] **Proper httpx connection pooling** — max_connections=10, max_keepalive_connections=5
+- [x] **Shutdown cleanup** — при завершении закрываются httpx клиенты (stalcraft_client + token_manager)
+- [x] **Batch-query в discovery.py** — ItemRegistry и ActiveLot загружаются пакетно (2 SQL-запроса вместо N*2 per lot)
+- [x] **Исправлен баг offset-naive/offset-aware datetime** — все `datetime.utcnow()` заменены на `datetime.now(timezone.utc)` в chat.py, users.py, catalog.py, auction.py
+- [x] **Исправлен баг ws_chat.py auth** — `_parse_init_data` (не существовала) заменена на `validate_init_data`
+- [x] **Убрана хрупкая динамическая mount StaticFiles** — thumbs dir создаётся при старте, mount статический
+- [x] **Удалён unused import `cachetools`** из requirements.txt
+
 ### Аукцион — полная переработка
 - [x] **Серверная сортировка лотов** — гарантированный порядок по цене без разрывов
 - [x] **Фильтрация лотов по качеству** — отдельный параметр quality для лотов
@@ -178,4 +199,21 @@
 - [ ] **Предиктор цен** — ML-модель прогноза на основе исторических данных
 - [ ] **Арбитраж** — купить на аукционе → продать на маркете, автоподсчёт маржи
 - [ ] **Volume profile** — распределение объёма по ценовым уровням
+
+### 🔧 Архитектурные улучшения (следующий этап)
+- [ ] **Redis кеш** — замена in-memory TTLCache при масштабировании на несколько воркеров
+- [ ] **PostgreSQL миграция** — замена SQLite для concurrent writes и полнотекстового поиска
+- [ ] **Celery/Dramatiq** — выделить фоновые задачи в отдельные worker-ы
+- [ ] **CDN для иконок** — загрузить все иконки на Cloudflare R2 / S3 для быстрой раздачи
+- [ ] **API versioning** — /api/v1/ для обратной совместимости при изменениях
+- [ ] **Pytest покрытие** — юнит-тесты для критических путей (аукцион, маркет, чат)
+- [ ] **Structured logging** — JSON-логи для ELK / Loki
+- [ ] **Graceful shutdown** — дождаться завершения активных запросов при рестарте
+- [ ] **DB connection pool tuning** — настройка pool_size / NullPool для SQLite
+- [ ] **Asyncio gather** — параллельный fetch нескольких предметов в discovery
+- [ ] **Response compression** — gzip middleware для FastAPI (особенно для JSON API)
+- [ ] **ETags для API** — conditional requests для тяжёлых endpoint-ов
+- [ ] **Background task queue** — для тяжёлых операций (wiki_sync, full_download)
+- [ ] **Metrics endpoint** — Prometheus metrics (req/s, latency, cache hit rate, DB query count)
+- [ ] **Auto-scaling history sync** — адаптивная скорость синхронизации по нагрузке API
 
