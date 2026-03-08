@@ -135,5 +135,5 @@ async def get_character_profile(character: str, region: str = STALCRAFT_REGION) 
         err_str = str(exc)
         logger.warning("Ошибка character profile %s: %s", character, err_str)
         if "404" in err_str:
-            return {"error": f"Персонаж «{character}» не найден. Проверьте имя — формат: Ник-1 (например Test-1)"}
+            return {"error": f"Персонаж «{character}» не найден. Убедитесь, что имя написано точно как в игре (с учётом регистра)"}
         return {"error": f"Ошибка API: {err_str[:200]}"}
