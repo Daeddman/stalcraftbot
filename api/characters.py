@@ -122,7 +122,11 @@ async def get_clan_members(clan_id: str, region: str = STALCRAFT_REGION) -> dict
 
 
 async def get_character_profile(character: str, region: str = STALCRAFT_REGION) -> dict[str, Any]:
-    """GET /{region}/character/{character}/profile"""
+    """GET /{region}/character/{character}/profile
+
+    Внимание: этот эндпоинт требует user token (Authorization Code flow).
+    С application token (client_credentials) всегда возвращает 404.
+    """
     cache_key = f"char_profile:{region}:{character}"
     cached = api_cache.get(cache_key)
     if cached is not None:
@@ -135,5 +139,9 @@ async def get_character_profile(character: str, region: str = STALCRAFT_REGION) 
         err_str = str(exc)
         logger.warning("Ошибка character profile %s: %s", character, err_str)
         if "404" in err_str:
-            return {"error": f"Персонаж «{character}» не найден. Убедитесь, что имя написано точно как в игре (с учётом регистра)"}
+            return {
+                "error": "Просмотр профилей персонажей требует авторизацию игрока (OAuth2 user token). "
+                         "Сейчас бот использует application token, который не имеет доступа к этому эндпоинту.",
+                "requires_user_auth": True,
+            }
         return {"error": f"Ошибка API: {err_str[:200]}"}

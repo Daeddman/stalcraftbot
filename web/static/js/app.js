@@ -701,7 +701,15 @@ async function P_player(name){
   if(!name){render(emptyMsg('Укажите имя'));return}
   render(skelRows(3));
   const d=await API.get('/api/character/'+encodeURIComponent(name)+'/profile');
-  if(d.error){render('<a class="back" onclick="history.back()">← Назад</a>'+emptyMsg(d.error));return}
+  if(d.error){
+    let h='<a class="back" onclick="history.back()">← Назад</a>';
+    if(d.requires_user_auth){
+      h+='<div class="empty"><div class="empty-i">🔒</div><div class="empty-t">Профиль игрока «'+escHtml(name)+'»</div><div style="color:var(--t3);font-size:13px;padding:0 16px;text-align:center;margin-top:8px">Просмотр профилей персонажей требует авторизацию через игровой аккаунт EXBO (OAuth2).<br><br>Сейчас бот работает в режиме приложения и не имеет доступа к этому разделу API.</div></div>';
+    } else {
+      h+=emptyMsg(d.error);
+    }
+    render(h);return;
+  }
   let h='<a class="back" onclick="history.back()">← Назад</a>';
   // Banner & name
   h+='<div class="prof-banner" style="height:80px"></div>';
