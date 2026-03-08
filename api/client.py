@@ -117,6 +117,9 @@ class StalcraftClient:
                     await asyncio.sleep(wait)
                     continue
 
+                if resp.status_code == 404:
+                    resp.raise_for_status()
+
                 if resp.status_code == 400:
                     try:
                         body = resp.json()

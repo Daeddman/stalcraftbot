@@ -99,8 +99,11 @@ async def get_clan_info(clan_id: str, region: str = STALCRAFT_REGION) -> dict[st
         api_cache.set(cache_key, data, ttl=300)
         return data
     except Exception as exc:
-        logger.warning("Ошибка clan info %s: %s", clan_id, exc)
-        return {"error": str(exc)}
+        err_str = str(exc)
+        logger.warning("Ошибка clan info %s: %s", clan_id, err_str)
+        if "404" in err_str:
+            return {"error": "Клан не найден"}
+        return {"error": f"Ошибка API: {err_str[:200]}"}
 
 
 async def get_clan_members(clan_id: str, region: str = STALCRAFT_REGION) -> dict[str, Any]:
@@ -129,5 +132,8 @@ async def get_character_profile(character: str, region: str = STALCRAFT_REGION) 
         api_cache.set(cache_key, data, ttl=180)
         return data
     except Exception as exc:
-        logger.warning("Ошибка character profile %s: %s", character, exc)
-        return {"error": str(exc)}
+        err_str = str(exc)
+        logger.warning("Ошибка character profile %s: %s", character, err_str)
+        if "404" in err_str:
+            return {"error": f"Персонаж «{character}» не найден. Проверьте имя — формат: Ник-1 (например Test-1)"}
+        return {"error": f"Ошибка API: {err_str[:200]}"}

@@ -88,7 +88,7 @@ async function route(){
     else if(pg==='clan')await P_clan(p[1]);
     else if(pg==='clans')await P_clans();
     else if(pg==='leaderboard')await P_leaderboard();
-    else if(pg==='player')await P_player(p.slice(1).join('/'));
+    else if(pg==='player')await P_player(decodeURIComponent(p.slice(1).join('/')));
     else if(pg==='market')await P_market(p[1]);
     else if(pg==='market-create')P_market_create();
     else if(pg==='market-my')await P_market_my();
@@ -701,7 +701,7 @@ async function P_player(name){
   if(!name){render(emptyMsg('Укажите имя'));return}
   render(skelRows(3));
   const d=await API.get('/api/character/'+encodeURIComponent(name)+'/profile');
-  if(d.error){render('<a class="back" onclick="history.back()">← Назад</a>'+emptyMsg('Профиль не найден: '+d.error));return}
+  if(d.error){render('<a class="back" onclick="history.back()">← Назад</a>'+emptyMsg(d.error));return}
   let h='<a class="back" onclick="history.back()">← Назад</a>';
   // Banner & name
   h+='<div class="prof-banner" style="height:80px"></div>';
