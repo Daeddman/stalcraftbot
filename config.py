@@ -33,7 +33,7 @@ WEBAPP_PORT: int = int(os.getenv("WEBAPP_PORT", ""))
 WEBAPP_URL: str = os.getenv("WEBAPP_URL", "")  # публичный HTTPS URL для Telegram WebApp
 
 # ── Rate Limiting ──
-MAX_REQUESTS_PER_SECOND: int = 2
+MAX_REQUESTS_PER_SECOND: int = 5
 
 # ── Категории предметов (красивые названия) ──
 CATEGORY_NAMES: dict[str, str] = {

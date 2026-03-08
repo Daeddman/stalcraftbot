@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, Depends, Query
 from api.emission import get_emission
-from api.characters import get_clan_info, get_clan_members, get_character_profile, get_clans_list
+from api.characters import get_clan_info, get_clan_members, get_character_profile, get_clans_list, search_clans
 from db.models import SessionLocal, EmissionNotifySetting, User, MarketListing, ReputationReview, UserFollow
 from web.auth import get_current_user, require_user
 from sqlalchemy import func
@@ -67,6 +67,14 @@ async def clans_list(
 ):
     """Список всех кланов региона."""
     return await get_clans_list(offset=offset, limit=limit)
+
+
+@router.get("/clans/search")
+async def clans_search(q: str = Query("", description="Поиск по названию/тегу")):
+    """Серверный поиск по всем кланам региона."""
+    if not q.strip():
+        return await get_clans_list(offset=0, limit=20)
+    return await search_clans(q.strip())
 
 
 @router.get("/clan/{clan_id}")

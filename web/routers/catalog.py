@@ -408,7 +408,7 @@ async def home_data():
         "popular": pop,
         "market": {"items": mkt_items, "total": len(mkt_items)},
     }
-    api_cache.set("home_data", result, ttl=30)
+    api_cache.set("home_data", result, ttl=60)
     return result
 
 

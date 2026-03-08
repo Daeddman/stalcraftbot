@@ -49,8 +49,8 @@ _bucket = _TokenBucket(rate=MAX_REQUESTS_PER_SECOND)
 class StalcraftClient:
     """HTTP-клиент к Stalcraft API с rate-limiting и retry."""
 
-    MAX_RETRIES = 5
-    BACKOFF_BASE = 1.5
+    MAX_RETRIES = 3
+    BACKOFF_BASE = 1.0
 
     def __init__(self) -> None:
         self._client: httpx.AsyncClient | None = None
@@ -59,8 +59,8 @@ class StalcraftClient:
         if self._client is None or self._client.is_closed:
             self._client = httpx.AsyncClient(
                 base_url=API_BASE_URL,
-                timeout=30.0,
-                limits=httpx.Limits(max_connections=10, max_keepalive_connections=5),
+                timeout=15.0,
+                limits=httpx.Limits(max_connections=20, max_keepalive_connections=10),
             )
         return self._client
 

@@ -80,11 +80,11 @@ class TTLCache:
 # ── Глобальные экземпляры кешей ──
 
 # Для аукционных данных (лоты, история)
-auction_cache = TTLCache(maxsize=512, default_ttl=60)
+auction_cache = TTLCache(maxsize=2048, default_ttl=90)
 
-# Для API-ответов (emission, catalog)
-api_cache = TTLCache(maxsize=256, default_ttl=30)
+# Для API-ответов (emission, catalog, clans)
+api_cache = TTLCache(maxsize=1024, default_ttl=60)
 
 # Для тяжёлых вычислений (popular items, chart-data)
-compute_cache = TTLCache(maxsize=128, default_ttl=300)
+compute_cache = TTLCache(maxsize=512, default_ttl=300)
 

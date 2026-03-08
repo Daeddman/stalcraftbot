@@ -816,19 +816,19 @@ async function P_clans(){
   h+='<div class="srch" style="margin-bottom:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
   h+='<input id="clan-search" placeholder="Поиск клана по названию или тегу..." value="'+escHtml(_clansSearch)+'">';
   h+='</div>';
-  // Fetch
-  const limit=50;
-  const offset=_clansPage*limit;
-  const d=await API.get('/api/clans?offset='+offset+'&limit='+limit);
+  // Fetch — server-side search if query, otherwise paginated list
+  let d;
+  if(_clansSearch){
+    d=await API.get('/api/clans/search?q='+encodeURIComponent(_clansSearch));
+  } else {
+    const limit=50;
+    const offset=_clansPage*limit;
+    d=await API.get('/api/clans?offset='+offset+'&limit='+limit);
+  }
   if(d.error&&!d.data){h+=emptyMsg('Ошибка загрузки: '+d.error);render(h);setupClanSearch();return}
   let clans=d.data||[];
   const totalFromApi=d.totalClans||0;
-  if(d.totalClans)h+='<div style="font-size:12px;color:var(--t3);margin-bottom:12px">Всего: '+totalFromApi+' кланов</div>';
-  // Client-side filter
-  if(_clansSearch){
-    const q=_clansSearch.toLowerCase();
-    clans=clans.filter(c=>(c.name||'').toLowerCase().includes(q)||(c.tag||'').toLowerCase().includes(q)||(c.alliance||'').toLowerCase().includes(q));
-  }
+  if(totalFromApi)h+='<div style="font-size:12px;color:var(--t3);margin-bottom:12px">'+(_clansSearch?'Найдено: '+totalFromApi:'Всего: '+totalFromApi+' кланов')+'</div>';
   if(!clans.length){h+=emptyMsg(_clansSearch?'По запросу «'+escHtml(_clansSearch)+'» ничего не найдено':'Кланы не найдены');render(h);setupClanSearch();return}
   for(const c of clans){
     h+='<div class="clan-card" onclick="go(\'#/clan/'+c.id+'\')">';
@@ -840,8 +840,9 @@ async function P_clans(){
     h+='<div class="clan-level">Lvl '+(c.level||'?')+'</div>';
     h+='</div>';
   }
-  // Pagination (only if not searching — search is within loaded page)
+  // Pagination (only when not searching)
   if(!_clansSearch){
+    const limit=50;
     const totalPages=Math.max(1,Math.ceil(totalFromApi/limit));
     const curPage=_clansPage+1;
     if(totalPages>1){
