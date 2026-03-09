@@ -19,8 +19,8 @@ from services.scanner import _parse_additional
 
 logger = logging.getLogger(__name__)
 
-# Пауза между запросами к API (rate limit = 2 req/s)
-_API_DELAY = 0.55
+# Пауза между запросами к API (rate limit = 10 req/s)
+_API_DELAY = 0.15
 _BATCH_SIZE = 200  # максимум API
 
 

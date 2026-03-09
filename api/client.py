@@ -59,8 +59,9 @@ class StalcraftClient:
         if self._client is None or self._client.is_closed:
             self._client = httpx.AsyncClient(
                 base_url=API_BASE_URL,
-                timeout=15.0,
-                limits=httpx.Limits(max_connections=20, max_keepalive_connections=10),
+                timeout=10.0,
+                limits=httpx.Limits(max_connections=40, max_keepalive_connections=20),
+                http2=True,
             )
         return self._client
 

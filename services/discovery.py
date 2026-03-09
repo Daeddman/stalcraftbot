@@ -27,8 +27,8 @@ logger = logging.getLogger("discovery")
 
 PAGE_SIZE = 200   # макс лотов за запрос (API limit)
 MAX_PAGES_PER_ITEM = 10  # макс страниц на один предмет
-SCAN_DELAY = 0.25  # задержка между запросами (rate limit)
-BATCH_SIZE = 5     # кол-во параллельных запросов
+SCAN_DELAY = 0.12  # задержка между запросами (rate limit = 10 req/s)
+BATCH_SIZE = 8     # кол-во параллельных запросов
 
 
 # ══════════════════════════════════════════════════════════════
@@ -318,6 +318,53 @@ async def run_discovery_scan(region: str = STALCRAFT_REGION) -> dict[str, int]:
         stats["total_lots"], stats["new_items"], stats["disappeared"], stats["samples"],
     )
     return stats
+
+
+async def run_priority_scan(region: str = STALCRAFT_REGION) -> dict[str, int]:
+    """
+    Быстрое сканирование приоритетных предметов (tracked + popular).
+    Запускается чаще основного скана для актуальности часто просматриваемых предметов.
+    """
+    from db.models import TrackedItem, ItemPriceStats as IPS
+
+    priority_ids: set[str] = set()
+
+    with SessionLocal() as session:
+        # Tracked items
+        tracked = session.query(TrackedItem.item_id).filter(TrackedItem.is_active == True).all()
+        for (iid,) in tracked:
+            priority_ids.add(iid)
+
+        # Items with active lots (popular)
+        popular = session.query(IPS.item_id).filter(
+            IPS.lots_count > 0
+        ).order_by(IPS.lots_count.desc()).limit(50).all()
+        for (iid,) in popular:
+            priority_ids.add(iid)
+
+    if not priority_ids:
+        return {"total_lots": 0, "new_items": 0, "disappeared": 0, "samples": 0}
+
+    logger.debug("⚡ Priority scan: %d предметов", len(priority_ids))
+
+    all_lots: list[dict] = []
+    id_list = list(priority_ids)
+
+    for i in range(0, len(id_list), BATCH_SIZE):
+        batch = id_list[i:i + BATCH_SIZE]
+        tasks = [_fetch_item_lots(iid, region) for iid in batch]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        for result in results:
+            if isinstance(result, list):
+                all_lots.extend(result)
+        await asyncio.sleep(SCAN_DELAY)
+
+    if all_lots:
+        stats = _process_lots(all_lots, region)
+        logger.debug("⚡ Priority scan: %d лотов обработано", stats["total_lots"])
+        return stats
+
+    return {"total_lots": 0, "new_items": 0, "disappeared": 0, "samples": 0}
 
 
 def sync_official_db_to_registry() -> int:

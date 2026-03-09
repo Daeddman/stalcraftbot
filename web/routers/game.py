@@ -79,17 +79,35 @@ async def clans_search(q: str = Query("", description="Поиск по назв�
 
 @router.get("/clan/{clan_id}")
 async def clan_info(clan_id: str):
-    return await get_clan_info(clan_id)
+    cached = compute_cache.get(f"clan:{clan_id}")
+    if cached is not None:
+        return cached
+    result = await get_clan_info(clan_id)
+    if not result.get("error"):
+        compute_cache.set(f"clan:{clan_id}", result, ttl=300)
+    return result
 
 
 @router.get("/clan/{clan_id}/members")
 async def clan_members(clan_id: str):
-    return await get_clan_members(clan_id)
+    cached = compute_cache.get(f"clan_m:{clan_id}")
+    if cached is not None:
+        return cached
+    result = await get_clan_members(clan_id)
+    if not isinstance(result, dict) or not result.get("error"):
+        compute_cache.set(f"clan_m:{clan_id}", result, ttl=300)
+    return result
 
 
 @router.get("/character/{name}/profile")
 async def character_profile(name: str):
-    return await get_character_profile(name)
+    cached = compute_cache.get(f"char:{name}")
+    if cached is not None:
+        return cached
+    result = await get_character_profile(name)
+    if not isinstance(result, dict) or not result.get("error"):
+        compute_cache.set(f"char:{name}", result, ttl=180)
+    return result
 
 
 # ═══════════════════════════════════════════════

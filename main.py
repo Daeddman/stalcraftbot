@@ -319,10 +319,27 @@ async def main() -> None:
 
     scheduler.add_job(
         _discovery_job, "interval",
-        minutes=10,
+        minutes=5,
         id="discovery_scan",
         name="Discovery: обход аукциона по предметам",
         misfire_grace_time=120,
+        max_instances=1,
+    )
+
+    # Приоритетное сканирование tracked/popular предметов (каждые 2 мин)
+    async def _priority_scan_job():
+        try:
+            from services.discovery import run_priority_scan
+            await run_priority_scan()
+        except Exception as exc:
+            logger.debug("Priority scan: %s", exc)
+
+    scheduler.add_job(
+        _priority_scan_job, "interval",
+        minutes=2,
+        id="priority_scan",
+        name="Discovery: быстрое сканирование приоритетных предметов",
+        misfire_grace_time=60,
         max_instances=1,
     )
 
