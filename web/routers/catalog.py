@@ -79,7 +79,11 @@ async def get_category_items(
 
 @router.get("/items/{item_id}")
 async def get_item(item_id: str):
-    """Полные данные предмета."""
+    """Полные данные предмета (кеш 5 мин)."""
+    cached = api_cache.get(f"item:{item_id}")
+    if cached is not None:
+        return cached
+
     item = item_db.get(item_id)
     if not item:
         return {"error": "not_found"}
@@ -89,7 +93,7 @@ async def get_item(item_id: str):
 
     is_art = item.category.startswith("artefact")
 
-    return {
+    result = {
         "id": item.item_id,
         "name": item.name_ru,
         "name_en": item.name_en,
@@ -102,6 +106,8 @@ async def get_item(item_id: str):
         "api_supported": item.api_supported,
         "stats": stats,
     }
+    api_cache.set(f"item:{item_id}", result, ttl=300)
+    return result
 
 
 @router.get("/search")
@@ -110,6 +116,10 @@ async def search_items(
     limit: int = 20,
     sort: str = "relevance",
 ):
+    cache_key = f"search:{q}:{limit}:{sort}"
+    cached = api_cache.get(cache_key)
+    if cached is not None:
+        return cached
     results = item_db.search(q, limit=limit)
     if sort == "name":
         results.sort(key=lambda x: x.name_ru)
@@ -117,7 +127,9 @@ async def search_items(
         rank_order = {"RANK_LEGEND": 0, "RANK_MASTER": 1, "RANK_VETERAN": 2, "RANK_STALKER": 3, "RANK_NEWBIE": 4, "DEFAULT": 5}
         results.sort(key=lambda x: (rank_order.get(x.color, 9), x.name_ru))
     # sort == "relevance" — оставляем порядок поисковика
-    return [_item_short(i) for i in results]
+    out = [_item_short(i) for i in results]
+    api_cache.set(cache_key, out, ttl=120)
+    return out
 
 
 @router.get("/popular")
@@ -361,13 +373,18 @@ async def home_data():
     if cached is not None:
         return cached
 
+    import asyncio
     from api.emission import get_emission
     from db.models import MarketListing, User as UserModel
 
-    # Emission (cached internally at 15s)
-    emi = await get_emission()
+    # Emission с таймаутом 3 сек — не блокируем главную
+    try:
+        emi = await asyncio.wait_for(get_emission(), timeout=3.0)
+    except asyncio.TimeoutError:
+        emi = {"currentStart": None, "currentEnd": None,
+               "previousStart": None, "previousEnd": None}
 
-    # Popular items (cached internally at 300s)
+    # Popular items (cached internally at 600s)
     pop = await popular_items(limit=8)
 
     # Recent market listings — lightweight inline query

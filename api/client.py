@@ -61,7 +61,6 @@ class StalcraftClient:
                 base_url=API_BASE_URL,
                 timeout=10.0,
                 limits=httpx.Limits(max_connections=40, max_keepalive_connections=20),
-                http2=True,
             )
         return self._client
 

@@ -263,27 +263,28 @@ async function P_auc(id,lp,sp){
   // Show skeleton
   render(skelBlock()+'<div class="sec">Загрузка...</div>'+skelRows(5));
 
-  const item=await API.get('/api/items/'+id);
-  if(item.api_supported===false){render('<a class="back" href="#/item/'+id+'">← Назад</a>'+warnBox('Недоступно','API не поддерживает.'));return}
-  const isA=!!item.is_artefact, nm=item.name||id;
-
-  // Build lots URL with quality filter
+  // Build lots URL (always pass quality filter — server handles it)
   const lOff=(lp-1)*S.lotPP;
   let lotsUrl='/api/auction/'+id+'/lots?limit='+S.lotPP+'&offset='+lOff+'&sort='+S.lotSort+'&order='+S.lotOrder;
-  if(isA&&S.lotQlt!=='all')lotsUrl+='&quality='+S.lotQlt;
+  if(S.lotQlt!=='all')lotsUrl+='&quality='+S.lotQlt;
 
-  // Build history URL with quality + upgrade + sort
+  // Build history URL
   const sOff=(sp-1)*S.salePP;
   let histUrl='/api/auction/'+id+'/history?limit='+S.salePP+'&offset='+sOff+'&sort='+S.saleSort;
-  if(isA&&S.saleQlt!=='all')histUrl+='&quality='+S.saleQlt;
-  if(isA&&S.saleUpg!=='all')histUrl+='&upgrade='+S.saleUpg;
+  if(S.saleQlt!=='all')histUrl+='&quality='+S.saleQlt;
+  if(S.saleUpg!=='all')histUrl+='&upgrade='+S.saleUpg;
 
-  const [ld,hd,syncSt,chartD]=await Promise.all([
+  // ALL requests in parallel (item info + 4 auction queries)
+  const [item,ld,hd,syncSt,chartD]=await Promise.all([
+    API.get('/api/items/'+id),
     API.get(lotsUrl),
     API.get(histUrl),
     API.get('/api/auction/'+id+'/sync-status').catch(()=>({})),
     API.get('/api/auction/'+id+'/chart-data?days='+S.chartDays+(S.chartQlt!=='all'?'&quality='+S.chartQlt:'')).catch(()=>({points:[]})),
   ]);
+
+  if(item.api_supported===false){render('<a class="back" href="#/item/'+id+'">← Назад</a>'+warnBox('Недоступно','API не поддерживает.'));return}
+  const isA=!!item.is_artefact, nm=item.name||id;
 
   const lots=ld.lots||[];
   const sales=hd.prices||[];

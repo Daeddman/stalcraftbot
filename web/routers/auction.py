@@ -81,15 +81,23 @@ async def lots(
         rows = q.offset(offset).limit(limit).all()
         lots_list = [_active_lot_to_dict(r) for r in rows]
 
-    # Если в БД пусто — fallback на единичный API-запрос (не цепочку!)
+    # Если в БД пусто — fallback на единичный API-запрос с кешем
     if total == 0 and quality == -99:
+        cache_key = f"lots_fb:{item_id}:{offset}:{limit}:{sort}:{order}"
+        cached = auction_cache.get(cache_key)
+        if cached is not None:
+            return cached
         try:
-            data = await get_active_lots(
-                item_id, limit=limit, offset=offset,
-                sort=sort, order=order, additional=True,
+            data = await asyncio.wait_for(
+                get_active_lots(
+                    item_id, limit=limit, offset=offset,
+                    sort=sort, order=order, additional=True,
+                ),
+                timeout=5.0,
             )
+            auction_cache.set(cache_key, data, ttl=120)
             return data
-        except Exception:
+        except (asyncio.TimeoutError, Exception):
             pass
 
     return {"lots": lots_list, "total": total}
@@ -116,13 +124,20 @@ async def history(
     if db_result["total"] > 0:
         return db_result
 
-    # Данных нет — запускаем фоновую синхронизацию и пробуем единичный API-запрос
+    # Данных нет — запускаем фоновую синхронизацию
     _trigger_bg_sync(item_id)
 
-    # Быстрый одноразовый запрос к API (1 запрос, не цепочка)
+    # Быстрый одноразовый запрос к API с таймаутом и кешем
+    cache_key = f"hist_fb:{item_id}:{offset}:{limit}"
+    cached = auction_cache.get(cache_key)
+    if cached is not None:
+        return cached
     try:
-        data = await get_price_history(
-            item_id, limit=min(limit, 200), offset=offset, additional=True,
+        data = await asyncio.wait_for(
+            get_price_history(
+                item_id, limit=min(limit, 200), offset=offset, additional=True,
+            ),
+            timeout=5.0,
         )
         prices = data.get("prices", [])
         if prices:
@@ -134,8 +149,10 @@ async def history(
                 prices.sort(key=lambda p: p.get("price", 0), reverse=True)
             elif sort == "price_asc":
                 prices.sort(key=lambda p: p.get("price", 0))
-            return {"prices": prices[:limit], "total": data.get("total", len(prices)), "syncing": True}
-    except Exception:
+            result = {"prices": prices[:limit], "total": data.get("total", len(prices)), "syncing": True}
+            auction_cache.set(cache_key, result, ttl=120)
+            return result
+    except (asyncio.TimeoutError, Exception):
         pass
 
     return {"prices": [], "total": 0, "syncing": True}

@@ -11,6 +11,7 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from config import GAME_DB_DIR, STALCRAFT_REGION, BASE_DIR
@@ -60,6 +61,9 @@ class CacheControlMiddleware(BaseHTTPMiddleware):
 
 
 app.add_middleware(CacheControlMiddleware)
+
+# GZip — сжатие JSON и статики для ускорения передачи
+app.add_middleware(GZipMiddleware, minimum_size=500)
 
 app.add_middleware(
     CORSMiddleware,
